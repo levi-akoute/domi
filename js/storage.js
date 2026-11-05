@@ -25,13 +25,21 @@
   const maVerification=uid=>ok(client().from("verification_requests").select("*").eq("user_id",uid).order("created_at",{ascending:false}).limit(1));
 
   // Admin
-  const adminAnnonces=()=>ok(L().select("*, profiles(nom,prenom,telephone)").order("created_at",{ascending:false}).limit(300));
+  const adminAnnonces=()=>ok(L().select("*, profiles!owner_id(nom,prenom,telephone)").order("created_at",{ascending:false}).limit(300));
   const adminUsers=()=>ok(client().from("profiles").select("*").order("created_at",{ascending:false}));
   const adminReports=()=>ok(client().from("reports").select("*, listings(id,titre)").order("created_at",{ascending:false}).limit(200));
   const updateReport=(id,status)=>ok(client().from("reports").update({status}).eq("id",id));
   const getVerifications=()=>ok(client().from("verification_requests").select("*, profiles(nom,prenom,telephone)").order("created_at",{ascending:false}));
   const decideVerification=(id,approve,note)=>ok(client().rpc("decide_verification",{p_id:id,p_approve:approve,p_note:note||null}));
   const lienDocument=async path=>{const {data,error}=await client().storage.from("verifications").createSignedUrl(path,300);if(error)throw new Error(fixMsg(error.message));return data.signedUrl;};
+
+  // Avis
+  const getAvis=id=>ok(client().from("reviews").select("*").eq("listing_id",id).eq("status","approuve").order("created_at",{ascending:false}).limit(30));
+  const monAvis=async(id,uid)=>{const r=await ok(client().from("reviews").select("*").eq("listing_id",id).eq("author_id",uid).limit(1));return r&&r[0]||null;};
+  const ajouterAvis=r=>ok(client().from("reviews").insert(r));
+  const adminAvis=()=>ok(client().from("reviews").select("*, listings(id,titre)").order("created_at",{ascending:false}).limit(200));
+  const updateAvis=(id,status)=>ok(client().from("reviews").update({status}).eq("id",id));
+  const supprimerAvis=id=>ok(client().from("reviews").delete().eq("id",id));
 
   // Fichiers : photos compressées (WebP 1280 px max) → bucket public « annonces »
   async function compress(file,max=1280){
@@ -60,5 +68,5 @@
     if(up.error)throw new Error(fixMsg(up.error.message));
     return ok(client().from("verification_requests").insert({user_id:uid,document_type:type,document_path:path}));
   }
-  window.ImmoStorage={fixMsg,isConfigured:()=>configured,client,getAnnonces,getAnnonce,vue,clicWhatsapp,signaler,getMesAnnonces,ajouterAnnonce,updateAnnonce,supprimerAnnonce,maVerification,adminAnnonces,adminUsers,adminReports,updateReport,getVerifications,decideVerification,lienDocument,uploadPhotos,soumettreVerification};
+  window.ImmoStorage={fixMsg,isConfigured:()=>configured,client,getAnnonces,getAnnonce,vue,clicWhatsapp,signaler,getMesAnnonces,ajouterAnnonce,updateAnnonce,supprimerAnnonce,maVerification,adminAnnonces,adminUsers,adminReports,updateReport,getVerifications,decideVerification,lienDocument,uploadPhotos,soumettreVerification,getAvis,monAvis,ajouterAvis,adminAvis,updateAvis,supprimerAvis};
 })();

@@ -1,15 +1,10 @@
-# Domi — plateforme de location immobilière (v3, nouvelle identité)
+# Domi — plateforme de location immobilière (v4)
 
-Site statique (HTML/CSS/JS) + base Supabase. **Même base de données et même `js/config.js` que la v2 : aucune nouvelle procédure.**
+Site statique (HTML/CSS/JS) + base Supabase.
 
-## Mise à jour depuis la v2
-1. Gardez votre fichier **`js/config.js`** (il contient vos clés). Ne le remplacez pas.
-2. Remplacez tout le reste du dossier par celui de ce zip.
-3. Ctrl+F5 dans le navigateur.
-
-## Changer le nom du site
-Dans VS Code : **Ctrl+Maj+H** → rechercher `Domi` → remplacer par le nouveau nom → *Remplacer tout*. Ne modifiez pas `EMAIL_DOMAIN` dans `config.js` (identifiant interne des comptes).
-Le logo est dans `js/utils.js` (constante `MARK`) et `assets/img/favicon.svg`. Les couleurs sont les variables en haut de `css/style.css`.
-
-## Mise en route, base de données, admin
-Voir `docs/GUIDE_MISE_EN_LIGNE.md` (inchangé).
+- **Mise à jour depuis une version précédente : `docs/GUIDE_MISE_A_JOUR.md`**
+- Première installation : `docs/GUIDE_MISE_EN_LIGNE.md`
+- Base de données : `database/01` (schéma), `02` (exemples), `03` (admin), `04` (mot de passe), `05` (avis et notes)
+- Configuration : `js/config.js` (à créer à partir de `js/config.exemple.js`, jamais écrasé par les mises à jour)
+- Nom du site : Ctrl+Maj+H dans VS Code, remplacer `Domi`. Couleurs : variables en haut de `css/style.css`.
+- Support : WhatsApp uniquement (+225 05 44 40 88 52)
