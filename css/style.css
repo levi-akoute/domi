@@ -158,3 +158,16 @@ input[type=file]{padding:11px;background:var(--cream)}label.check{flex-direction
   .wa-float{right:14px;bottom:16px;padding:0;width:56px;height:56px;justify-content:center}.wa-float span{display:none}body.is-detail .wa-float{display:none}
   .lightbox img{inset:70px 8px;max-width:calc(100% - 16px)}.tip{grid-template-columns:48px 1fr}
 }
+
+
+/* ═══ v4.1 — navigation : Accueil, bouton maison mobile, menu adapté aux tablettes ═══ */
+.nav-tools{display:none;align-items:center;gap:8px}
+.home-btn{width:44px;height:44px;border:1.5px solid var(--line);border-radius:12px;background:#fff;display:grid;place-items:center;color:var(--forest)}
+.home-btn .ic{width:1.35em;height:1.35em}.home-btn[aria-current]{background:var(--forest);border-color:var(--forest);color:#fff}
+.main-nav a{white-space:nowrap}
+@media(max-width:1040px){
+  .nav-tools{display:flex}.menu-toggle{display:flex}
+  .main-nav{display:none;position:absolute;left:0;right:0;top:74px;flex-direction:column;align-items:stretch;background:var(--cream);padding:12px 20px 22px;border-bottom:1px solid var(--line);gap:2px;box-shadow:0 18px 30px rgba(11,59,53,.08)}
+  .main-nav.open{display:flex}.main-nav .nav-cta{margin:8px 0 0;text-align:center}
+  .main-nav a,.logout-link{padding:13px 14px;text-align:left}
+}
