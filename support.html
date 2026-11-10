@@ -1,6 +1,87 @@
-<!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0B3B35"><title>Support — Domi</title><meta name="description" content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."><meta property="og:title" content="Support — Domi"><meta property="og:description" content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."><meta property="og:type" content="website"><link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"></head>
-<body><header id="site-header"></header><main class="container"><div class="page-head" style="padding-left:0"><span class="eyebrow">Support</span><h1>Nous sommes là pour vous écouter.</h1><p>Notre support est disponible uniquement sur WhatsApp. Écrivez-nous, nous répondons dès que possible.</p></div>
-<div class="support-grid"><div class="support-card"><h3>Poser une question</h3><p>Fonctionnement du site, publication d’une annonce, badge vérifié…</p><a class="btn btn-primary" data-wa="Bonjour Domi, j’ai une question : " href="#">Écrire sur WhatsApp</a></div><div class="support-card"><h3>Signaler une annonce suspecte</h3><p>Un doute, une demande d’argent inhabituelle ? Envoyez-nous le lien de l’annonce.</p><a class="btn btn-primary" data-wa="Bonjour Domi, je souhaite signaler cette annonce (collez le lien) : " href="#">Signaler sur WhatsApp</a></div><div class="support-card"><h3>Problème de compte</h3><p>Mot de passe oublié, connexion impossible, modification de vos informations.</p><a class="btn btn-primary" data-wa="Bonjour Domi, j’ai un problème avec mon compte. Mon numéro : " href="#">Demander de l’aide</a></div></div>
-<div class="detail-section" style="margin:28px 0 80px"><h2>Notre numéro</h2><p class="lead" style="margin:0"><strong id="support-number"></strong> <span class="muted">(WhatsApp uniquement, pas d’appels)</span></p><p class="fine-print">Pour votre sécurité, ne nous communiquez jamais de code reçu par SMS ni de code Mobile Money : nous ne vous les demanderons jamais.</p></div></main><footer id="site-footer"></footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="js/config.js"></script><script src="js/utils.js"></script><script src="js/storage.js"></script><script src="js/auth.js"></script><script src="js/support.js"></script></body></html>
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0B3B35" />
+    <title>Support — Domi</title>
+    <meta
+      name="description"
+      content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."
+    />
+    <meta property="og:title" content="Support — Domi" />
+    <meta
+      property="og:description"
+      content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header id="site-header"></header>
+    <main class="container">
+      <div class="page-head" style="padding-left: 0">
+        <span class="eyebrow">Support</span>
+        <h1>Nous sommes là pour vous écouter.</h1>
+        <p>
+          Notre support est disponible uniquement sur WhatsApp. Écrivez-nous, nous répondons dès que
+          possible.
+        </p>
+      </div>
+      <div class="support-grid">
+        <div class="support-card">
+          <h3>Poser une question</h3>
+          <p>Fonctionnement du site, publication d’une annonce, badge vérifié…</p>
+          <a class="btn btn-primary" data-wa="Bonjour Domi, j’ai une question : " href="#"
+            >Écrire sur WhatsApp</a
+          >
+        </div>
+        <div class="support-card">
+          <h3>Signaler une annonce suspecte</h3>
+          <p>Un doute, une demande d’argent inhabituelle ? Envoyez-nous le lien de l’annonce.</p>
+          <a
+            class="btn btn-primary"
+            data-wa="Bonjour Domi, je souhaite signaler cette annonce (collez le lien) : "
+            href="#"
+            >Signaler sur WhatsApp</a
+          >
+        </div>
+        <div class="support-card">
+          <h3>Problème de compte</h3>
+          <p>Mot de passe oublié, connexion impossible, modification de vos informations.</p>
+          <a
+            class="btn btn-primary"
+            data-wa="Bonjour Domi, j’ai un problème avec mon compte. Mon numéro : "
+            href="#"
+            >Demander de l’aide</a
+          >
+        </div>
+      </div>
+      <div class="detail-section" style="margin: 28px 0 80px">
+        <h2>Notre numéro</h2>
+        <p class="lead" style="margin: 0">
+          <strong id="support-number"></strong>
+          <span class="muted">(WhatsApp uniquement, pas d’appels)</span>
+        </p>
+        <p class="fine-print">
+          Pour votre sécurité, ne nous communiquez jamais de code reçu par SMS ni de code Mobile
+          Money : nous ne vous les demanderons jamais.
+        </p>
+      </div>
+    </main>
+    <footer id="site-footer"></footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/support.js"></script>
+  </body>
+</html>
