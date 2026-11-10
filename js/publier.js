@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           caution: Number(d.get("caution")) || 0,
           etage: d.get("etage").trim() || null,
           chambres: Number(d.get("chambres")) || 0,
-          video: d.get("video").trim() || null,
+          video: U.safeUrl(d.get("video")) || null, // seuls les liens http(s) sont acceptés
           telephone: ImmoAuth.normalize(d.get("telephone")),
         };
       if (!row.commune) throw new Error("Choisissez une commune.");
