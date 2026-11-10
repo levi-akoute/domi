@@ -1,8 +1,168 @@
-<!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0B3B35"><title>Connexion — Domi</title><meta name="description" content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."><meta property="og:title" content="Connexion — Domi"><meta property="og:description" content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."><meta property="og:type" content="website"><link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"></head>
-<body><header id="site-header"></header><main class="auth-split"><aside class="auth-aside"><span class="eyebrow" style="color:#F3B173">Espace annonceur</span><h2>Louez plus vite, avec des locataires de confiance.</h2><ul><li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Publiez gratuitement, avec photos et visite vidéo.</span></li><li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Suivez les vues et les contacts de chaque annonce.</span></li><li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Obtenez le badge « Propriétaire vérifié » pour rassurer.</span></li></ul></aside>
-<section class="auth-pane"><div class="auth-card"><h1 id="auth-title">Bienvenue sur Domi</h1><div class="tabs"><button type="button" class="active" data-tab="login">Connexion</button><button type="button" data-tab="register">Inscription</button></div>
-<form id="login-form" class="stack"><label>Numéro de téléphone<input name="telephone" type="tel" required placeholder="Ex. 0700000000" autocomplete="tel"></label><label>Mot de passe<input name="password" type="password" required autocomplete="current-password"></label><button class="btn btn-primary btn-block" type="submit">Se connecter</button><p style="margin:0;text-align:center"><a class="text-link" href="mot-de-passe-oublie.html">Mot de passe oublié ?</a></p></form>
-<form id="register-form" class="stack hidden"><div class="two"><label>Prénom<input name="prenom" required autocomplete="given-name"></label><label>Nom<input name="nom" required autocomplete="family-name"></label></div><label>Numéro de téléphone (WhatsApp)<input name="telephone" type="tel" required placeholder="Ex. 0700000000" autocomplete="tel"></label><label>Votre profil<select name="role"><option value="proprietaire">Propriétaire</option><option value="agent">Agent / démarcheur</option></select></label><label>Commune principale<select name="commune" required></select></label><label>Mot de passe (6 caractères minimum)<input name="password" type="password" minlength="6" required autocomplete="new-password"></label><button class="btn btn-primary btn-block" type="submit">Créer mon compte</button><p class="fine-print" style="margin:0">En créant un compte, vous acceptez les <a class="text-link" href="conditions.html">conditions d’utilisation</a>.</p></form>
-<div id="auth-message" class="notice hidden"></div></div></section></main><footer id="site-footer"></footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="js/config.js"></script><script src="js/utils.js"></script><script src="js/storage.js"></script><script src="js/auth.js"></script><script src="js/connexion.js"></script></body></html>
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0B3B35" />
+    <title>Connexion — Domi</title>
+    <meta
+      name="description"
+      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
+    />
+    <meta property="og:title" content="Connexion — Domi" />
+    <meta
+      property="og:description"
+      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta property="og:site_name" content="Domi" />
+    <meta
+      property="og:image"
+      content="https://levi-akoute.github.io/domi/assets/img/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header id="site-header"></header>
+    <main class="auth-split">
+      <aside class="auth-aside">
+        <span class="eyebrow" style="color: #f3b173">Espace annonceur</span>
+        <h2>Louez plus vite, avec des locataires de confiance.</h2>
+        <ul>
+          <li>
+            <svg
+              class="ic"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12.5l4.5 4.5L19 7.5" /></svg
+            ><span>Publiez gratuitement, avec photos et visite vidéo.</span>
+          </li>
+          <li>
+            <svg
+              class="ic"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12.5l4.5 4.5L19 7.5" /></svg
+            ><span>Suivez les vues et les contacts de chaque annonce.</span>
+          </li>
+          <li>
+            <svg
+              class="ic"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12.5l4.5 4.5L19 7.5" /></svg
+            ><span>Obtenez le badge « Propriétaire vérifié » pour rassurer.</span>
+          </li>
+        </ul>
+      </aside>
+      <section class="auth-pane">
+        <div class="auth-card">
+          <h1 id="auth-title">Bienvenue sur Domi</h1>
+          <div class="tabs">
+            <button type="button" class="active" data-tab="login">Connexion</button
+            ><button type="button" data-tab="register">Inscription</button>
+          </div>
+          <form id="login-form" class="stack">
+            <label
+              >Numéro de téléphone<input
+                name="telephone"
+                type="tel"
+                required
+                placeholder="Ex. 0700000000"
+                autocomplete="tel" /></label
+            ><label
+              >Mot de passe<input
+                name="password"
+                type="password"
+                required
+                autocomplete="current-password" /></label
+            ><button class="btn btn-primary btn-block" type="submit">Se connecter</button>
+            <p style="margin: 0; text-align: center">
+              <a class="text-link" href="mot-de-passe-oublie.html">Mot de passe oublié ?</a>
+            </p>
+          </form>
+          <form id="register-form" class="stack hidden">
+            <div class="two">
+              <label>Prénom<input name="prenom" required autocomplete="given-name" /></label
+              ><label>Nom<input name="nom" required autocomplete="family-name" /></label>
+            </div>
+            <label
+              >Numéro de téléphone (WhatsApp)<input
+                name="telephone"
+                type="tel"
+                required
+                placeholder="Ex. 0700000000"
+                autocomplete="tel" /></label
+            ><label
+              >Votre profil<select name="role">
+                <option value="proprietaire">Propriétaire</option>
+                <option value="agent">Agent / démarcheur</option>
+              </select></label
+            ><label>Commune principale<select name="commune" required></select></label>
+            <label
+              >Email de récupération (facultatif, conseillé)<input
+                name="email"
+                type="email"
+                maxlength="120"
+                placeholder="Ex. nom@gmail.com"
+                autocomplete="email"
+              /><small class="field-hint"
+                >Sert uniquement à recevoir un code si vous oubliez votre mot de passe.</small
+              ></label
+            >
+            <label
+              >Mot de passe (8 caractères minimum)<input
+                name="password"
+                type="password"
+                minlength="8"
+                required
+                autocomplete="new-password" /></label
+            ><button class="btn btn-primary btn-block" type="submit">Créer mon compte</button>
+            <p class="fine-print" style="margin: 0">
+              En créant un compte, vous acceptez les
+              <a class="text-link" href="conditions.html">conditions d’utilisation</a>.
+            </p>
+          </form>
+          <div id="auth-message" class="notice hidden"></div>
+        </div>
+      </section>
+    </main>
+    <footer id="site-footer"></footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/connexion.js"></script>
+  </body>
+</html>

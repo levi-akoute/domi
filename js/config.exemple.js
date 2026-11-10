@@ -5,7 +5,31 @@
 window.IMMOCI_CONFIG = {
   SUPABASE_URL: "COLLE_ICI_TON_PROJECT_URL",
   SUPABASE_ANON_KEY: "COLLE_ICI_TA_CLE_ANON",
-  SUPPORT_WHATSAPP: "2250544408852",      // numéro du support, format international sans + (ex. 2250700000000)
-  EMAIL_DOMAIN: "immoci.app",             // sert à fabriquer l'identifiant interne à partir du numéro de téléphone
-  COMMUNES: ["Abobo","Adjamé","Anyama","Attécoubé","Bingerville","Cocody","Koumassi","Marcory","Plateau","Port-Bouët","Songon","Treichville","Yopougon","Grand-Bassam","Yamoussoukro","Bouaké","Daloa","Korhogo","San-Pédro","Man","Gagnoa","Divo","Abengourou"]
+  SUPPORT_WHATSAPP: "2250544408852", // numéro du support, format international sans + (ex. 2250700000000)
+  EMAIL_DOMAIN: "immoci.app", // sert à fabriquer l'identifiant interne à partir du numéro de téléphone
+  COMMUNES: [
+    "Abobo",
+    "Adjamé",
+    "Anyama",
+    "Attécoubé",
+    "Bingerville",
+    "Cocody",
+    "Koumassi",
+    "Marcory",
+    "Plateau",
+    "Port-Bouët",
+    "Songon",
+    "Treichville",
+    "Yopougon",
+    "Grand-Bassam",
+    "Yamoussoukro",
+    "Bouaké",
+    "Daloa",
+    "Korhogo",
+    "San-Pédro",
+    "Man",
+    "Gagnoa",
+    "Divo",
+    "Abengourou",
+  ],
 };

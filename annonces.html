@@ -1,6 +1,159 @@
-<!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0B3B35"><title>Annonces de logements — Domi</title><meta name="description" content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."><meta property="og:title" content="Annonces de logements — Domi"><meta property="og:description" content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."><meta property="og:type" content="website"><link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"></head>
-<body><header id="site-header"></header><main><section class="page-head container"><span class="eyebrow">Catalogue</span><h1>Trouvez le bien qui vous correspond.</h1><p>Filtrez les annonces par commune, type de bien et budget. Toutes sont examinées avant publication.</p></section>
-<div class="container catalog-layout"><aside class="filter-card"><h2>Filtrer</h2><label>Recherche<input id="filter-q" type="search" placeholder="Quartier, titre…"></label><label>Commune<select id="filter-commune"></select></label><label>Type de bien<select id="filter-type"><option value="">Tous les types</option><option>Studio</option><option>Appartement</option><option>Maison</option><option>Villa</option></select></label><label>Loyer maximum (FCFA)<input id="filter-budget" type="number" min="0" step="5000" placeholder="Sans limite"></label><label>Disponibilité<select id="filter-status"><option value="">Toutes</option><option>Disponible</option><option>Déjà loué</option></select></label><label>Trier par<select id="filter-sort"><option value="">Plus récentes</option><option value="prix-asc">Prix croissant</option><option value="prix-desc">Prix décroissant</option></select></label><button id="reset-filters" class="btn btn-outline" type="button">Réinitialiser</button></aside>
-<section><div class="results-head"><strong id="results-count">…</strong><span>Informations fournies par les annonceurs</span></div><div id="all-listings" class="listing-grid"></div><div id="empty-state" class="empty-state hidden"><h3>Aucune annonce ne correspond</h3><p>Essayez d’élargir votre recherche ou de réinitialiser les filtres.</p></div><div class="load-more-wrap"><button id="load-more" class="btn btn-outline hidden" type="button">Afficher plus d’annonces</button></div></section></div></main><footer id="site-footer"></footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="js/config.js"></script><script src="js/utils.js"></script><script src="js/storage.js"></script><script src="js/auth.js"></script><script src="js/annonces.js"></script></body></html>
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0B3B35" />
+    <title>Annonces de logements — Domi</title>
+    <meta
+      name="description"
+      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
+    />
+    <meta property="og:title" content="Annonces de logements — Domi" />
+    <meta
+      property="og:description"
+      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta property="og:site_name" content="Domi" />
+    <meta
+      property="og:image"
+      content="https://levi-akoute.github.io/domi/assets/img/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header id="site-header"></header>
+    <main>
+      <section class="page-head container">
+        <span class="eyebrow">Catalogue</span>
+        <h1>Trouvez le bien qui vous correspond.</h1>
+        <p>
+          Filtrez par commune, budget et nombre de chambres. Chaque annonce est contrôlée par notre
+          équipe ou publiée par un propriétaire vérifié.
+        </p>
+      </section>
+
+      <div class="container catalog-layout">
+        <aside class="filter-card" aria-label="Filtres">
+          <div class="filter-head">
+            <h2>Filtrer</h2>
+            <button
+              type="button"
+              id="close-filters"
+              class="icon-btn"
+              aria-label="Fermer les filtres"
+            >
+              ✕
+            </button>
+          </div>
+          <label
+            >Recherche <input id="filter-q" type="search" placeholder="Quartier, titre…"
+          /></label>
+          <label
+            >Commune
+            <select id="filter-commune"></select
+          ></label>
+          <label
+            >Type de bien
+            <select id="filter-type">
+              <option value="">Tous les types</option>
+              <option>Studio</option>
+              <option>Appartement</option>
+              <option>Maison</option>
+              <option>Villa</option>
+            </select>
+          </label>
+          <div class="two">
+            <label
+              >Loyer min.
+              <input id="filter-budget-min" type="number" min="0" step="5000" placeholder="0"
+            /></label>
+            <label
+              >Loyer max.
+              <input id="filter-budget" type="number" min="0" step="5000" placeholder="Illimité"
+            /></label>
+          </div>
+          <label
+            >Chambres
+            <select id="filter-chambres">
+              <option value="">Peu importe</option>
+              <option value="1">1 ou plus</option>
+              <option value="2">2 ou plus</option>
+              <option value="3">3 ou plus</option>
+              <option value="4">4 ou plus</option>
+            </select>
+          </label>
+          <label
+            >Disponibilité
+            <select id="filter-status">
+              <option value="">Toutes</option>
+              <option>Disponible</option>
+              <option>Déjà loué</option>
+            </select>
+          </label>
+          <label class="check"
+            ><input id="filter-verifie" type="checkbox" /> Propriétaires vérifiés uniquement</label
+          >
+          <label class="check"><input id="filter-video" type="checkbox" /> Avec visite vidéo</label>
+          <button id="reset-filters" class="btn btn-outline btn-block" type="button">
+            Réinitialiser
+          </button>
+        </aside>
+
+        <section>
+          <div class="results-head">
+            <strong id="results-count">…</strong>
+            <div class="results-tools">
+              <button type="button" id="toggle-filters" class="btn btn-outline btn-sm filters-btn">
+                Filtres <b id="filters-count" hidden></b>
+              </button>
+              <label class="sort-label"
+                ><span>Trier</span>
+                <select id="filter-sort">
+                  <option value="">Plus récentes</option>
+                  <option value="frais">Confirmées récemment</option>
+                  <option value="prix-asc">Prix croissant</option>
+                  <option value="prix-desc">Prix décroissant</option>
+                  <option value="note">Mieux notées</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div id="all-listings" class="listing-grid"></div>
+          <div id="empty-state" class="empty-state hidden">
+            <h3>Aucune annonce ne correspond</h3>
+            <p>Essayez d’élargir votre recherche ou de réinitialiser les filtres.</p>
+          </div>
+          <div class="load-more-wrap">
+            <button id="load-more" class="btn btn-outline hidden" type="button">
+              Afficher plus d’annonces
+            </button>
+          </div>
+          <p class="fine-print center">
+            Informations fournies par les annonceurs. Visitez toujours avant de payer.
+          </p>
+        </section>
+      </div>
+    </main>
+    <footer id="site-footer"></footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/annonces.js"></script>
+  </body>
+</html>

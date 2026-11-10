@@ -1,10 +1,23 @@
-# Domi — plateforme de location immobilière (v4)
+# Domi : plateforme de location de logements (v5)
 
-Site statique (HTML/CSS/JS) + base Supabase.
+Site statique (HTML, CSS, JavaScript) + base Supabase, hébergé sur GitHub Pages :
+https://levi-akoute.github.io/domi/
 
-- **Mise à jour depuis une version précédente : `docs/GUIDE_MISE_A_JOUR.md`**
-- Première installation : `docs/GUIDE_MISE_EN_LIGNE.md`
-- Base de données : `database/01` (schéma), `02` (exemples), `03` (admin), `04` (mot de passe), `05` (avis et notes)
-- Configuration : `js/config.js` (à créer à partir de `js/config.exemple.js`, jamais écrasé par les mises à jour)
-- Nom du site : Ctrl+Maj+H dans VS Code, remplacer `Domi`. Couleurs : variables en haut de `css/style.css`.
-- Support : WhatsApp uniquement (+225 05 44 40 88 52)
+## Documentation
+
+| Document | Pour quoi faire |
+|----------|-----------------|
+| `docs/COMPRENDRE_LE_CODE.md` | Comprendre l'architecture, chaque fichier, la sécurité |
+| `docs/GUIDE_MISE_A_JOUR.md` | Installer la v5 (fichiers SQL 06, 07, 08) |
+| `docs/GUIDE_MOT_DE_PASSE_OUBLIE.md` | Activer la récupération du mot de passe par code email |
+| `docs/GUIDE_MISE_EN_LIGNE.md` | Première installation complète |
+| `CHANGELOG.md` | Historique des versions |
+
+## Repères
+
+- Base de données : `database/01` à `08`, à exécuter dans l'ordre dans Supabase → SQL Editor.
+- Fonction serveur : `supabase/functions/reinitialiser-mot-de-passe/index.ts`.
+- Configuration : `js/config.js` (URL et clé **anon** uniquement, jamais la clé `service_role`).
+- Couleurs : variables en haut de `css/style.css`. Logo : `MARK` dans `js/utils.js` et `assets/img/`.
+- Mise en forme du code : `npx prettier --write .` (réglages dans `.prettierrc.json`).
+- Support : WhatsApp (+225 05 44 40 88 52).

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- GitHub Pages affiche cette page pour toute adresse inexistante, même dans un sous-dossier.
+         <base> garantit que css/, js/ et les liens pointent vers la racine du site.
+         ⚠ Avec un nom de domaine : remplacez "/domi/" par "/". -->
+    <base href="/domi/" />
+    <meta name="theme-color" content="#0B3B35" />
+    <title>Page introuvable — Domi</title>
+    <meta
+      name="description"
+      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
+    />
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta property="og:site_name" content="Domi" />
+    <meta
+      property="og:image"
+      content="https://levi-akoute.github.io/domi/assets/img/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header id="site-header"></header>
+    <main class="container notfound">
+      <div class="big">404</div>
+      <h1>Cette page n’existe pas (ou plus).</h1>
+      <p>
+        Le lien est peut-être incomplet, ou l’annonce a été retirée parce que le logement est déjà
+        loué. Les autres logements vous attendent.
+      </p>
+      <div class="btns">
+        <a class="btn btn-primary" href="annonces.html">Voir les annonces</a>
+        <a class="btn btn-outline" href="index.html">Retour à l’accueil</a>
+      </div>
+    </main>
+    <footer id="site-footer"></footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+  </body>
+</html>
