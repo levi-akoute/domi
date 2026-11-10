@@ -8,24 +8,25 @@
    - sécurité du compte : email de récupération et mot de passe
    ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", async () => {
-  document.body.classList.add("is-dashboard");
-  const U = ImmoUtils;
-  const S = ImmoStorage;
-  const A = ImmoAuth;
-  const E = U.escapeHtml;
-  const I = U.icon;
+  document.body.classList.add("is-dashboard"); // classe CSS propre à cette page
+  const U = ImmoUtils; // boîte à outils
+  const S = ImmoStorage; // accès à la base
+  const A = ImmoAuth; // comptes
+  const E = U.escapeHtml; // protection du texte
+  const I = U.icon; // icônes
 
   const user = await A.requireUser(); // redirige vers connexion.html si non connecté
   if (!user) return;
   if (user.role === "admin") {
-    location.href = "admin.html";
+    location.href = "admin.html"; // l'admin a sa propre page
     return;
   }
 
+  // Message d'accueil (textContent : le prénom ne peut pas injecter de code)
   U.qs("#dashboard-welcome").textContent =
     `Bonjour ${user.prenom}, voici les performances de vos annonces.`;
 
-  // Message après publication : immédiat pour un compte vérifié (modération mixte, database/08)
+  // Message après publication (?publie=1) : immédiat pour un compte vérifié (database/08)
   if (U.getParam("publie"))
     U.toast(
       user.verifie
@@ -34,40 +35,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
 
   /* ───────── Petits gabarits ───────── */
+
+  // Pastille d'état de modération
   const badgeModeration = (m) =>
     m === "approuvee"
-      ? '<span class="status-badge static available">Publiée</span>'
+      ? '<span class="status-badge static available">Publiée</span>' // vert
       : m === "rejetee"
-        ? '<span class="status-badge static unavailable">Refusée</span>'
-        : '<span class="status-badge static pending">En validation</span>';
+        ? '<span class="status-badge static unavailable">Refusée</span>' // rouge
+        : '<span class="status-badge static pending">En validation</span>'; // orange
+  // Taux de contact = clics WhatsApp ÷ vues, en pourcentage (« – » s'il n'y a aucune vue)
   const taux = (clics, vues) => (vues ? Math.round((clics / vues) * 100) + " %" : "–");
 
   // Fraîcheur : rappel à 30 jours, masquée du public à 45 jours (réglages dans utils.js)
   function fraicheur(a) {
-    const j = U.daysSince(a.confirmee_le);
-    if (a.moderation !== "approuvee" || a.statut !== "Disponible") return "";
+    const j = U.daysSince(a.confirmee_le); // jours depuis la dernière confirmation
+    if (a.moderation !== "approuvee" || a.statut !== "Disponible") return ""; // seulement les annonces en ligne
     if (j >= U.JOURS_MASQUAGE)
       return `<div class="notice error compact">Masquée du public : non confirmée depuis ${j} jours. Cliquez sur « Confirmer à jour » pour la republier.</div>`;
     if (j >= U.JOURS_RAPPEL)
       return `<div class="notice info compact">Confirmez que ce logement est toujours disponible : sans confirmation, l’annonce sera masquée dans ${U.JOURS_MASQUAGE - j} jour(s).</div>`;
-    return "";
+    return ""; // annonce fraîche : rien à signaler
   }
 
   // Exécute une action, affiche un message, puis rafraîchit la liste
   const act = async (fn, okMsg) => {
     try {
-      await fn();
-      if (okMsg) U.toast(okMsg);
+      await fn(); // l'action (modifier, supprimer…)
+      if (okMsg) U.toast(okMsg); // confirmation
     } catch (e) {
-      U.toast(e.message, "error");
+      U.toast(e.message, "error"); // erreur
     }
-    render();
+    render(); // réaffiche les annonces à jour
   };
 
   /* ───────── Mes annonces ───────── */
   async function render() {
-    const host = U.qs("#owner-listings");
-    let list = [];
+    const host = U.qs("#owner-listings"); // zone de la liste
+    let list = []; // annonces du propriétaire
     try {
       list = await S.getMesAnnonces(user.id);
     } catch (e) {
@@ -75,7 +79,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const sum = (k) => list.reduce((n, a) => n + (Number(a[k]) || 0), 0);
+    // Statistiques globales
+    const sum = (k) => list.reduce((n, a) => n + (Number(a[k]) || 0), 0); // total d'une colonne
     const vues = sum("vues");
     const clics = sum("clics_whatsapp");
     const publiees = list.filter((a) => a.moderation === "approuvee").length;
@@ -86,25 +91,29 @@ document.addEventListener("DOMContentLoaded", async () => {
       ["Taux de contact", taux(clics, vues), "chart"],
     ]
       .map(
+        // une carte par statistique : [titre, valeur, icône]
         ([label, val, ic]) =>
           `<div class="stat-card">${I(ic, "stat-ic")}<span>${label}</span><strong>${val}</strong></div>`
       )
       .join("");
 
     if (!list.length) {
+      // aucune annonce : invitation à publier
       host.innerHTML = `<div class="empty-state compact"><h3>Aucune annonce</h3><p>Publiez votre premier bien pour le retrouver ici.</p><a class="btn btn-primary" href="publier.html">Publier un bien</a></div>`;
       return;
     }
 
+    // Une carte par annonce : miniature, infos, statistiques, actions
     host.innerHTML = `<div class="owner-list">${list
       .map((a) => {
         const dispo = a.statut === "Disponible";
-        const img = U.safeUrl(a.image) || "assets/img/placeholder.svg";
+        const img = U.safeUrl(a.image) || "assets/img/placeholder.svg"; // photo vérifiée
         const v = Number(a.vues) || 0;
         const c = Number(a.clics_whatsapp) || 0;
+        // data-* : on range l'identifiant dans le bouton pour savoir sur quelle annonce agir
         return `
         <article class="owner-item">
-          <a class="owner-thumb" href="maison-detail.html?id=${E(a.id)}"><img src="${E(img)}" alt="" loading="lazy"></a>
+          <a class="owner-thumb" href="maison-detail.html?id=${E(a.id)}"><img src="${E(img)}" alt="" loading="lazy" data-fallback="assets/img/placeholder.svg"></a>
           <div class="owner-info">
             <div class="owner-badges">${badgeModeration(a.moderation)} <span class="status-badge static ${dispo ? "available" : "unavailable"}">${E(a.statut)}</span></div>
             <h3><a href="maison-detail.html?id=${E(a.id)}">${E(a.titre)}</a></h3>
@@ -127,6 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       })
       .join("")}</div>`;
 
+    // Bouton « Marquer loué » / « Rendre disponible »
     host
       .querySelectorAll("[data-status]")
       .forEach(
@@ -137,6 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               "Statut mis à jour"
             ))
       );
+    // Bouton « Confirmer à jour » : la date de confirmation devient « maintenant »
     host
       .querySelectorAll("[data-confirm]")
       .forEach(
@@ -147,9 +158,11 @@ document.addEventListener("DOMContentLoaded", async () => {
               "Annonce confirmée à jour"
             ))
       );
+    // Bouton « Modifier » : ouvre le formulaire en mode modification
     host
       .querySelectorAll("[data-edit]")
       .forEach((b) => (b.onclick = () => (location.href = "publier.html?edit=" + b.dataset.edit)));
+    // Bouton « Supprimer » : demande confirmation avant
     host.querySelectorAll("[data-delete]").forEach(
       (b) =>
         (b.onclick = () => {
@@ -158,29 +171,33 @@ document.addEventListener("DOMContentLoaded", async () => {
         })
     );
   }
-  render();
+  render(); // premier affichage
 
   /* ───────── Badge « Propriétaire vérifié » ───────── */
-  const vh = U.qs("#verification-area");
-  const vm = U.qs("#verification-message");
+  const vh = U.qs("#verification-area"); // zone du badge
+  const vm = U.qs("#verification-message"); // zone des messages
   async function renderVerif() {
     if (user.verifie) {
+      // déjà vérifié
       vh.innerHTML = `<div class="notice success">${I("check")} Votre compte est vérifié : le badge « Propriétaire vérifié » apparaît sur vos annonces, et vos nouvelles annonces sont publiées immédiatement.</div>`;
       return;
     }
-    let last = null;
+    let last = null; // dernière demande
     try {
       last = (await S.maVerification(user.id))[0];
     } catch (e) {}
     if (last && last.status === "en_attente") {
+      // demande en cours
       vh.innerHTML =
         '<div class="notice info">Votre demande est en cours d’examen par notre équipe.</div>';
       return;
     }
+    // Dernière demande refusée : on affiche le motif (échappé : écrit par l'admin)
     const refus =
       last && last.status === "rejetee"
         ? `<div class="notice error">Votre dernière demande a été refusée${last.reviewer_note ? " : " + E(last.reviewer_note) : "."} Vous pouvez en soumettre une nouvelle.</div>`
         : "";
+    // Formulaire d'envoi d'une pièce d'identité
     vh.innerHTML = `${refus}
       <form id="verification-form" class="verify-form">
         <label>Document<select name="document"><option>Carte nationale d’identité (CNI)</option><option>Passeport</option><option>Titre de propriété / attestation</option></select></label>
@@ -192,11 +209,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.preventDefault();
       const d = new FormData(e.target);
       const btn = e.target.querySelector("button");
-      btn.disabled = true;
+      btn.disabled = true; // évite le double envoi
       try {
         await S.soumettreVerification(d.get("file"), d.get("document"), user.id);
         U.toast("Demande envoyée");
-        renderVerif();
+        renderVerif(); // affiche « en cours d'examen »
       } catch (err) {
         U.showMessage(vm, err.message, "error");
         btn.disabled = false;
@@ -206,24 +223,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderVerif();
 
   /* ───────── Email de récupération ─────────
-     La colonne n'existe qu'après database/07 : si elle est absente, on masque le bloc. */
+     La colonne n'existe qu'après database/07 : si elle est absente, on retire le bloc. */
   const emailForm = U.qs("#email-form");
   if (!("email_recuperation" in user)) {
-    U.qs("#email-block")?.remove();
+    U.qs("#email-block")?.remove(); // base pas encore à jour
   } else {
-    emailForm.elements.email.value = user.email_recuperation || "";
-    if (!user.email_recuperation) U.qs("#email-warning").classList.remove("hidden");
+    emailForm.elements.email.value = user.email_recuperation || ""; // email actuel
+    if (!user.email_recuperation) U.qs("#email-warning").classList.remove("hidden"); // alerte si absent
     emailForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = emailForm.elements.email.value.trim().toLowerCase() || null;
+      const email = emailForm.elements.email.value.trim().toLowerCase() || null; // vide → null (retrait)
       try {
         await S.updateMonProfil(user.id, { email_recuperation: email });
-        user.email_recuperation = email;
+        user.email_recuperation = email; // mémorise la nouvelle valeur
         U.qs("#email-warning").classList.toggle("hidden", !!email);
         U.toast(email ? "Email de récupération enregistré" : "Email de récupération retiré");
       } catch (err) {
         U.toast(
-          /check|format/i.test(err.message) ? "Adresse email invalide." : err.message,
+          /check|format/i.test(err.message) ? "Adresse email invalide." : err.message, // refus de la base
           "error"
         );
       }
@@ -233,14 +250,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   /* ───────── Mot de passe ───────── */
   U.qs("#password-form").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const pw = new FormData(e.target).get("password");
+    const pw = new FormData(e.target).get("password"); // nouveau mot de passe
     if (pw.length < 8) {
       U.toast("8 caractères minimum.", "error");
       return;
     }
     try {
       await A.changePassword(pw);
-      e.target.reset();
+      e.target.reset(); // vide le champ
       U.toast("Mot de passe modifié");
     } catch (err) {
       U.toast(err.message, "error");

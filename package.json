@@ -1,0 +1,16 @@
+{
+  "name": "domi",
+  "version": "6.0.0",
+  "private": true,
+  "description": "Domi : plateforme de location de logements en Côte d'Ivoire",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "format": "prettier --write \"**/*.{js,css,html}\""
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0",
+    "html-minifier-terser": "7.2.0",
+    "prettier": "3.3.3"
+  }
+}

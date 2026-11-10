@@ -1,0 +1,55 @@
+# ═══════════════════════════════════════════════════════════════════
+# .github/workflows/deploy.yml : publication automatique du site
+#
+# À chaque « git push » sur la branche main, GitHub :
+#   1. récupère le code source (commenté) ;
+#   2. installe les outils (esbuild, html-minifier-terser) ;
+#   3. lance « npm run build », qui crée dist/ (version minifiée, sans commentaires) ;
+#   4. publie UNIQUEMENT dist/ sur GitHub Pages.
+#
+# ⚠ Pour que ce fichier soit utilisé, il faut régler une fois :
+#   GitHub > dépôt domi > Settings > Pages > Source : « GitHub Actions ».
+# Suivi des publications : onglet « Actions » du dépôt.
+# ═══════════════════════════════════════════════════════════════════
+
+name: Publier le site # nom affiché dans l'onglet Actions
+
+on: # quand lancer ce travail ?
+  push:
+    branches: [main] # à chaque envoi sur la branche principale
+  workflow_dispatch: # et à la demande (bouton « Run workflow »)
+
+permissions: # droits minimum nécessaires
+  contents: read # lire le code
+  pages: write # publier sur GitHub Pages
+  id-token: write # prouver à Pages que la publication vient bien de ce dépôt
+
+concurrency: # si deux envois se suivent de près…
+  group: pages
+  cancel-in-progress: true # …on annule le plus ancien et on ne publie que le dernier
+
+jobs:
+  build: # 1re étape : fabriquer dist/
+    runs-on: ubuntu-latest # ordinateur Linux fourni gratuitement par GitHub
+    steps:
+      - uses: actions/checkout@v4 # récupère le code du dépôt
+      - uses: actions/setup-node@v4 # installe Node.js…
+        with:
+          node-version: 20 # …version 20
+          cache: npm # garde les outils en mémoire pour aller plus vite la fois suivante
+      - run: npm ci # installe exactement les versions notées dans package-lock.json
+      - run: npm run build # lance scripts/build.mjs → crée dist/
+      - uses: actions/configure-pages@v5 # prépare GitHub Pages
+      - uses: actions/upload-pages-artifact@v3 # emballe dist/ pour la publication
+        with:
+          path: dist
+
+  deploy: # 2e étape : mettre en ligne
+    needs: build # attend que « build » ait réussi
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages # environnement de publication de GitHub Pages
+      url: ${{ steps.deployment.outputs.page_url }} # adresse du site, affichée dans Actions
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4 # publie le paquet préparé à l'étape build

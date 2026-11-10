@@ -1,271 +1,223 @@
 <!doctype html>
+<!-- doctype : indique au navigateur que c'est une page HTML5 moderne -->
 <html lang="fr">
+  <!-- lang="fr" : la page est en français (lecteurs d'écran, traduction, Google) -->
   <head>
+    <!-- ═══ EN-TÊTE : informations sur la page (rien de visible ici) ═══ -->
+
+    <!-- Encodage des caractères : indispensable pour afficher les accents (é, à, ç…) -->
     <meta charset="UTF-8" />
+    <!-- Sur téléphone : la largeur de la page = la largeur de l'écran (pas de zoom arrière) -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- SÉCURITÉ : politique de contenu (CSP). Le navigateur refuse tout script, style ou
+         connexion qui ne vient pas des adresses listées ici. Une injection de code par un
+         pirate (dans une annonce par exemple) est donc bloquée. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <!-- SÉCURITÉ : quand un visiteur quitte Domi par un lien, le site visité ne voit que
+         « domi » et pas l'adresse complète de la page (qui peut contenir un identifiant) -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- Couleur de la barre du navigateur sur Android (vert Domi) -->
     <meta name="theme-color" content="#0B3B35" />
+    <!-- Titre affiché dans l'onglet et dans les résultats Google -->
     <title>Domi — Trouvez un logement en Côte d’Ivoire, en toute confiance</title>
-    <meta
-      name="description"
-      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
-    />
-    <meta
-      property="og:title"
-      content="Domi — Trouvez un logement en Côte d’Ivoire, en toute confiance"
-    />
-    <meta
-      property="og:description"
-      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
-    />
+    <!-- Résumé affiché par Google sous le titre -->
+    <meta name="description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
+
+    <!-- Aperçu quand le lien est partagé sur WhatsApp / Facebook (protocole « Open Graph ») -->
+    <meta property="og:title" content="Domi — Trouvez un logement en Côte d’Ivoire, en toute confiance" />
+    <meta property="og:description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
     <meta property="og:type" content="website" />
-    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
-    <link rel="manifest" href="manifest.webmanifest" />
     <meta property="og:site_name" content="Domi" />
-    <meta
-      property="og:image"
-      content="https://levi-akoute.github.io/domi/assets/img/og-image.png"
-    />
+    <meta property="og:image" content="https://levi-akoute.github.io/domi/assets/img/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <!-- Même aperçu, en grand, sur X (Twitter) -->
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Icône de l'onglet (logo Domi en SVG : net à toutes les tailles) -->
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <!-- Icône utilisée par l'iPhone quand on ajoute Domi à l'écran d'accueil -->
+    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
+    <!-- Manifeste : nom, icônes et couleurs de l'application installable (PWA) -->
+    <link rel="manifest" href="manifest.webmanifest" />
+
+    <!-- Polices Google : « preconnect » ouvre la connexion à l'avance (affichage plus rapide) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fraunces (titres, élégante) et Manrope (texte, très lisible) -->
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <!-- Notre feuille de style (toute l'apparence du site) -->
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
+    <!-- ═══ CORPS : tout ce qui est visible ═══ -->
+
+    <!-- En-tête (logo + menu) : vide ici, construit par renderChrome() dans js/utils.js
+         pour ne pas répéter le menu dans les 15 pages -->
     <header id="site-header"></header>
+
+    <!-- Contenu principal de la page d'accueil -->
     <main>
+      <!-- ═══ HAUT DE PAGE : carrousel + barre de recherche ═══ -->
       <div class="container hero">
+        <!-- Carrousel : bannières qui défilent (logique dans js/home.js).
+             aria-roledescription / aria-label : décrivent le bloc aux lecteurs d'écran -->
         <div class="banner" id="banner" aria-roledescription="carrousel" aria-label="À la une">
+          <!-- Bande qui contient toutes les bannières côte à côte (décalée par home.js) -->
           <div class="slides" id="slides">
+            <!-- Bannière 1 : message principal -->
             <div class="slide txt">
-              <svg
-                class="slide-ic"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width=".7"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M4 11l8-7 8 7v9H4z" />
-                <path d="M10 20v-6h4v6" />
-              </svg>
+              <!-- Grand dessin décoratif de maison, à droite -->
+              <svg class="slide-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z" /><path d="M10 20v-6h4v6" /></svg>
+              <!-- Texte de la bannière -->
               <div class="slide-copy">
+                <!-- Petit surtitre orange en majuscules -->
                 <span class="eyebrow">Location · Côte d’Ivoire</span>
+                <!-- Titre principal de la page (un seul h1 par page, important pour Google) -->
                 <h1>Le logement qu’il vous faut, <em>sans mauvaise surprise.</em></h1>
+                <!-- Phrase d'accroche -->
                 <p>Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp.</p>
+                <!-- Bouton vers le catalogue -->
                 <a class="btn btn-accent" href="annonces.html">Voir les annonces</a>
               </div>
             </div>
+            <!-- Bannière 2 : conseil de sécurité -->
             <div class="slide txt">
-              <svg
-                class="slide-ic"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width=".7"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z" />
-                <path d="M8.5 12l2.5 2.5 4.5-5" />
-              </svg>
+              <svg class="slide-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z" /><path d="M8.5 12l2.5 2.5 4.5-5" /></svg>
               <div class="slide-copy">
                 <span class="eyebrow">Notre conseil n°1</span>
                 <h2>Visitez avant de payer.</h2>
-                <p>
-                  Domi ne reçoit jamais votre argent. Découvrez les réflexes simples qui évitent les
-                  arnaques.
-                </p>
+                <p>Domi ne reçoit jamais votre argent. Découvrez les réflexes simples qui évitent les arnaques.</p>
                 <a class="btn btn-accent" href="conseils.html">Lire les conseils</a>
               </div>
             </div>
+            <!-- Bannière 3 : invitation aux propriétaires -->
             <div class="slide txt">
-              <svg
-                class="slide-ic"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width=".7"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="8" cy="14" r="4" />
-                <path d="M11 11l9-9M16 6l3 3" />
-              </svg>
+              <svg class="slide-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="14" r="4" /><path d="M11 11l9-9M16 6l3 3" /></svg>
               <div class="slide-copy">
                 <span class="eyebrow">Propriétaires et agents</span>
                 <h2>Vous avez un bien à louer ?</h2>
-                <p>
-                  Publiez gratuitement, avec photos, et recevez des demandes directement sur
-                  WhatsApp.
-                </p>
-                <a class="btn btn-accent" href="connexion.html?inscription=1"
-                  >Publier une annonce</a
-                >
+                <p>Publiez gratuitement, avec photos, et recevez des demandes directement sur WhatsApp.</p>
+                <a class="btn btn-accent" href="connexion.html?inscription=1">Publier une annonce</a>
               </div>
             </div>
+            <!-- (home.js ajoute ensuite jusqu'à 3 bannières photo avec de vraies annonces) -->
           </div>
+          <!-- Flèche « précédente » (aria-label : texte lu par les lecteurs d'écran) -->
           <button class="arrow l" id="banner-prev" type="button" aria-label="Bannière précédente">
-            <svg
-              class="ic"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.9"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M15 6l-6 6 6 6" />
-            </svg></button
-          ><button class="arrow r" id="banner-next" type="button" aria-label="Bannière suivante">
-            <svg
-              class="ic"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.9"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M9 6l6 6-6 6" />
-            </svg>
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
           </button>
+          <!-- Flèche « suivante » -->
+          <button class="arrow r" id="banner-next" type="button" aria-label="Bannière suivante">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+          </button>
+          <!-- Points de navigation : créés par home.js (un par bannière) -->
           <div class="dots" id="banner-dots"></div>
         </div>
+
+        <!-- Barre de recherche : envoie vers annonces.html avec les filtres (js/annonces.js) -->
         <form id="home-search" class="search-bar">
-          <label>Commune<select id="search-commune"></select></label
-          ><label
-            >Type de bien<select id="search-type">
+          <!-- Liste des communes : remplie par fillCommunes() avec les communes de config.js -->
+          <label>Commune <select id="search-commune"></select></label>
+          <!-- Type de bien -->
+          <label>
+            Type de bien
+            <select id="search-type">
               <option value="">Tous les types</option>
               <option>Studio</option>
               <option>Appartement</option>
               <option>Maison</option>
               <option>Villa</option>
-            </select></label
-          ><label
-            >Budget mensuel<select id="search-budget">
+            </select>
+          </label>
+          <!-- Budget maximum (value = montant en FCFA envoyé au catalogue) -->
+          <label>
+            Budget mensuel
+            <select id="search-budget">
               <option value="">Tous budgets</option>
               <option value="60000">Jusqu’à 60 000 FCFA</option>
               <option value="100000">Jusqu’à 100 000 FCFA</option>
               <option value="150000">Jusqu’à 150 000 FCFA</option>
               <option value="250000">Jusqu’à 250 000 FCFA</option>
               <option value="400000">Jusqu’à 400 000 FCFA</option>
-            </select></label
-          ><button class="btn btn-accent" type="submit">Rechercher</button>
+            </select>
+          </label>
+          <!-- Bouton d'envoi (type="submit" : déclenche l'événement submit du formulaire) -->
+          <button class="btn btn-accent" type="submit">Rechercher</button>
         </form>
       </div>
+
+      <!-- ═══ DERNIÈRES ANNONCES ═══ -->
       <section class="section">
         <div class="container">
+          <!-- Titre de section + lien vers toutes les annonces -->
           <div class="section-head">
             <div><h2>Dernières annonces</h2></div>
-            <a class="btn btn-outline" href="annonces.html"
-              >Voir toutes les annonces
-              <svg
-                class="ic"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.9"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M5 12h14M13 6l6 6-6 6" /></svg
-            ></a>
+            <a class="btn btn-outline" href="annonces.html">
+              Voir toutes les annonces
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </a>
           </div>
+          <!-- Grille des cartes : remplie par initHome() dans js/annonces.js -->
           <div id="home-listings" class="listing-grid"></div>
+
+          <!-- Bandeau des 4 engagements de Domi -->
           <div class="strip">
+            <!-- Engagement 1 -->
             <div class="it">
-              <svg
-                class="ic"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-              <div>
-                <b>Annonces contrôlées</b
-                ><span>Relues ou publiées par un propriétaire vérifié</span>
-              </div>
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>
+              <div><b>Annonces contrôlées</b><span>Relues ou publiées par un propriétaire vérifié</span></div>
             </div>
+            <!-- Engagement 2 -->
             <div class="it">
-              <svg
-                class="ic"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z" />
-                <path d="M8.5 12l2.5 2.5 4.5-5" />
-              </svg>
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z" /><path d="M8.5 12l2.5 2.5 4.5-5" /></svg>
               <div><b>Propriétaires vérifiables</b><span>Badge d’identité contrôlée</span></div>
             </div>
+            <!-- Engagement 3 -->
             <div class="it">
-              <svg
-                class="ic"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M20 12a8 8 0 0 1-11.8 7L4 20l1.2-4.1A8 8 0 1 1 20 12z" />
-              </svg>
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.8 7L4 20l1.2-4.1A8 8 0 1 1 20 12z" /></svg>
               <div><b>Contact direct</b><span>Sur WhatsApp, sans intermédiaire</span></div>
             </div>
+            <!-- Engagement 4 -->
             <div class="it">
-              <svg
-                class="ic"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M4 11l8-7 8 7v9H4z" />
-                <path d="M10 20v-6h4v6" />
-              </svg>
-              <div>
-                <b>Visitez avant de payer</b><span>Domi ne reçoit jamais votre argent</span>
-              </div>
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z" /><path d="M10 20v-6h4v6" /></svg>
+              <div><b>Visitez avant de payer</b><span>Domi ne reçoit jamais votre argent</span></div>
             </div>
           </div>
         </div>
       </section>
     </main>
+
+    <!-- Pied de page : vide ici, construit lui aussi par js/utils.js -->
     <footer id="site-footer"></footer>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+
+    <!-- ═══ SCRIPTS : placés en bas pour que la page s'affiche avant d'être rendue interactive.
+         L'ORDRE COMPTE : chaque fichier utilise ceux chargés avant lui. ═══ -->
+
+    <!-- 1. Librairie officielle Supabase (dialogue avec la base de données).
+         integrity = empreinte SRI : si quelqu'un modifiait ce fichier sur le CDN,
+         le navigateur refuserait de l'exécuter (protection contre un CDN piraté). -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"
+      integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug"
+      crossorigin="anonymous"
+    ></script>
+    <!-- 2. Réglages : adresse de la base, numéro du support, communes -->
     <script src="js/config.js"></script>
+    <!-- 3. Boîte à outils commune : menu, pied de page, favoris, sécurité, installation -->
     <script src="js/utils.js"></script>
+    <!-- 4. Couche de données : toutes les requêtes vers la base -->
     <script src="js/storage.js"></script>
+    <!-- 5. Comptes : connexion, inscription, utilisateur courant -->
     <script src="js/auth.js"></script>
+    <!-- Script propre à cette page -->
     <script src="js/home.js"></script>
+    <!-- Script propre à cette page -->
     <script src="js/annonces.js"></script>
   </body>
 </html>

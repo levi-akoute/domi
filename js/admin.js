@@ -5,77 +5,91 @@
      Vue d'ensemble · Annonces · Signalements · Vérifications · Avis · Utilisateurs
    L'onglet actif est gardé dans l'adresse (#annonces…) pour survivre au rechargement.
 
-   SÉCURITÉ : cette page vérifie le rôle admin pour l'affichage, mais la vraie
+   SÉCURITÉ : cette page vérifie le rôle admin pour l'AFFICHAGE, mais la vraie
    protection est dans la base (is_admin() dans les règles RLS) : un non-admin
    qui forcerait l'accès ne recevrait aucune donnée.
    ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", async () => {
-  document.body.classList.add("is-admin");
-  const U = ImmoUtils;
-  const S = ImmoStorage;
-  const E = U.escapeHtml;
-  const I = U.icon;
-  const user = await ImmoAuth.requireAdmin();
+  document.body.classList.add("is-admin"); // classe CSS propre à cette page
+  const U = ImmoUtils; // boîte à outils
+  const S = ImmoStorage; // accès à la base
+  const E = U.escapeHtml; // protection du texte
+  const I = U.icon; // icônes
+  const user = await ImmoAuth.requireAdmin(); // affiche « Accès réservé » si non admin
   if (!user) return;
 
-  const msg = U.qs("#admin-message");
-  const date = (x) => new Date(x).toLocaleDateString("fr-FR");
+  const msg = U.qs("#admin-message"); // zone des messages d'erreur
+  const date = (x) => new Date(x).toLocaleDateString("fr-FR"); // date au format 10/11/2026
+  // Toutes les données chargées : annonces, utilisateurs, signalements, vérifications, avis
   let data = { ads: [], users: [], reps: [], ver: [], revs: [] };
 
   /* ───────── Gabarits communs ───────── */
+
+  // Construit un tableau HTML (ou un message si aucune ligne)
   const table = (head, rows, empty) =>
     rows.length
       ? `<div class="table-wrap"><table class="admin-table"><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>`
       : `<div class="empty-state compact"><p>${empty}</p></div>`;
-  // data-label : sur mobile, chaque cellule affiche le nom de sa colonne (tableau → cartes)
+  // Une cellule. data-label : sur mobile, chaque cellule affiche le nom de sa colonne (tableau → cartes)
   const td = (label, html) => `<td data-label="${label}">${html}</td>`;
+  // Pastille colorée (cls = couleur, txt = texte)
   const badge = (cls, txt) => `<span class="status-badge static ${cls}">${txt}</span>`;
+  // Correspondances état → [couleur, texte affiché]
   const MOD = {
+    // modération des annonces
     en_attente: ["pending", "À valider"],
     approuvee: ["available", "Publiée"],
     rejetee: ["unavailable", "Refusée"],
   };
   const REV = {
+    // avis
     en_attente: ["pending", "À valider"],
     approuve: ["available", "Publié"],
     rejete: ["unavailable", "Refusé"],
   };
   const REP = {
+    // signalements
     ouvert: ["pending", "Ouvert"],
     en_cours: ["pending", "En cours"],
     traite: ["available", "Traité"],
     rejete: ["unavailable", "Rejeté"],
   };
   const VER = {
+    // demandes de vérification
     en_attente: ["pending", "En attente"],
     approuvee: ["available", "Validée"],
     rejetee: ["unavailable", "Refusée"],
   };
+  // Pastille d'un état (état inconnu : affiché tel quel, échappé)
   const st = (map, k) => badge(...(map[k] || ["", E(k)]));
-  // Recherche simple : vrai si le texte de la ligne contient la saisie
+  // Recherche simple : vrai si l'un des champs contient la saisie (sans tenir compte des majuscules)
   const match = (q, ...fields) =>
     !q || fields.join(" ").toLowerCase().includes(q.trim().toLowerCase());
 
   /* ───────── Onglets ───────── */
   const TABS = ["apercu", "annonces", "signalements", "verifications", "avis", "utilisateurs"];
+  // Montre l'onglet name, cache les autres
   function showTab(name) {
-    if (!TABS.includes(name)) name = "apercu";
+    if (!TABS.includes(name)) name = "apercu"; // onglet inconnu → vue d'ensemble
     document.querySelectorAll(".admin-tab").forEach((p) => (p.hidden = p.id !== "tab-" + name));
     document.querySelectorAll("[data-tab-link]").forEach((a) => {
-      const on = a.dataset.tabLink === name;
-      a.classList.toggle("active", on);
+      const on = a.dataset.tabLink === name; // est-ce le lien de l'onglet actif ?
+      a.classList.toggle("active", on); // fond vert
       if (on) {
-        a.setAttribute("aria-current", "page");
+        a.setAttribute("aria-current", "page"); // pour les lecteurs d'écran
         // Mobile : fait défiler la barre d'onglets pour que l'onglet actif soit visible
         a.scrollIntoView({ block: "nearest", inline: "nearest" });
       } else a.removeAttribute("aria-current");
     });
   }
+  // hashchange : la partie « #… » de l'adresse a changé (clic sur un lien d'onglet)
   window.addEventListener("hashchange", () => showTab(location.hash.slice(1)));
-  showTab(location.hash.slice(1));
+  showTab(location.hash.slice(1)); // onglet initial (slice(1) retire le « # »)
 
   /* ───────── Chargement des données ───────── */
   async function load() {
+    // Promise.allSettled : lance les 5 requêtes EN MÊME TEMPS et attend qu'elles soient
+    // toutes terminées, même si l'une échoue (contrairement à Promise.all).
     const res = await Promise.allSettled([
       S.adminAnnonces(),
       S.adminUsers(),
@@ -83,6 +97,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       S.getVerifications(),
       S.adminAvis(),
     ]);
+    // Résultat de la requête i (tableau vide si elle a échoué)
     const val = (i) => (res[i].status === "fulfilled" ? res[i].value || [] : []);
     data = { ads: val(0), users: val(1), reps: val(2), ver: val(3), revs: val(4) };
     // Les avis (index 4) peuvent manquer si 05_avis.sql n'a pas été exécuté : pas une erreur
@@ -91,7 +106,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       .map((i) => res[i].reason.message);
     if (errs.length) U.showMessage(msg, errs.join(" · "), "error");
     else msg.classList.add("hidden");
-    render();
+    render(); // affichage de tous les onglets
   }
 
   // Exécute une action puis recharge tout
@@ -107,7 +122,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   /* ───────── Affichage ───────── */
   function render() {
-    const { ads, users, reps, ver, revs } = data;
+    const { ads, users, reps, ver, revs } = data; // « déstructuration » : 5 variables d'un coup
+    // Nombre d'éléments à traiter dans chaque onglet
     const todo = {
       annonces: ads.filter((a) => a.moderation === "en_attente").length,
       signalements: reps.filter((r) => r.status === "ouvert" || r.status === "en_cours").length,
@@ -119,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const b = U.qs(`[data-count="${k}"]`);
       if (b) {
         b.textContent = n;
-        b.hidden = !n;
+        b.hidden = !n; // cachée s'il n'y a rien à traiter
       }
     });
 
@@ -131,14 +147,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderUtilisateurs();
   }
 
+  // Onglet « Vue d'ensemble »
   function renderApercu(todo) {
     const { ads, users } = data;
-    const pub = ads.filter((a) => a.moderation === "approuvee");
-    const vues = pub.reduce((n, a) => n + (Number(a.vues) || 0), 0);
-    const clics = pub.reduce((n, a) => n + (Number(a.clics_whatsapp) || 0), 0);
-    const semaine = Date.now() - 7 * 86400000;
-    const nouveaux = users.filter((u) => new Date(u.created_at) > semaine).length;
+    const pub = ads.filter((a) => a.moderation === "approuvee"); // annonces en ligne
+    const vues = pub.reduce((n, a) => n + (Number(a.vues) || 0), 0); // total des vues
+    const clics = pub.reduce((n, a) => n + (Number(a.clics_whatsapp) || 0), 0); // total des clics
+    const semaine = Date.now() - 7 * 86400000; // il y a 7 jours
+    const nouveaux = users.filter((u) => new Date(u.created_at) > semaine).length; // inscrits récents
 
+    // Cartes de statistiques : [titre, valeur, icône]
     U.qs("#admin-stats").innerHTML = [
       ["Annonces en ligne", pub.length, "grid"],
       ["Utilisateurs", `${users.length}<small> (+${nouveaux} cette semaine)</small>`, "users"],
@@ -151,16 +169,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       )
       .join("");
 
+    // Liste « À traiter » : un lien par onglet qui a du travail en attente
     const items = [
       ["annonces", "annonce(s) à valider", "grid"],
       ["signalements", "signalement(s) ouvert(s)", "flag"],
       ["verifications", "demande(s) de vérification", "shield"],
       ["avis", "avis à relire", "star"],
     ];
-    const total = Object.values(todo).reduce((a, b) => a + b, 0);
+    const total = Object.values(todo).reduce((a, b) => a + b, 0); // total à traiter
     U.qs("#admin-todo").innerHTML = total
       ? items
-          .filter(([k]) => todo[k])
+          .filter(([k]) => todo[k]) // seulement les onglets non vides
           .map(
             ([k, label, ic]) =>
               `<a class="todo-item" href="#${k}">${I(ic)}<strong>${todo[k]}</strong> ${label}<span>${I("arrow")}</span></a>`
@@ -168,7 +187,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           .join("")
       : `<div class="notice success">${I("check")} Tout est à jour : rien à traiter pour le moment.</div>`;
 
-    // Annonces les plus consultées
+    // Les 5 annonces les plus consultées
     const top = [...pub].sort((a, b) => (b.vues || 0) - (a.vues || 0)).slice(0, 5);
     U.qs("#admin-top").innerHTML = table(
       ["Annonce", "Vues", "Clics", "Contact"],
@@ -180,9 +199,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
   }
 
+  // Onglet « Annonces »
   function renderAnnonces() {
-    const f = U.qs("#ads-filter").value;
-    const q = U.qs("#ads-search").value;
+    const f = U.qs("#ads-filter").value; // filtre d'état choisi
+    const q = U.qs("#ads-search").value; // texte recherché
     const list = data.ads.filter(
       (a) =>
         (f === "tous" || a.moderation === f) &&
@@ -191,13 +211,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     U.qs("#admin-ads").innerHTML = table(
       ["Annonce", "Annonceur", "Loyer", "État", "Actions"],
       list.map((a) => {
-        const img = U.safeUrl(a.image) || "assets/img/placeholder.svg";
-        const p = a.profiles;
+        const img = U.safeUrl(a.image) || "assets/img/placeholder.svg"; // miniature
+        const p = a.profiles; // auteur de l'annonce
         const owner = p
           ? `${E(p.prenom)} ${E(p.nom)}${p.verifie ? ` <span class="verified-inline">${I("shield")}</span>` : ""}`
           : "–";
         return `<tr>
-          ${td("Annonce", `<div class="cell-media"><img src="${E(img)}" alt="" loading="lazy"><div><strong>${E(a.titre)}</strong><small>${E(a.commune)}${a.quartier ? " · " + E(a.quartier) : ""} · ${date(a.created_at)}</small></div></div>`)}
+          ${td("Annonce", `<div class="cell-media"><img src="${E(img)}" alt="" loading="lazy" data-fallback="assets/img/placeholder.svg"><div><strong>${E(a.titre)}</strong><small>${E(a.commune)}${a.quartier ? " · " + E(a.quartier) : ""} · ${date(a.created_at)}</small></div></div>`)}
           ${td("Annonceur", `${owner}<small>${E(p?.telephone || a.telephone || "")}</small>`)}
           ${td("Loyer", U.money(a.loyer))}
           ${td("État", st(MOD, a.moderation))}
@@ -216,9 +236,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
   }
 
+  // Onglet « Signalements »
   function renderSignalements() {
     const q = U.qs("#reps-search").value;
-    // Nombre de signalements ouverts par annonce (pour repérer les plus signalées)
+    // Nombre de signalements OUVERTS par annonce (pour repérer les plus signalées)
     const parAnnonce = {};
     data.reps
       .filter((r) => r.status === "ouvert" || r.status === "en_cours")
@@ -227,7 +248,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     U.qs("#admin-reports").innerHTML = table(
       ["Annonce", "Motif", "Date", "Statut", "Actions"],
       list.map((r) => {
-        const open = r.status === "ouvert" || r.status === "en_cours";
+        const open = r.status === "ouvert" || r.status === "en_cours"; // encore à traiter ?
         const n = parAnnonce[r.listing_id] || 0;
         return `<tr>
           ${td("Annonce", r.listings ? `<a class="text-link" href="maison-detail.html?id=${E(r.listings.id)}" target="_blank" rel="noopener">${E(r.listings.titre)}</a>${n > 1 ? `<small class="danger-text">${n} signalements ouverts</small>` : ""}` : "–")}
@@ -250,6 +271,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
   }
 
+  // Onglet « Vérifications »
   function renderVerifications() {
     U.qs("#admin-verifications").innerHTML = table(
       ["Compte", "Document", "Date", "Statut", "Actions"],
@@ -272,15 +294,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
   }
 
+  // Onglet « Avis »
   function renderAvis() {
-    const stars = (n) => "★".repeat(n) + "☆".repeat(5 - n);
+    // Note en étoiles texte : 4 → ★★★★☆ (bornée entre 0 et 5 par sécurité)
+    const stars = (n) => {
+      n = Math.max(0, Math.min(5, Number(n) || 0));
+      return "★".repeat(n) + "☆".repeat(5 - n);
+    };
     U.qs("#admin-reviews").innerHTML = table(
       ["Annonce", "Auteur", "Note", "Commentaire", "Statut", "Actions"],
       data.revs.map(
         (r) => `<tr>
           ${td("Annonce", r.listings ? `<a class="text-link" href="maison-detail.html?id=${E(r.listings.id)}" target="_blank" rel="noopener">${E(r.listings.titre)}</a>` : "–")}
           ${td("Auteur", `${E(r.author_name || "–")}<small>${date(r.created_at)}</small>`)}
-          ${td("Note", `<span class="stars-txt">${stars(Number(r.rating) || 0)}</span>`)}
+          ${td("Note", `<span class="stars-txt">${stars(r.rating)}</span>`)}
           ${td("Commentaire", E(r.comment || ""))}
           ${td("Statut", st(REV, r.status))}
           ${td(
@@ -297,18 +324,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
   }
 
+  // Onglet « Utilisateurs »
   function renderUtilisateurs() {
     const q = U.qs("#users-search").value;
-    const nbAnnonces = {};
+    const nbAnnonces = {}; // nombre d'annonces par utilisateur
     data.ads.forEach((a) => (nbAnnonces[a.owner_id] = (nbAnnonces[a.owner_id] || 0) + 1));
-    const ROLES = { proprietaire: "Propriétaire", agent: "Agent", admin: "Admin" };
+    const ROLES = { proprietaire: "Propriétaire", agent: "Agent", admin: "Admin" }; // libellés lisibles
     const list = data.users.filter((u) => match(q, u.prenom, u.nom, u.telephone, u.commune));
     U.qs("#admin-users").innerHTML = table(
       ["Nom", "Téléphone", "Profil", "Annonces", "Vérifié", "Récupération", "Inscrit le"],
       list.map(
         (u) => `<tr>
           ${td("Nom", `<strong>${E(u.prenom)} ${E(u.nom)}</strong><small>${E(u.commune || "")}</small>`)}
-          ${td("Téléphone", u.telephone ? `<a class="text-link" href="https://wa.me/225${E(u.telephone)}" target="_blank" rel="noopener">${E(u.telephone)}</a>` : "–")}
+          ${td("Téléphone", u.telephone ? `<a class="text-link" href="https://wa.me/225${encodeURIComponent(u.telephone)}" target="_blank" rel="noopener">${E(u.telephone)}</a>` : "–")}
           ${td("Profil", E(ROLES[u.role] || u.role))}
           ${td("Annonces", nbAnnonces[u.id] || 0)}
           ${td("Vérifié", u.verifie ? badge("available", "Oui") : "–")}
@@ -322,31 +350,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   /* ───────── Actions (délégation : un seul écouteur pour tous les boutons) ───────── */
   U.qs("#admin-main").addEventListener("click", async (e) => {
-    const b = e.target.closest("button");
+    const b = e.target.closest("button"); // bouton cliqué (ou contenant l'élément cliqué)
     if (!b) return;
-    const d = b.dataset;
+    const d = b.dataset; // ses attributs data-*
     if (d.mod)
+      // approuver / refuser une annonce
       run(
         () => S.updateAnnonce(d.mod, { moderation: d.to }),
         d.to === "approuvee" ? "Annonce publiée" : "Annonce refusée"
       );
     else if (d.del) {
+      // supprimer une annonce
       if (confirm("Supprimer définitivement cette annonce ?"))
         run(() => S.supprimerAnnonce(d.del), "Annonce supprimée");
-    } else if (d.rep) run(() => S.updateReport(d.rep, d.to), "Signalement mis à jour");
-    else if (d.rv) run(() => S.updateAvis(d.rv, d.to), "Avis mis à jour");
+    } else if (d.rep)
+      run(() => S.updateReport(d.rep, d.to), "Signalement mis à jour"); // traiter un signalement
+    else if (d.rv)
+      run(() => S.updateAvis(d.rv, d.to), "Avis mis à jour"); // publier / refuser un avis
     else if (d.rvdel) {
+      // supprimer un avis
       if (confirm("Supprimer cet avis ?")) run(() => S.supprimerAvis(d.rvdel), "Avis supprimé");
     } else if (d.ver) {
+      // valider / refuser une vérification
       const ok = d.ok === "1";
       const note = ok ? null : prompt("Motif du refus (visible par l’utilisateur) :");
       if (!ok && note === null) return; // « Annuler » dans la boîte de dialogue
       run(() => S.decideVerification(d.ver, ok, note), ok ? "Compte vérifié" : "Demande refusée");
     } else if (d.doc) {
-      // Ouvre l'onglet tout de suite (sinon le navigateur bloque la fenêtre), puis y charge le lien
+      // voir une pièce d'identité
+      // On ouvre l'onglet TOUT DE SUITE (sinon le navigateur bloque la fenêtre), puis on y charge le lien
       const w = window.open("", "_blank");
       try {
-        w.location = await S.lienDocument(d.doc);
+        w.location = await S.lienDocument(d.doc); // lien temporaire de 5 minutes
       } catch (err) {
         w && w.close();
         U.showMessage(msg, err.message, "error");
@@ -359,10 +394,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   U.qs("#ads-search").addEventListener("input", renderAnnonces);
   U.qs("#reps-search").addEventListener("input", renderSignalements);
   U.qs("#users-search").addEventListener("input", renderUtilisateurs);
+  // Bouton « Actualiser » : recharge les données depuis la base
   U.qs("#admin-refresh").addEventListener("click", () => {
     load();
     U.toast("Données actualisées");
   });
 
-  load();
+  load(); // premier chargement
 });

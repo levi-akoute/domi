@@ -1,78 +1,110 @@
 <!doctype html>
+<!-- doctype : indique au navigateur que c'est une page HTML5 moderne -->
 <html lang="fr">
+  <!-- lang="fr" : la page est en français (lecteurs d'écran, traduction, Google) -->
   <head>
+    <!-- ═══ EN-TÊTE : informations sur la page (rien de visible ici) ═══ -->
+
+    <!-- Encodage des caractères : indispensable pour afficher les accents (é, à, ç…) -->
     <meta charset="UTF-8" />
+    <!-- Sur téléphone : la largeur de la page = la largeur de l'écran (pas de zoom arrière) -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- SÉCURITÉ : politique de contenu (CSP). Le navigateur refuse tout script, style ou
+         connexion qui ne vient pas des adresses listées ici. Une injection de code par un
+         pirate (dans une annonce par exemple) est donc bloquée. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <!-- SÉCURITÉ : quand un visiteur quitte Domi par un lien, le site visité ne voit que
+         « domi » et pas l'adresse complète de la page (qui peut contenir un identifiant) -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- Couleur de la barre du navigateur sur Android (vert Domi) -->
     <meta name="theme-color" content="#0B3B35" />
+    <!-- Titre affiché dans l'onglet et dans les résultats Google -->
     <title>Politique de confidentialité — Domi</title>
-    <meta
-      name="description"
-      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
-    />
+    <!-- Résumé affiché par Google sous le titre -->
+    <meta name="description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
+
+    <!-- Aperçu quand le lien est partagé sur WhatsApp / Facebook (protocole « Open Graph ») -->
     <meta property="og:title" content="Politique de confidentialité — Domi" />
-    <meta
-      property="og:description"
-      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
-    />
+    <meta property="og:description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
     <meta property="og:type" content="website" />
-    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
-    <link rel="manifest" href="manifest.webmanifest" />
     <meta property="og:site_name" content="Domi" />
-    <meta
-      property="og:image"
-      content="https://levi-akoute.github.io/domi/assets/img/og-image.png"
-    />
+    <meta property="og:image" content="https://levi-akoute.github.io/domi/assets/img/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <!-- Même aperçu, en grand, sur X (Twitter) -->
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Icône de l'onglet (logo Domi en SVG : net à toutes les tailles) -->
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <!-- Icône utilisée par l'iPhone quand on ajoute Domi à l'écran d'accueil -->
+    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
+    <!-- Manifeste : nom, icônes et couleurs de l'application installable (PWA) -->
+    <link rel="manifest" href="manifest.webmanifest" />
+
+    <!-- Polices Google : « preconnect » ouvre la connexion à l'avance (affichage plus rapide) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fraunces (titres, élégante) et Manrope (texte, très lisible) -->
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <!-- Notre feuille de style (toute l'apparence du site) -->
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
+    <!-- ═══ CORPS : tout ce qui est visible ═══ -->
+
+    <!-- En-tête (logo + menu) : vide ici, construit par renderChrome() dans js/utils.js
+         pour ne pas répéter le menu dans les 15 pages -->
     <header id="site-header"></header>
+
+    <!-- Contenu principal : texte légal (legal-main = colonne de lecture confortable) -->
     <main class="container legal-main">
       <span class="eyebrow">Informations légales</span>
       <h1>Politique de confidentialité</h1>
-      <div class="notice info">
-        Modèle de départ : à compléter avec vos informations et à faire valider par un juriste avant
-        l’ouverture au public.
-      </div>
+      <!-- Avertissement : ce texte est un modèle à faire valider -->
+      <div class="notice info">Modèle de départ : à compléter avec vos informations et à faire valider par un juriste avant l’ouverture au public.</div>
+      <!-- Section : Données collectées -->
       <h2>Données collectées</h2>
-      <p>
-        Nom, prénom, numéro de téléphone, commune, annonces publiées et, si vous demandez le badge «
-        Propriétaire vérifié », un document d’identité ou justificatif.
-      </p>
+      <p>Nom, prénom, numéro de téléphone, commune, email de récupération (facultatif), annonces publiées et, si vous demandez le badge « Propriétaire vérifié », un document d’identité ou justificatif. Vos favoris sont enregistrés uniquement dans votre navigateur.</p>
+      <!-- Section : Utilisation -->
       <h2>Utilisation</h2>
-      <p>
-        Ces données servent à faire fonctionner votre compte, afficher vos annonces et modérer la
-        plateforme. Le numéro de contact d’une annonce est visible publiquement pour permettre
-        d’être contacté.
-      </p>
+      <p>Ces données servent à faire fonctionner votre compte, afficher vos annonces, récupérer votre mot de passe et modérer la plateforme. Le numéro de contact d’une annonce est visible publiquement pour permettre d’être contacté.</p>
+      <!-- Section : Documents d’identité -->
       <h2>Documents d’identité</h2>
-      <p>
-        Stockés dans un espace privé, consultables uniquement par les administrateurs habilités,
-        uniquement pour la vérification. [Indiquer la durée de conservation.]
-      </p>
+      <p>Stockés dans un espace privé, consultables uniquement par les administrateurs habilités, uniquement pour la vérification. [Indiquer la durée de conservation.]</p>
+      <!-- Section : Vos droits -->
       <h2>Vos droits</h2>
-      <p>
-        Vous pouvez demander l’accès, la rectification ou la suppression de vos données via le
-        support. [Mentionner les formalités auprès de l’ARTCI et l’hébergeur des données
-        (Supabase).]
-      </p>
+      <p>Vous pouvez demander l’accès, la rectification ou la suppression de vos données via le support. [Mentionner les formalités auprès de l’ARTCI et l’hébergeur des données (Supabase).]</p>
+      <!-- Section : Contact -->
       <h2>Contact</h2>
       <p>[Responsable du traitement, email, numéro du support]</p>
     </main>
+
+    <!-- Pied de page : vide ici, construit lui aussi par js/utils.js -->
     <footer id="site-footer"></footer>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+
+    <!-- ═══ SCRIPTS : placés en bas pour que la page s'affiche avant d'être rendue interactive.
+         L'ORDRE COMPTE : chaque fichier utilise ceux chargés avant lui. ═══ -->
+
+    <!-- 1. Librairie officielle Supabase (dialogue avec la base de données).
+         integrity = empreinte SRI : si quelqu'un modifiait ce fichier sur le CDN,
+         le navigateur refuserait de l'exécuter (protection contre un CDN piraté). -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"
+      integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug"
+      crossorigin="anonymous"
+    ></script>
+    <!-- 2. Réglages : adresse de la base, numéro du support, communes -->
     <script src="js/config.js"></script>
+    <!-- 3. Boîte à outils commune : menu, pied de page, favoris, sécurité, installation -->
     <script src="js/utils.js"></script>
+    <!-- 4. Couche de données : toutes les requêtes vers la base -->
     <script src="js/storage.js"></script>
+    <!-- 5. Comptes : connexion, inscription, utilisateur courant -->
     <script src="js/auth.js"></script>
   </body>
 </html>

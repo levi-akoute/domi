@@ -189,7 +189,43 @@ n'exécute pas de SQL libre.
 
 ---
 
-## 8. Pistes pour aller plus loin
+## 8. Nouveautés de la v6
+
+### Application installable (PWA)
+
+Trois éléments rendent Domi installable sur téléphone :
+
+| Fichier | Rôle |
+|---------|------|
+| `manifest.webmanifest` | Carte d'identité de l'application : nom, icônes, couleurs, page de démarrage |
+| `sw.js` | Service worker : script en arrière-plan qui intercepte les requêtes (réseau d'abord, réserve en secours) |
+| `offline.html` | Page affichée sans connexion |
+
+`utils.js` (section 9) enregistre le service worker, écoute l'événement `beforeinstallprompt` (Android,
+ordinateur) pour afficher notre bouton « Installer », et explique la marche à suivre sur iPhone (Safari
+n'a pas d'installation automatique).
+
+### Content Security Policy (CSP)
+
+Chaque page déclare dans son `<head>` la liste des adresses autorisées (scripts, styles, connexions).
+Le navigateur bloque tout le reste. Conséquence importante : **aucun JavaScript ni style ne doit être
+écrit dans le HTML** (`onclick="…"`, `onerror="…"`, `style="…"`). On utilise à la place :
+- des écouteurs d'événements dans les fichiers `.js` (ex. images de secours : `data-fallback` + écouteur
+  dans `utils.js`) ;
+- des classes CSS utilitaires (`m-0`, `mt-28`, `span-all`…, section 3 de `style.css`).
+
+### Source commentée et version publiée
+
+```
+Code source (commenté)  ──  git push  ──►  GitHub Actions  ──►  npm run build  ──►  dist/ (minifié)  ──►  GitHub Pages
+```
+
+Vous travaillez toujours dans les fichiers commentés. `scripts/build.mjs` fabrique la version publiée.
+Détails dans `docs/SECURITE.md`.
+
+---
+
+## 9. Pistes pour aller plus loin
 
 - **Modules ES** (`import` / `export`) à la place des objets sur `window` : dépendances explicites.
 - **Pagination côté serveur** (`.range()`) quand il y aura plusieurs centaines d'annonces.

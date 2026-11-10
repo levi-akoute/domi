@@ -1,162 +1,204 @@
 <!doctype html>
+<!-- doctype : indique au navigateur que c'est une page HTML5 moderne -->
 <html lang="fr">
+  <!-- lang="fr" : la page est en français (lecteurs d'écran, traduction, Google) -->
   <head>
+    <!-- ═══ EN-TÊTE : informations sur la page (rien de visible ici) ═══ -->
+
+    <!-- Encodage des caractères : indispensable pour afficher les accents (é, à, ç…) -->
     <meta charset="UTF-8" />
+    <!-- Sur téléphone : la largeur de la page = la largeur de l'écran (pas de zoom arrière) -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- SÉCURITÉ : politique de contenu (CSP). Le navigateur refuse tout script, style ou
+         connexion qui ne vient pas des adresses listées ici. Une injection de code par un
+         pirate (dans une annonce par exemple) est donc bloquée. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <!-- SÉCURITÉ : quand un visiteur quitte Domi par un lien, le site visité ne voit que
+         « domi » et pas l'adresse complète de la page (qui peut contenir un identifiant) -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <!-- Page privée : on demande à Google de ne PAS l'afficher dans ses résultats -->
+    <meta name="robots" content="noindex" />
+
+    <!-- Couleur de la barre du navigateur sur Android (vert Domi) -->
     <meta name="theme-color" content="#0B3B35" />
+    <!-- Titre affiché dans l'onglet et dans les résultats Google -->
     <title>Administration — Domi</title>
-    <meta
-      name="description"
-      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
-    />
+    <!-- Résumé affiché par Google sous le titre -->
+    <meta name="description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
+
+    <!-- Aperçu quand le lien est partagé sur WhatsApp / Facebook (protocole « Open Graph ») -->
     <meta property="og:title" content="Administration — Domi" />
-    <meta
-      property="og:description"
-      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
-    />
+    <meta property="og:description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
     <meta property="og:type" content="website" />
-    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
-    <link rel="manifest" href="manifest.webmanifest" />
     <meta property="og:site_name" content="Domi" />
-    <meta
-      property="og:image"
-      content="https://levi-akoute.github.io/domi/assets/img/og-image.png"
-    />
+    <meta property="og:image" content="https://levi-akoute.github.io/domi/assets/img/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <!-- Même aperçu, en grand, sur X (Twitter) -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="robots" content="noindex" />
+
+    <!-- Icône de l'onglet (logo Domi en SVG : net à toutes les tailles) -->
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <!-- Icône utilisée par l'iPhone quand on ajoute Domi à l'écran d'accueil -->
+    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
+    <!-- Manifeste : nom, icônes et couleurs de l'application installable (PWA) -->
+    <link rel="manifest" href="manifest.webmanifest" />
+
+    <!-- Polices Google : « preconnect » ouvre la connexion à l'avance (affichage plus rapide) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fraunces (titres, élégante) et Manrope (texte, très lisible) -->
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <!-- Notre feuille de style (toute l'apparence du site) -->
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
+    <!-- ═══ CORPS : tout ce qui est visible ═══ -->
+
+    <!-- En-tête (logo + menu) : vide ici, construit par renderChrome() dans js/utils.js
+         pour ne pas répéter le menu dans les 15 pages -->
     <header id="site-header"></header>
+
+    <!-- Mise en page de l'administration : menu latéral + contenu (js/admin.js).
+         Rappel : sans le rôle admin, la base ne renvoie AUCUNE donnée (règles RLS). -->
     <div class="admin-shell container" id="admin-main">
+      <!-- ═══ MENU LATÉRAL ═══ (sur téléphone : barre d'onglets défilante en haut) -->
       <aside class="admin-side" aria-label="Menu d’administration">
         <span class="eyebrow">Administration</span>
         <nav>
+          <!-- href="#…" : change la fin de l'adresse ; data-tab-link : onglet à afficher.
+               <b data-count> : pastille rouge du nombre d'éléments à traiter -->
           <a href="#apercu" data-tab-link="apercu">Vue d’ensemble</a>
-          <a href="#annonces" data-tab-link="annonces"
-            >Annonces <b data-count="annonces" hidden></b
-          ></a>
-          <a href="#signalements" data-tab-link="signalements"
-            >Signalements <b data-count="signalements" hidden></b
-          ></a>
-          <a href="#verifications" data-tab-link="verifications"
-            >Vérifications <b data-count="verifications" hidden></b
-          ></a>
+          <a href="#annonces" data-tab-link="annonces">Annonces <b data-count="annonces" hidden></b></a>
+          <a href="#signalements" data-tab-link="signalements">Signalements <b data-count="signalements" hidden></b></a>
+          <a href="#verifications" data-tab-link="verifications">Vérifications <b data-count="verifications" hidden></b></a>
           <a href="#avis" data-tab-link="avis">Avis <b data-count="avis" hidden></b></a>
           <a href="#utilisateurs" data-tab-link="utilisateurs">Utilisateurs</a>
         </nav>
-        <button type="button" id="admin-refresh" class="btn btn-outline btn-sm btn-block">
-          Actualiser
-        </button>
+        <!-- Recharge les données depuis la base -->
+        <button type="button" id="admin-refresh" class="btn btn-outline btn-sm btn-block">Actualiser</button>
       </aside>
 
+      <!-- ═══ CONTENU ═══ -->
       <main class="admin-content">
-        <div id="admin-message" class="notice hidden"></div>
+        <!-- Messages d'erreur -->
+        <div id="admin-message" class="notice hidden" role="alert"></div>
 
+        <!-- ═══ ONGLET : VUE D'ENSEMBLE ═══ (le seul visible au départ) -->
         <section class="admin-tab" id="tab-apercu">
           <div class="admin-head">
             <h1>Vue d’ensemble</h1>
             <p class="muted">L’essentiel de la plateforme et ce qui attend votre décision.</p>
           </div>
+          <!-- Statistiques -->
           <div id="admin-stats" class="stats-grid"></div>
+          <!-- Liste des tâches en attente -->
           <div class="dashboard-panel">
             <h2>À traiter</h2>
             <div id="admin-todo" class="todo-list"></div>
           </div>
+          <!-- Annonces les plus consultées -->
           <div class="dashboard-panel">
             <h2>Annonces les plus consultées</h2>
             <div id="admin-top"></div>
           </div>
         </section>
 
+        <!-- ═══ ONGLET : ANNONCES ═══ (hidden = caché ; admin.js affiche l'onglet choisi) -->
         <section class="admin-tab" id="tab-annonces" hidden>
           <div class="admin-head">
             <h1>Annonces</h1>
-            <p class="muted">
-              Les annonces des propriétaires vérifiés sont publiées directement ; les autres
-              attendent votre validation.
-            </p>
+            <p class="muted">Les annonces des propriétaires vérifiés sont publiées directement ; les autres attendent votre validation.</p>
           </div>
+          <!-- Barre d'outils : recherche + filtre par état -->
           <div class="admin-toolbar">
-            <input
-              id="ads-search"
-              type="search"
-              placeholder="Rechercher : titre, commune, annonceur…"
-            />
-            <select id="ads-filter" class="mini-select">
+            <input id="ads-search" type="search" placeholder="Rechercher : titre, commune, annonceur…" aria-label="Rechercher une annonce" />
+            <select id="ads-filter" class="mini-select" aria-label="Filtrer par état">
               <option value="en_attente">À valider</option>
               <option value="approuvee">Publiées</option>
               <option value="rejetee">Refusées</option>
               <option value="tous">Toutes</option>
             </select>
           </div>
+          <!-- Tableau des annonces (admin.js) -->
           <div id="admin-ads"></div>
         </section>
 
+        <!-- ═══ ONGLET : SIGNALEMENTS ═══ (hidden = caché ; admin.js affiche l'onglet choisi) -->
         <section class="admin-tab" id="tab-signalements" hidden>
           <div class="admin-head">
             <h1>Signalements</h1>
-            <p class="muted">
-              Une annonce signalée par 3 sources différentes est automatiquement retirée du public
-              en attendant votre décision.
-            </p>
+            <p class="muted">Une annonce signalée par 3 sources différentes est automatiquement retirée du public en attendant votre décision.</p>
           </div>
           <div class="admin-toolbar">
-            <input id="reps-search" type="search" placeholder="Rechercher : motif, annonce…" />
+            <input id="reps-search" type="search" placeholder="Rechercher : motif, annonce…" aria-label="Rechercher un signalement" />
           </div>
+          <!-- Tableau des signalements (admin.js) -->
           <div id="admin-reports"></div>
         </section>
 
+        <!-- ═══ ONGLET : DEMANDES DE VÉRIFICATION ═══ (hidden = caché ; admin.js affiche l'onglet choisi) -->
         <section class="admin-tab" id="tab-verifications" hidden>
           <div class="admin-head">
             <h1>Demandes de vérification</h1>
-            <p class="muted">
-              Les documents sont dans un espace privé, consultables par vous seul (lien valable 5
-              minutes).
-            </p>
+            <p class="muted">Les documents sont dans un espace privé, consultables par vous seul (lien valable 5 minutes).</p>
           </div>
+          <!-- Tableau des demandes de badge (admin.js) -->
           <div id="admin-verifications"></div>
         </section>
 
+        <!-- ═══ ONGLET : AVIS DES UTILISATEURS ═══ (hidden = caché ; admin.js affiche l'onglet choisi) -->
         <section class="admin-tab" id="tab-avis" hidden>
           <div class="admin-head">
             <h1>Avis des utilisateurs</h1>
             <p class="muted">Un avis n’est visible du public qu’après votre validation.</p>
           </div>
+          <!-- Tableau des avis (admin.js) -->
           <div id="admin-reviews"></div>
         </section>
 
+        <!-- ═══ ONGLET : UTILISATEURS ═══ (hidden = caché ; admin.js affiche l'onglet choisi) -->
         <section class="admin-tab" id="tab-utilisateurs" hidden>
           <div class="admin-head">
             <h1>Utilisateurs</h1>
             <p class="muted">Comptes propriétaires et agents inscrits sur Domi.</p>
           </div>
           <div class="admin-toolbar">
-            <input
-              id="users-search"
-              type="search"
-              placeholder="Rechercher : nom, téléphone, commune…"
-            />
+            <input id="users-search" type="search" placeholder="Rechercher : nom, téléphone, commune…" aria-label="Rechercher un utilisateur" />
           </div>
+          <!-- Tableau des utilisateurs (admin.js) -->
           <div id="admin-users"></div>
         </section>
       </main>
     </div>
+
+    <!-- Pied de page : vide ici, construit lui aussi par js/utils.js -->
     <footer id="site-footer"></footer>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+
+    <!-- ═══ SCRIPTS : placés en bas pour que la page s'affiche avant d'être rendue interactive.
+         L'ORDRE COMPTE : chaque fichier utilise ceux chargés avant lui. ═══ -->
+
+    <!-- 1. Librairie officielle Supabase (dialogue avec la base de données).
+         integrity = empreinte SRI : si quelqu'un modifiait ce fichier sur le CDN,
+         le navigateur refuserait de l'exécuter (protection contre un CDN piraté). -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"
+      integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug"
+      crossorigin="anonymous"
+    ></script>
+    <!-- 2. Réglages : adresse de la base, numéro du support, communes -->
     <script src="js/config.js"></script>
+    <!-- 3. Boîte à outils commune : menu, pied de page, favoris, sécurité, installation -->
     <script src="js/utils.js"></script>
+    <!-- 4. Couche de données : toutes les requêtes vers la base -->
     <script src="js/storage.js"></script>
+    <!-- 5. Comptes : connexion, inscription, utilisateur courant -->
     <script src="js/auth.js"></script>
+    <!-- Script propre à cette page -->
     <script src="js/admin.js"></script>
   </body>
 </html>

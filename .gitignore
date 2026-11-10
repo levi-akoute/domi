@@ -24,3 +24,6 @@ node_modules/
 *.log
 *.tmp
 *.bak
+
+# ---- Version publiée (fabriquée par npm run build, jamais enregistrée dans Git) ----
+dist/

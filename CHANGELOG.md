@@ -1,5 +1,28 @@
 # CHANGELOG : Domi, site de location de maisons
 
+## v6.0 (2026-11-10)
+
+### Application installable (PWA)
+- Service worker `sw.js` (stratégie « réseau d'abord ») et page `offline.html` hors connexion.
+- Bouton « Installer l'appli » (menu et pied de page), bandeau sur téléphone, aide pour iPhone.
+- Manifeste complété : raccourcis (Annonces, Favoris, Mon espace), orientation, catégories.
+
+### Sécurité
+- Politique de sécurité du contenu (CSP) sur toutes les pages ; plus aucun JavaScript ni style dans le HTML.
+- Empreinte SRI sur la librairie Supabase, politique de référent stricte.
+- Protection anti-clickjacking et avertissement anti-arnaque dans la console.
+- `database/09_securite_renforcee.sql` : limites anti-spam (annonces, signalements, vérifications),
+  numéro de téléphone verrouillé, tailles maximales, fonction interne protégée.
+- Edge Function : appels limités au site (CORS), comparaison à temps constant, ménage des vieux codes.
+- Favoris : identifiants vérifiés avant envoi à la base.
+- Publication par GitHub Actions d'une version minifiée sans commentaires (`scripts/build.mjs`) ;
+  `database/`, `docs/` et `supabase/` ne sont plus publiés sur le site. Voir `docs/SECURITE.md`.
+
+### Code commenté
+- Tous les fichiers JavaScript, le CSS (réorganisé en 22 sections, sans couches contradictoires,
+  classes inutilisées retirées) et les 15 pages HTML sont commentés ligne par ligne ou bloc par bloc.
+- Correction : l'attribut `hidden` ne cachait pas les éléments ayant un `display` imposé (flèches du plein écran).
+
 ## v5.0 (2026-11-10)
 
 ### Sécurité

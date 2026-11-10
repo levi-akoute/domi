@@ -1,137 +1,143 @@
 <!doctype html>
+<!-- doctype : indique au navigateur que c'est une page HTML5 moderne -->
 <html lang="fr">
+  <!-- lang="fr" : la page est en français (lecteurs d'écran, traduction, Google) -->
   <head>
+    <!-- ═══ EN-TÊTE : informations sur la page (rien de visible ici) ═══ -->
+
+    <!-- Encodage des caractères : indispensable pour afficher les accents (é, à, ç…) -->
     <meta charset="UTF-8" />
+    <!-- Sur téléphone : la largeur de la page = la largeur de l'écran (pas de zoom arrière) -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- SÉCURITÉ : politique de contenu (CSP). Le navigateur refuse tout script, style ou
+         connexion qui ne vient pas des adresses listées ici. Une injection de code par un
+         pirate (dans une annonce par exemple) est donc bloquée. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <!-- SÉCURITÉ : quand un visiteur quitte Domi par un lien, le site visité ne voit que
+         « domi » et pas l'adresse complète de la page (qui peut contenir un identifiant) -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <!-- Page privée : on demande à Google de ne PAS l'afficher dans ses résultats -->
+    <meta name="robots" content="noindex" />
+
+    <!-- Couleur de la barre du navigateur sur Android (vert Domi) -->
     <meta name="theme-color" content="#0B3B35" />
+    <!-- Titre affiché dans l'onglet et dans les résultats Google -->
     <title>Mot de passe oublié — Domi</title>
-    <meta
-      name="description"
-      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
-    />
+    <!-- Résumé affiché par Google sous le titre -->
+    <meta name="description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
+
+    <!-- Aperçu quand le lien est partagé sur WhatsApp / Facebook (protocole « Open Graph ») -->
     <meta property="og:title" content="Mot de passe oublié — Domi" />
-    <meta
-      property="og:description"
-      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
-    />
+    <meta property="og:description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
     <meta property="og:type" content="website" />
-    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
-    <link rel="manifest" href="manifest.webmanifest" />
     <meta property="og:site_name" content="Domi" />
-    <meta
-      property="og:image"
-      content="https://levi-akoute.github.io/domi/assets/img/og-image.png"
-    />
+    <meta property="og:image" content="https://levi-akoute.github.io/domi/assets/img/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <!-- Même aperçu, en grand, sur X (Twitter) -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="robots" content="noindex" />
+
+    <!-- Icône de l'onglet (logo Domi en SVG : net à toutes les tailles) -->
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <!-- Icône utilisée par l'iPhone quand on ajoute Domi à l'écran d'accueil -->
+    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
+    <!-- Manifeste : nom, icônes et couleurs de l'application installable (PWA) -->
+    <link rel="manifest" href="manifest.webmanifest" />
+
+    <!-- Polices Google : « preconnect » ouvre la connexion à l'avance (affichage plus rapide) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fraunces (titres, élégante) et Manrope (texte, très lisible) -->
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <!-- Notre feuille de style (toute l'apparence du site) -->
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
+    <!-- ═══ CORPS : tout ce qui est visible ═══ -->
+
+    <!-- En-tête (logo + menu) : vide ici, construit par renderChrome() dans js/utils.js
+         pour ne pas répéter le menu dans les 15 pages -->
     <header id="site-header"></header>
+
+    <!-- Contenu principal : récupération du mot de passe en 2 étapes (js/recovery.js) -->
     <main class="auth-wrap">
       <section class="auth-card">
         <span class="eyebrow">Sécurité du compte</span>
         <h1>Mot de passe oublié ?</h1>
 
-        <!-- Étape 1 : demander un code -->
+        <!-- ÉTAPE 1 : demander un code -->
         <form id="step-ask" class="stack">
           <p class="muted">
             Saisissez le numéro de votre compte. Si vous avez enregistré un email de récupération,
             vous recevrez un code à 6 chiffres pour choisir un nouveau mot de passe.
           </p>
-          <label
-            >Numéro de téléphone du compte
-            <input
-              name="telephone"
-              type="tel"
-              required
-              placeholder="Ex. 0700000000"
-              autocomplete="tel"
-            />
-          </label>
+          <label>Numéro de téléphone du compte <input name="telephone" type="tel" required placeholder="Ex. 0700000000" autocomplete="tel" /></label>
           <button class="btn btn-primary btn-block" type="submit">Recevoir un code</button>
         </form>
 
-        <!-- Étape 2 : saisir le code et le nouveau mot de passe -->
+        <!-- ÉTAPE 2 : saisir le code et le nouveau mot de passe (cachée au départ) -->
         <form id="step-reset" class="stack hidden">
+          <!-- Message de confirmation d'envoi (écrit par recovery.js) -->
           <p class="muted" id="reset-intro"></p>
-          <label
-            >Code reçu par email
-            <input
-              name="code"
-              inputmode="numeric"
-              pattern="[0-9]{6}"
-              maxlength="6"
-              required
-              placeholder="123456"
-              autocomplete="one-time-code"
-              class="code-input"
-            />
+          <!-- Code : inputmode="numeric" affiche le clavier chiffres sur téléphone ;
+               autocomplete="one-time-code" permet au téléphone de proposer le code reçu -->
+          <label>
+            Code reçu par email
+            <input name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="123456" autocomplete="one-time-code" class="code-input" />
           </label>
-          <label
-            >Nouveau mot de passe (8 caractères minimum)
-            <input
-              name="password"
-              type="password"
-              minlength="8"
-              required
-              autocomplete="new-password"
-            />
-          </label>
-          <label
-            >Confirmez le mot de passe
-            <input
-              name="password2"
-              type="password"
-              minlength="8"
-              required
-              autocomplete="new-password"
-            />
-          </label>
+          <!-- Nouveau mot de passe, saisi deux fois pour éviter les fautes de frappe -->
+          <label>Nouveau mot de passe (8 caractères minimum) <input name="password" type="password" minlength="8" maxlength="72" required autocomplete="new-password" /></label>
+          <label>Confirmez le mot de passe <input name="password2" type="password" minlength="8" maxlength="72" required autocomplete="new-password" /></label>
           <button class="btn btn-primary btn-block" type="submit">Changer mon mot de passe</button>
-          <p class="fine-print" style="margin: 0; text-align: center">
-            Pas de code ?
-            <button type="button" class="text-link link-btn" id="resend">Renvoyer un code</button> ·
-            <button type="button" class="text-link link-btn" id="change-number">
-              Changer de numéro
-            </button>
+          <!-- Liens secondaires (boutons qui ressemblent à des liens) -->
+          <p class="fine-print m-0 center">
+            Pas de code ? <button type="button" class="text-link link-btn" id="resend">Renvoyer un code</button>
+            · <button type="button" class="text-link link-btn" id="change-number">Changer de numéro</button>
           </p>
         </form>
 
+        <!-- Messages (role="status" : lu automatiquement par les lecteurs d'écran) -->
         <div id="recovery-message" class="notice hidden" role="status"></div>
 
+        <!-- Solution de secours pour les comptes sans email -->
         <div class="recovery-help">
           <strong>Pas d’email enregistré sur votre compte ?</strong>
           <p>Notre équipe peut vous aider après vérification de votre identité.</p>
-          <a
-            id="support-link"
-            class="btn btn-outline btn-block"
-            href="#"
-            target="_blank"
-            rel="noopener"
-            >Contacter le support sur WhatsApp</a
-          >
+          <!-- Lien WhatsApp (adresse écrite par recovery.js) -->
+          <a id="support-link" class="btn btn-outline btn-block" href="#" target="_blank" rel="noopener">Contacter le support sur WhatsApp</a>
         </div>
-        <p style="margin-top: 20px; margin-bottom: 0">
-          <a class="text-link" href="connexion.html">← Retour à la connexion</a>
-        </p>
+        <!-- Retour -->
+        <p class="mt-20 m-b0"><a class="text-link" href="connexion.html">← Retour à la connexion</a></p>
       </section>
     </main>
+
+    <!-- Pied de page : vide ici, construit lui aussi par js/utils.js -->
     <footer id="site-footer"></footer>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+
+    <!-- ═══ SCRIPTS : placés en bas pour que la page s'affiche avant d'être rendue interactive.
+         L'ORDRE COMPTE : chaque fichier utilise ceux chargés avant lui. ═══ -->
+
+    <!-- 1. Librairie officielle Supabase (dialogue avec la base de données).
+         integrity = empreinte SRI : si quelqu'un modifiait ce fichier sur le CDN,
+         le navigateur refuserait de l'exécuter (protection contre un CDN piraté). -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"
+      integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug"
+      crossorigin="anonymous"
+    ></script>
+    <!-- 2. Réglages : adresse de la base, numéro du support, communes -->
     <script src="js/config.js"></script>
+    <!-- 3. Boîte à outils commune : menu, pied de page, favoris, sécurité, installation -->
     <script src="js/utils.js"></script>
+    <!-- 4. Couche de données : toutes les requêtes vers la base -->
     <script src="js/storage.js"></script>
+    <!-- 5. Comptes : connexion, inscription, utilisateur courant -->
     <script src="js/auth.js"></script>
+    <!-- Script propre à cette page -->
     <script src="js/recovery.js"></script>
   </body>
 </html>

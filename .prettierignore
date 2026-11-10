@@ -1,0 +1,6 @@
+# Fichiers que Prettier (npm run format) ne doit pas reformater
+# Les pages HTML sont mises en forme à la main, avec leurs commentaires
+*.html
+# Dossiers générés ou externes
+dist/
+node_modules/

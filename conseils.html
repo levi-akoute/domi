@@ -1,121 +1,166 @@
 <!doctype html>
+<!-- doctype : indique au navigateur que c'est une page HTML5 moderne -->
 <html lang="fr">
+  <!-- lang="fr" : la page est en français (lecteurs d'écran, traduction, Google) -->
   <head>
+    <!-- ═══ EN-TÊTE : informations sur la page (rien de visible ici) ═══ -->
+
+    <!-- Encodage des caractères : indispensable pour afficher les accents (é, à, ç…) -->
     <meta charset="UTF-8" />
+    <!-- Sur téléphone : la largeur de la page = la largeur de l'écran (pas de zoom arrière) -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- SÉCURITÉ : politique de contenu (CSP). Le navigateur refuse tout script, style ou
+         connexion qui ne vient pas des adresses listées ici. Une injection de code par un
+         pirate (dans une annonce par exemple) est donc bloquée. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <!-- SÉCURITÉ : quand un visiteur quitte Domi par un lien, le site visité ne voit que
+         « domi » et pas l'adresse complète de la page (qui peut contenir un identifiant) -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- Couleur de la barre du navigateur sur Android (vert Domi) -->
     <meta name="theme-color" content="#0B3B35" />
+    <!-- Titre affiché dans l'onglet et dans les résultats Google -->
     <title>Conseils de sécurité — Domi</title>
-    <meta
-      name="description"
-      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
-    />
+    <!-- Résumé affiché par Google sous le titre -->
+    <meta name="description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
+
+    <!-- Aperçu quand le lien est partagé sur WhatsApp / Facebook (protocole « Open Graph ») -->
     <meta property="og:title" content="Conseils de sécurité — Domi" />
-    <meta
-      property="og:description"
-      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
-    />
+    <meta property="og:description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
     <meta property="og:type" content="website" />
-    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
-    <link rel="manifest" href="manifest.webmanifest" />
     <meta property="og:site_name" content="Domi" />
-    <meta
-      property="og:image"
-      content="https://levi-akoute.github.io/domi/assets/img/og-image.png"
-    />
+    <meta property="og:image" content="https://levi-akoute.github.io/domi/assets/img/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <!-- Même aperçu, en grand, sur X (Twitter) -->
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Icône de l'onglet (logo Domi en SVG : net à toutes les tailles) -->
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <!-- Icône utilisée par l'iPhone quand on ajoute Domi à l'écran d'accueil -->
+    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
+    <!-- Manifeste : nom, icônes et couleurs de l'application installable (PWA) -->
+    <link rel="manifest" href="manifest.webmanifest" />
+
+    <!-- Polices Google : « preconnect » ouvre la connexion à l'avance (affichage plus rapide) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fraunces (titres, élégante) et Manrope (texte, très lisible) -->
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <!-- Notre feuille de style (toute l'apparence du site) -->
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
+    <!-- ═══ CORPS : tout ce qui est visible ═══ -->
+
+    <!-- En-tête (logo + menu) : vide ici, construit par renderChrome() dans js/utils.js
+         pour ne pas répéter le menu dans les 15 pages -->
     <header id="site-header"></header>
-    <main class="container legal-main" style="max-width: 860px">
+
+    <!-- Contenu principal : conseils pour louer sans se faire arnaquer.
+         legal-main = mise en page des pages de texte ; mw-860 = largeur maximale 860 px -->
+    <main class="container legal-main mw-860">
       <span class="eyebrow">Louer en sécurité</span>
       <h1>Les réflexes qui évitent les mauvaises surprises.</h1>
+      <!-- Introduction (lead = texte un peu plus grand) -->
       <p class="lead muted">
         Domi met en relation locataires et annonceurs. Nous ne recevons jamais d’argent : c’est à
         vous de rester vigilant. Voici l’essentiel.
       </p>
+
+      <!-- Conseil n°01 -->
       <div class="tip">
+        <!-- Grand numéro orange -->
         <span class="num">01</span>
         <div>
           <h3>Visitez toujours avant de payer</h3>
-          <p>
-            Ne versez aucune somme (avance, caution, « frais de réservation ») avant d’avoir visité
-            le logement et vu l’annonceur en personne.
-          </p>
+          <p>Ne versez aucune somme (avance, caution, « frais de réservation ») avant d’avoir visité le logement et vu l’annonceur en personne.</p>
         </div>
       </div>
+
+      <!-- Conseil n°02 -->
       <div class="tip">
+        <!-- Grand numéro orange -->
         <span class="num">02</span>
         <div>
           <h3>Vérifiez qui vous louera le bien</h3>
-          <p>
-            Demandez une pièce d’identité et un justificatif de propriété ou de mandat. Privilégiez
-            les annonceurs qui affichent le badge « Propriétaire vérifié », et lisez les avis
-            laissés par d’autres locataires.
-          </p>
+          <p>Demandez une pièce d’identité et un justificatif de propriété ou de mandat. Privilégiez les annonceurs qui affichent le badge « Propriétaire vérifié », et lisez les avis laissés par d’autres locataires.</p>
         </div>
       </div>
+
+      <!-- Conseil n°03 -->
       <div class="tip">
+        <!-- Grand numéro orange -->
         <span class="num">03</span>
         <div>
           <h3>Exigez un reçu écrit</h3>
-          <p>
-            Tout paiement doit être documenté : montant, date, nom du bénéficiaire, objet du
-            paiement. Gardez une copie.
-          </p>
+          <p>Tout paiement doit être documenté : montant, date, nom du bénéficiaire, objet du paiement. Gardez une copie.</p>
         </div>
       </div>
+
+      <!-- Conseil n°04 -->
       <div class="tip">
+        <!-- Grand numéro orange -->
         <span class="num">04</span>
         <div>
           <h3>Protégez vos codes</h3>
-          <p>
-            Ne communiquez jamais un code Mobile Money, un code reçu par SMS ou un code
-            confidentiel, même à quelqu’un qui se présente comme le support.
-          </p>
+          <p>Ne communiquez jamais un code Mobile Money, un code reçu par SMS ou un code confidentiel, même à quelqu’un qui se présente comme le support.</p>
         </div>
       </div>
+
+      <!-- Conseil n°05 -->
       <div class="tip">
+        <!-- Grand numéro orange -->
         <span class="num">05</span>
         <div>
           <h3>Méfiez-vous des offres trop belles</h3>
-          <p>
-            Un loyer très inférieur au marché, une demande urgente d’argent ou un annonceur qui
-            refuse la visite sont des signaux d’alerte.
-          </p>
+          <p>Un loyer très inférieur au marché, une demande urgente d’argent ou un annonceur qui refuse la visite sont des signaux d’alerte.</p>
         </div>
       </div>
-      <div class="detail-section" style="margin-top: 34px">
+
+      <!-- Encadré : le rôle exact de Domi (mt-34 = marge de 34 px au-dessus) -->
+      <div class="detail-section mt-34">
         <h2>Ce que Domi fait, et ne fait pas</h2>
         <p>
-          Nous examinons les annonces avant publication, traitons les signalements et affichons un
-          badge pour les propriétaires dont l’identité a été contrôlée. En revanche,
+          Nous contrôlons les annonces, traitons les signalements et affichons un badge pour les
+          propriétaires dont l’identité a été vérifiée. En revanche,
           <strong>Domi ne reçoit aucun paiement</strong>, n’est pas partie au contrat de location et
           ne vous demandera jamais d’argent ni de code.
         </p>
-        <p style="margin: 0">
-          Un doute sur une annonce ? Utilisez « Signaler cette annonce » sur sa fiche, ou
-          écrivez-nous sur WhatsApp.
+        <p class="m-0">
+          Un doute sur une annonce ? Utilisez « Signaler cette annonce » sur sa fiche, ou écrivez-nous
+          sur WhatsApp.
         </p>
       </div>
-      <p style="margin-top: 28px">
-        <a class="btn btn-primary" href="support.html">Contacter le support</a>
-      </p>
+      <!-- Bouton vers la page Support -->
+      <p class="mt-28"><a class="btn btn-primary" href="support.html">Contacter le support</a></p>
     </main>
+
+    <!-- Pied de page : vide ici, construit lui aussi par js/utils.js -->
     <footer id="site-footer"></footer>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+
+    <!-- ═══ SCRIPTS : placés en bas pour que la page s'affiche avant d'être rendue interactive.
+         L'ORDRE COMPTE : chaque fichier utilise ceux chargés avant lui. ═══ -->
+
+    <!-- 1. Librairie officielle Supabase (dialogue avec la base de données).
+         integrity = empreinte SRI : si quelqu'un modifiait ce fichier sur le CDN,
+         le navigateur refuserait de l'exécuter (protection contre un CDN piraté). -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"
+      integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug"
+      crossorigin="anonymous"
+    ></script>
+    <!-- 2. Réglages : adresse de la base, numéro du support, communes -->
     <script src="js/config.js"></script>
+    <!-- 3. Boîte à outils commune : menu, pied de page, favoris, sécurité, installation -->
     <script src="js/utils.js"></script>
+    <!-- 4. Couche de données : toutes les requêtes vers la base -->
     <script src="js/storage.js"></script>
+    <!-- 5. Comptes : connexion, inscription, utilisateur courant -->
     <script src="js/auth.js"></script>
   </body>
 </html>

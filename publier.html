@@ -1,44 +1,73 @@
 <!doctype html>
+<!-- doctype : indique au navigateur que c'est une page HTML5 moderne -->
 <html lang="fr">
+  <!-- lang="fr" : la page est en français (lecteurs d'écran, traduction, Google) -->
   <head>
+    <!-- ═══ EN-TÊTE : informations sur la page (rien de visible ici) ═══ -->
+
+    <!-- Encodage des caractères : indispensable pour afficher les accents (é, à, ç…) -->
     <meta charset="UTF-8" />
+    <!-- Sur téléphone : la largeur de la page = la largeur de l'écran (pas de zoom arrière) -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- SÉCURITÉ : politique de contenu (CSP). Le navigateur refuse tout script, style ou
+         connexion qui ne vient pas des adresses listées ici. Une injection de code par un
+         pirate (dans une annonce par exemple) est donc bloquée. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <!-- SÉCURITÉ : quand un visiteur quitte Domi par un lien, le site visité ne voit que
+         « domi » et pas l'adresse complète de la page (qui peut contenir un identifiant) -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <!-- Page privée : on demande à Google de ne PAS l'afficher dans ses résultats -->
+    <meta name="robots" content="noindex" />
+
+    <!-- Couleur de la barre du navigateur sur Android (vert Domi) -->
     <meta name="theme-color" content="#0B3B35" />
+    <!-- Titre affiché dans l'onglet et dans les résultats Google -->
     <title>Publier une annonce — Domi</title>
-    <meta
-      name="description"
-      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
-    />
+    <!-- Résumé affiché par Google sous le titre -->
+    <meta name="description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
+
+    <!-- Aperçu quand le lien est partagé sur WhatsApp / Facebook (protocole « Open Graph ») -->
     <meta property="og:title" content="Publier une annonce — Domi" />
-    <meta
-      property="og:description"
-      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
-    />
+    <meta property="og:description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
     <meta property="og:type" content="website" />
-    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
-    <link rel="manifest" href="manifest.webmanifest" />
     <meta property="og:site_name" content="Domi" />
-    <meta
-      property="og:image"
-      content="https://levi-akoute.github.io/domi/assets/img/og-image.png"
-    />
+    <meta property="og:image" content="https://levi-akoute.github.io/domi/assets/img/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <!-- Même aperçu, en grand, sur X (Twitter) -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="robots" content="noindex" />
+
+    <!-- Icône de l'onglet (logo Domi en SVG : net à toutes les tailles) -->
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <!-- Icône utilisée par l'iPhone quand on ajoute Domi à l'écran d'accueil -->
+    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
+    <!-- Manifeste : nom, icônes et couleurs de l'application installable (PWA) -->
+    <link rel="manifest" href="manifest.webmanifest" />
+
+    <!-- Polices Google : « preconnect » ouvre la connexion à l'avance (affichage plus rapide) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fraunces (titres, élégante) et Manrope (texte, très lisible) -->
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..600&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <!-- Notre feuille de style (toute l'apparence du site) -->
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
+    <!-- ═══ CORPS : tout ce qui est visible ═══ -->
+
+    <!-- En-tête (logo + menu) : vide ici, construit par renderChrome() dans js/utils.js
+         pour ne pas répéter le menu dans les 15 pages -->
     <header id="site-header"></header>
+
+    <!-- Contenu principal : formulaire de publication (js/publier.js).
+         Même page pour MODIFIER une annonce : publier.html?edit=<identifiant> -->
     <main class="container">
-      <div class="page-head" style="padding-left: 0">
+      <!-- Titre (changé en « Modifier votre annonce » en mode modification) -->
+      <div class="page-head pl-0">
         <span class="eyebrow">Espace annonceur</span>
         <h1 id="publish-title">Présentez votre logement.</h1>
         <p id="publish-intro">
@@ -46,118 +75,136 @@
           d’être publiée (les comptes vérifiés publient sans attente).
         </p>
       </div>
+
+      <!-- Le formulaire, en 4 sections numérotées -->
       <form id="publish-form" class="form-card">
-        <div id="publish-message" class="notice hidden"></div>
+        <!-- Zone des messages d'erreur -->
+        <div id="publish-message" class="notice hidden" role="alert"></div>
+
+        <!-- ═══ SECTION 1 : LE BIEN ═══ -->
         <div class="form-section">
           <h2><span>1</span>Le bien</h2>
+          <!-- form-grid : champs sur 2 colonnes ; class full = sur toute la largeur -->
           <div class="form-grid">
-            <label class="full"
-              >Titre de l’annonce<input
-                name="titre"
-                required
-                maxlength="90"
-                placeholder="Ex. Appartement 3 pièces lumineux à Angré" /></label
-            ><label
-              >Type de bien<select name="type">
+            <!-- Titre (90 caractères max, comme dans la base) -->
+            <label class="full">Titre de l’annonce <input name="titre" required minlength="3" maxlength="90" placeholder="Ex. Appartement 3 pièces lumineux à Angré" /></label>
+            <!-- Type de bien (« selected » = choix par défaut) -->
+            <label>
+              Type de bien
+              <select name="type">
                 <option>Studio</option>
                 <option selected>Appartement</option>
                 <option>Maison</option>
                 <option>Villa</option>
-              </select></label
-            ><label
-              >Loyer mensuel (FCFA)<input
-                name="loyer"
-                type="number"
-                min="1000"
-                step="500"
-                required
-                placeholder="Ex. 120000" /></label
-            ><label
-              >Numéro WhatsApp de contact<input
-                name="telephone"
-                type="tel"
-                required
-                placeholder="Ex. 0700000000" /></label
-            ><label
-              >Disponibilité<select name="statut">
+              </select>
+            </label>
+            <!-- Loyer en FCFA (nombre entre 1 000 et 100 millions) -->
+            <label>Loyer mensuel (FCFA) <input name="loyer" type="number" min="1000" max="100000000" step="500" required placeholder="Ex. 120000" /></label>
+            <!-- Numéro de contact affiché sur l'annonce -->
+            <label>Numéro WhatsApp de contact <input name="telephone" type="tel" required placeholder="Ex. 0700000000" /></label>
+            <!-- Disponibilité -->
+            <label>
+              Disponibilité
+              <select name="statut">
                 <option>Disponible</option>
                 <option>Déjà loué</option>
-              </select></label
-            >
+              </select>
+            </label>
           </div>
         </div>
+
+        <!-- ═══ SECTION 2 : LOCALISATION ═══ -->
         <div class="form-section">
           <h2><span>2</span>Localisation</h2>
           <div class="form-grid">
-            <label>Commune<select name="commune" required></select></label
-            ><label>Quartier<input name="quartier" placeholder="Ex. Angré 8e tranche" /></label
-            ><label class="full"
-              >Repère ou adresse (facultatif)<input
-                name="adresse"
-                placeholder="Ex. Derrière la pharmacie…"
-            /></label>
+            <!-- Commune (liste remplie par js/publier.js) -->
+            <label>Commune <select name="commune" required></select></label>
+            <!-- Quartier -->
+            <label>Quartier <input name="quartier" maxlength="120" placeholder="Ex. Angré 8e tranche" /></label>
+            <!-- Repère : facultatif -->
+            <label class="full">Repère ou adresse (facultatif) <input name="adresse" maxlength="200" placeholder="Ex. Derrière la pharmacie…" /></label>
           </div>
         </div>
+
+        <!-- ═══ SECTION 3 : DÉTAILS ET CONDITIONS ═══ -->
         <div class="form-section">
           <h2><span>3</span>Détails et conditions</h2>
           <div class="form-grid">
-            <label class="full"
-              >Description<textarea
-                name="description"
-                placeholder="État du logement, équipements, environnement, règles de la maison…"
-              ></textarea></label
-            ><label>Chambres<input name="chambres" type="number" min="0" value="1" /></label
-            ><label>Étage<input name="etage" placeholder="Ex. Rez-de-chaussée" /></label
-            ><label
-              >Compteur CIE<select name="cie">
+            <!-- Description longue (textarea = zone de texte sur plusieurs lignes) -->
+            <label class="full">Description <textarea name="description" maxlength="5000" placeholder="État du logement, équipements, environnement, règles de la maison…"></textarea></label>
+            <!-- Nombre de chambres (0 = studio) -->
+            <label>Chambres <input name="chambres" type="number" min="0" max="50" value="1" /></label>
+            <!-- Étage -->
+            <label>Étage <input name="etage" maxlength="60" placeholder="Ex. Rez-de-chaussée" /></label>
+            <!-- Compteur d'électricité CIE -->
+            <label>
+              Compteur CIE
+              <select name="cie">
                 <option>Individuel</option>
                 <option>Commun</option>
                 <option>Non précisé</option>
-              </select></label
-            ><label
-              >Compteur SODECI<select name="sodeci">
+              </select>
+            </label>
+            <!-- Compteur d'eau SODECI -->
+            <label>
+              Compteur SODECI
+              <select name="sodeci">
                 <option>Individuel</option>
                 <option>Commun</option>
                 <option>Non précisé</option>
-              </select></label
-            ><label>Avance (mois)<input name="avance" type="number" min="0" value="2" /></label
-            ><label>Caution (mois)<input name="caution" type="number" min="0" value="2" /></label>
+              </select>
+            </label>
+            <!-- Avance et caution, en nombre de mois -->
+            <label>Avance (mois) <input name="avance" type="number" min="0" max="24" value="2" /></label>
+            <label>Caution (mois) <input name="caution" type="number" min="0" max="24" value="2" /></label>
           </div>
         </div>
+
+        <!-- ═══ SECTION 4 : PHOTOS ET VIDÉO ═══ -->
         <div class="form-section">
           <h2><span>4</span>Photos et vidéo</h2>
           <div class="form-grid">
-            <label class="full"
-              >Photos du logement (1 à 6 — la première sera la photo principale)<input
-                id="photos"
-                type="file"
-                accept="image/*"
-                multiple
-            /></label>
+            <!-- Photos : accept="image/*" n'autorise que les images ; multiple = plusieurs à la fois -->
+            <label class="full">Photos du logement (1 à 6, la première sera la photo principale) <input id="photos" type="file" accept="image/*" multiple /></label>
+            <!-- Aperçu des photos choisies (rempli par js/publier.js) -->
             <div id="photo-preview" class="photo-preview full"></div>
-            <label class="full"
-              >Lien d’une visite vidéo (YouTube, TikTok, Facebook… facultatif)<input
-                name="video"
-                type="url"
-                placeholder="https://…"
-            /></label>
+            <!-- Lien vidéo : type="url" vérifie le format ; seuls http(s) sont acceptés (safeUrl) -->
+            <label class="full">Lien d’une visite vidéo (YouTube, TikTok, Facebook… facultatif) <input name="video" type="url" placeholder="https://…" /></label>
           </div>
-          <p class="fine-print">
-            Les photos sont allégées automatiquement. Utilisez uniquement des photos de ce logement.
-          </p>
+          <p class="fine-print">Les photos sont allégées automatiquement. Utilisez uniquement des photos de ce logement.</p>
         </div>
+
+        <!-- Boutons : annuler (retour) ou envoyer -->
         <div class="publish-actions">
-          <a class="btn btn-outline" href="dashboard-proprietaire.html">Annuler</a
-          ><button class="btn btn-primary" type="submit">Envoyer pour validation</button>
+          <a class="btn btn-outline" href="dashboard-proprietaire.html">Annuler</a>
+          <button class="btn btn-primary" type="submit">Envoyer pour validation</button>
         </div>
       </form>
     </main>
+
+    <!-- Pied de page : vide ici, construit lui aussi par js/utils.js -->
     <footer id="site-footer"></footer>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+
+    <!-- ═══ SCRIPTS : placés en bas pour que la page s'affiche avant d'être rendue interactive.
+         L'ORDRE COMPTE : chaque fichier utilise ceux chargés avant lui. ═══ -->
+
+    <!-- 1. Librairie officielle Supabase (dialogue avec la base de données).
+         integrity = empreinte SRI : si quelqu'un modifiait ce fichier sur le CDN,
+         le navigateur refuserait de l'exécuter (protection contre un CDN piraté). -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"
+      integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug"
+      crossorigin="anonymous"
+    ></script>
+    <!-- 2. Réglages : adresse de la base, numéro du support, communes -->
     <script src="js/config.js"></script>
+    <!-- 3. Boîte à outils commune : menu, pied de page, favoris, sécurité, installation -->
     <script src="js/utils.js"></script>
+    <!-- 4. Couche de données : toutes les requêtes vers la base -->
     <script src="js/storage.js"></script>
+    <!-- 5. Comptes : connexion, inscription, utilisateur courant -->
     <script src="js/auth.js"></script>
+    <!-- Script propre à cette page -->
     <script src="js/publier.js"></script>
   </body>
 </html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<!-- ═══════════════════════════════════════════════════════════════════
+     offline.html : page « Pas de connexion »
+     Affichée par le service worker (sw.js) quand le téléphone n'a plus
+     Internet et que la page demandée n'est pas en réserve.
+     Volontairement simple : aucun script, aucune donnée de la base.
+     ═══════════════════════════════════════════════════════════════════ -->
+<html lang="fr">
+  <head>
+    <!-- Encodage des caractères : permet d'afficher les accents correctement -->
+    <meta charset="UTF-8" />
+    <!-- Adapte la largeur de la page à l'écran du téléphone -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Couleur de la barre du navigateur sur mobile (vert Domi) -->
+    <meta name="theme-color" content="#0B3B35" />
+    <!-- Cette page n'a pas à apparaître dans Google -->
+    <meta name="robots" content="noindex" />
+    <!-- Titre de l'onglet -->
+    <title>Pas de connexion · Domi</title>
+    <!-- Logo dans l'onglet -->
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <!-- Feuille de style du site (gardée en réserve par le service worker) -->
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Contenu centré (classe .notfound, la même que la page 404) -->
+    <main class="container notfound">
+      <!-- Logo de Domi dessiné en SVG (dessin vectoriel, net à toutes les tailles) -->
+      <svg class="offline-logo" viewBox="0 0 40 40" aria-hidden="true">
+        <rect width="40" height="40" rx="12" fill="#0B3B35" />
+        <path d="M8.5 19.2 20 9.5l11.5 9.7V29a2.5 2.5 0 0 1-2.5 2.5H11A2.5 2.5 0 0 1 8.5 29z" fill="#F7F4EE" />
+        <path d="M20 30.2s-4.9-4.3-4.9-7.8a4.9 4.9 0 0 1 9.8 0c0 3.5-4.9 7.8-4.9 7.8z" fill="#E07A1F" />
+        <circle cx="20" cy="22.3" r="1.8" fill="#F7F4EE" />
+      </svg>
+      <!-- Titre principal -->
+      <h1>Pas de connexion Internet</h1>
+      <!-- Explication pour le visiteur -->
+      <p>
+        Domi a besoin d’Internet pour afficher les annonces à jour. Vérifiez vos données mobiles ou
+        votre Wi-Fi, puis réessayez.
+      </p>
+      <!-- Bouton : un simple lien vers l'accueil, qui relance le chargement -->
+      <div class="btns">
+        <a class="btn btn-primary" href="index.html">Réessayer</a>
+      </div>
+    </main>
+  </body>
+</html>
