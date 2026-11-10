@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         telephone: d.get("telephone"),
         role: d.get("role"),
         commune: d.get("commune"),
+        email: (d.get("email") || "").trim().toLowerCase(),
         password: d.get("password"),
       });
       location.href = "dashboard-proprietaire.html";

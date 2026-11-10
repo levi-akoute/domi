@@ -39,11 +39,21 @@
   }
   async function register(d) {
     const tel = normalize(d.telephone);
+    if (String(d.password || "").length < 8)
+      throw new Error("Le mot de passe doit contenir au moins 8 caractères.");
     const { data, error } = await S().auth.signUp({
       email: email(tel),
       password: d.password,
       options: {
-        data: { nom: d.nom, prenom: d.prenom, telephone: tel, commune: d.commune, role: d.role },
+        // Ces infos sont lues par le trigger handle_new_user (database/07) pour créer le profil
+        data: {
+          nom: d.nom,
+          prenom: d.prenom,
+          telephone: tel,
+          commune: d.commune,
+          role: d.role,
+          email_recuperation: d.email || null,
+        },
       },
     });
     if (error)

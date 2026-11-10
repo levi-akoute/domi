@@ -35,47 +35,68 @@
         </div>
         <a href="publier.html" class="btn btn-primary">+ Publier un bien</a>
       </div>
+
       <div class="stats-grid" id="dashboard-stats"></div>
+
       <section class="dashboard-panel">
         <div class="panel-heading">
           <div>
             <h2>Mes annonces</h2>
             <p>
-              « Confirmer à jour » rafraîchit la date de confirmation : les annonces récemment
-              confirmées inspirent plus confiance.
+              Confirmez régulièrement vos annonces : sans confirmation pendant 45 jours, une annonce
+              est masquée pour ne pas montrer de logements déjà loués.
             </p>
           </div>
         </div>
         <div id="owner-listings"></div>
       </section>
+
       <section class="dashboard-panel verification-panel">
         <div>
           <span class="eyebrow">Confiance</span>
           <h2>Obtenir le badge « Propriétaire vérifié »</h2>
           <p>
             Envoyez une pièce d’identité ou un justificatif. Il est stocké dans un espace privé et
-            n’est jamais affiché publiquement.
+            n’est jamais affiché publiquement. Avantage : vos annonces sont ensuite publiées sans
+            attente.
           </p>
         </div>
         <div id="verification-area"></div>
         <div id="verification-message" class="notice hidden"></div>
       </section>
+
       <section class="dashboard-panel">
         <div class="panel-heading">
           <div>
             <h2>Sécurité du compte</h2>
-            <p>Changez votre mot de passe (6 caractères minimum).</p>
+            <p>Protégez votre accès et préparez la récupération de votre compte.</p>
           </div>
         </div>
-        <form id="password-form" class="verify-form">
-          <label
-            >Nouveau mot de passe<input
-              name="password"
-              type="password"
-              minlength="6"
-              required /></label
-          ><button class="btn btn-outline">Modifier</button>
-        </form>
+        <div class="account-grid">
+          <div id="email-block">
+            <h3>Email de récupération</h3>
+            <div id="email-warning" class="notice info compact hidden">
+              Sans email, vous devrez contacter le support si vous oubliez votre mot de passe.
+            </div>
+            <form id="email-form" class="verify-form">
+              <label
+                >Adresse email
+                <input name="email" type="email" maxlength="120" placeholder="nom@gmail.com" autocomplete="email" />
+              </label>
+              <button class="btn btn-outline">Enregistrer</button>
+            </form>
+          </div>
+          <div>
+            <h3>Mot de passe</h3>
+            <form id="password-form" class="verify-form">
+              <label
+                >Nouveau mot de passe (8 caractères minimum)
+                <input name="password" type="password" minlength="8" required autocomplete="new-password" />
+              </label>
+              <button class="btn btn-outline">Modifier</button>
+            </form>
+          </div>
+        </div>
       </section>
     </main>
     <footer id="site-footer"></footer>

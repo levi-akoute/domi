@@ -30,20 +30,61 @@
       <section class="auth-card">
         <span class="eyebrow">Sécurité du compte</span>
         <h1>Mot de passe oublié ?</h1>
-        <p class="muted">
-          Pour protéger votre compte, la réinitialisation est faite par notre équipe après
-          vérification. Écrivez-nous sur WhatsApp avec le numéro de votre compte : un mot de passe
-          temporaire vous sera communiqué, à modifier ensuite dans « Mon espace ».
-        </p>
-        <a
-          id="support-link"
-          class="btn btn-primary btn-block"
-          href="#"
-          target="_blank"
-          rel="noopener"
-          >Contacter le support sur WhatsApp ↗</a
-        >
-        <p style="margin-top: 20px">
+
+        <!-- Étape 1 : demander un code -->
+        <form id="step-ask" class="stack">
+          <p class="muted">
+            Saisissez le numéro de votre compte. Si vous avez enregistré un email de récupération,
+            vous recevrez un code à 6 chiffres pour choisir un nouveau mot de passe.
+          </p>
+          <label
+            >Numéro de téléphone du compte
+            <input name="telephone" type="tel" required placeholder="Ex. 0700000000" autocomplete="tel" />
+          </label>
+          <button class="btn btn-primary btn-block" type="submit">Recevoir un code</button>
+        </form>
+
+        <!-- Étape 2 : saisir le code et le nouveau mot de passe -->
+        <form id="step-reset" class="stack hidden">
+          <p class="muted" id="reset-intro"></p>
+          <label
+            >Code reçu par email
+            <input
+              name="code"
+              inputmode="numeric"
+              pattern="[0-9]{6}"
+              maxlength="6"
+              required
+              placeholder="123456"
+              autocomplete="one-time-code"
+              class="code-input"
+            />
+          </label>
+          <label
+            >Nouveau mot de passe (8 caractères minimum)
+            <input name="password" type="password" minlength="8" required autocomplete="new-password" />
+          </label>
+          <label
+            >Confirmez le mot de passe
+            <input name="password2" type="password" minlength="8" required autocomplete="new-password" />
+          </label>
+          <button class="btn btn-primary btn-block" type="submit">Changer mon mot de passe</button>
+          <p class="fine-print" style="margin: 0; text-align: center">
+            Pas de code ? <button type="button" class="text-link link-btn" id="resend">Renvoyer un code</button>
+            · <button type="button" class="text-link link-btn" id="change-number">Changer de numéro</button>
+          </p>
+        </form>
+
+        <div id="recovery-message" class="notice hidden" role="status"></div>
+
+        <div class="recovery-help">
+          <strong>Pas d’email enregistré sur votre compte ?</strong>
+          <p>Notre équipe peut vous aider après vérification de votre identité.</p>
+          <a id="support-link" class="btn btn-outline btn-block" href="#" target="_blank" rel="noopener"
+            >Contacter le support sur WhatsApp</a
+          >
+        </div>
+        <p style="margin-top: 20px; margin-bottom: 0">
           <a class="text-link" href="connexion.html">← Retour à la connexion</a>
         </p>
       </section>

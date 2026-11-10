@@ -118,12 +118,23 @@
                 <option value="proprietaire">Propriétaire</option>
                 <option value="agent">Agent / démarcheur</option>
               </select></label
-            ><label>Commune principale<select name="commune" required></select></label
-            ><label
-              >Mot de passe (6 caractères minimum)<input
+            ><label>Commune principale<select name="commune" required></select></label>
+            <label
+              >Email de récupération (facultatif, conseillé)<input
+                name="email"
+                type="email"
+                maxlength="120"
+                placeholder="Ex. nom@gmail.com"
+                autocomplete="email"
+              /><small class="field-hint"
+                >Sert uniquement à recevoir un code si vous oubliez votre mot de passe.</small
+              ></label
+            >
+            <label
+              >Mot de passe (8 caractères minimum)<input
                 name="password"
                 type="password"
-                minlength="6"
+                minlength="8"
                 required
                 autocomplete="new-password" /></label
             ><button class="btn btn-primary btn-block" type="submit">Créer mon compte</button>
