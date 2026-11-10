@@ -1,10 +1,20 @@
+/* ═══════════════════════════════════════════════════════════════════
+   detail.js : fiche d'une annonce (maison-detail.html?id=...)
+
+   - affiche l'annonce, la galerie photo (+ plein écran), les conditions
+   - contact WhatsApp / appel, partage, favori, signalement
+   - avis et notes (lecture, et formulaire pour les utilisateurs connectés)
+   ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", async () => {
   document.body.classList.add("is-detail");
-  const U = window.ImmoUtils,
-    S = window.ImmoStorage,
-    A = window.ImmoAuth,
-    main = U.qs("#detail-content"),
-    FALLBACK = "assets/img/placeholder.svg";
+  const U = window.ImmoUtils;
+  const S = window.ImmoStorage;
+  const A = window.ImmoAuth;
+  const E = U.escapeHtml;
+  const I = U.icon;
+  const main = U.qs("#detail-content");
+  const FALLBACK = "assets/img/placeholder.svg";
+
   const notFound =
     '<div class="empty-state"><h1>Annonce introuvable</h1><p>Cette annonce n’existe pas, n’est plus publiée ou a été supprimée.</p><a class="btn btn-primary" href="annonces.html">Retour aux annonces</a></div>';
   let a = null;
@@ -15,44 +25,102 @@ document.addEventListener("DOMContentLoaded", async () => {
     main.innerHTML = notFound;
     return;
   }
-  const user = await A.currentUser(),
-    mine = user && user.id === a.owner_id,
-    pub = a.moderation === "approuvee";
+
+  const user = await A.currentUser();
+  const mine = user && user.id === a.owner_id;
+  const pub = a.moderation === "approuvee";
+
+  // Une vue comptée par annonce et par session de navigation (pas à chaque rechargement)
   if (pub && !sessionStorage.getItem("v_" + a.id)) {
     sessionStorage.setItem("v_" + a.id, "1");
     S.vue(a.id);
   }
   document.title = a.titre + " — Domi";
-  const photos = (a.images && a.images.length ? a.images : [a.image]).filter(Boolean);
+
+  // Photos : seules les adresses http(s) sont gardées
+  const photos = (a.images && a.images.length ? a.images : [a.image])
+    .map(U.safeUrl)
+    .filter(Boolean);
   if (!photos.length) photos.push(FALLBACK);
-  const phone = String(a.telephone || "").replace(/\D/g, ""),
-    full = phone.startsWith("225") ? phone : "225" + phone,
-    dispo = a.statut === "Disponible" && pub;
+
+  // Numéro au format international pour WhatsApp (225 + 10 chiffres)
+  const phone = String(a.telephone || "").replace(/\D/g, "");
+  const full = phone.startsWith("225") ? phone : "225" + phone;
+  const dispo = a.statut === "Disponible" && pub;
   const wa = phone
-    ? `https://wa.me/${full}?text=${encodeURIComponent("Bonjour, je vous contacte au sujet de votre annonce Domi : " + a.titre)}`
+    ? `https://wa.me/${full}?text=${encodeURIComponent("Bonjour, je vous contacte au sujet de votre annonce Domi : " + a.titre + "\n" + location.href)}`
     : "#";
   const waAttr =
-      dispo && phone ? `href="${wa}" target="_blank" rel="noopener"` : `aria-disabled="true"`,
-    dis = dispo && phone ? "" : "disabled-link";
-  const E = U.escapeHtml,
-    I = U.icon;
-  main.innerHTML = `<a class="back-link" href="annonces.html">${I("arrow", "flip")} Retour aux annonces</a>
-  ${!pub ? `<div class="notice info">${a.moderation === "rejetee" ? "Cette annonce a été refusée par la modération." : "Cette annonce est en attente de validation."} Elle n’est visible que par vous${user && user.role === "admin" ? " et les administrateurs" : ""}.</div>` : ""}
-  <div class="detail-heading"><div><div class="listing-location">${I("pin")} ${E(a.commune)}${a.quartier ? " · " + E(a.quartier) : ""}</div><h1>${E(a.titre)}</h1><p>${E(a.type)} · ${Number(a.chambres) || 0} chambre(s) · ${E(a.etage || "Étage non précisé")}</p></div><div class="badge-stack"><span class="status-badge static ${a.statut === "Disponible" ? "available" : "unavailable"}">${E(a.statut)}</span>${a.proprietaire_verifie ? `<span class="verified-badge static">${I("check")} Propriétaire vérifié</span>` : ""}</div></div>
-  <div class="detail-layout"><div class="detail-main-column">
-    <div class="detail-photo"><img id="gallery-main" src="${E(photos[0])}" alt="${E(a.titre)}" onerror="this.onerror=null;this.src='${FALLBACK}'">${U.safeUrl(a.video) ? `<a class="video-overlay" href="${E(U.safeUrl(a.video))}" target="_blank" rel="noopener nofollow">${I("play")} Voir la visite vidéo</a>` : ""}</div>
-    ${photos.length > 1 ? `<div class="thumbs">${photos.map((p, i) => `<button type="button" class="thumb ${i ? "" : "active"}" data-i="${i}" aria-label="Photo ${i + 1}"><img src="${E(p)}" alt="" loading="lazy"></button>`).join("")}</div>` : ""}
-    <section class="detail-section"><h2>Description</h2><p>${E(a.description || "Aucune description fournie.").replace(/\n/g, "<br>")}</p></section>
-    <section class="detail-section"><h2>Caractéristiques</h2><div class="feature-grid"><div><small>${I("bolt")} Compteur CIE</small><strong>${E(a.cie || "Non renseigné")}</strong></div><div><small>${I("drop")} Compteur SODECI</small><strong>${E(a.sodeci || "Non renseigné")}</strong></div><div><small>Avance</small><strong>${Number(a.avance) || 0} mois</strong></div><div><small>Caution</small><strong>${Number(a.caution) || 0} mois</strong></div><div><small>${I("bed")} Chambres</small><strong>${Number(a.chambres) || 0}</strong></div><div><small>Annonce confirmée</small><strong>${U.daysAgo(a.confirmee_le)}</strong></div></div></section>
-    <section class="safety-note"><strong>Conseils de sécurité</strong><ul><li>Visitez le logement avant de verser de l’argent.</li><li>Vérifiez l’identité de l’annonceur et que c’est bien lui qui détient le bien.</li><li>Demandez un reçu écrit pour tout paiement.</li><li>Ne transmettez jamais de code confidentiel ni de code Mobile Money.</li></ul></section>
-    <section class="detail-section" id="reviews-section"></section>
+    dispo && phone ? `href="${wa}" target="_blank" rel="noopener"` : `aria-disabled="true"`;
+  const dis = dispo && phone ? "" : "disabled-link";
+  const ch = U.chambresLabel(a.chambres);
+  const video = U.safeUrl(a.video);
+  const ancienne = pub && U.daysSince(a.confirmee_le) >= U.JOURS_RAPPEL;
+
+  // Bandeau d'information : annonce non publiée, ou pas confirmée depuis longtemps
+  const bandeau = !pub
+    ? `<div class="notice info">${a.moderation === "rejetee" ? "Cette annonce a été refusée par la modération." : "Cette annonce est en attente de validation."} Elle n’est visible que par vous${user && user.role === "admin" ? " et les administrateurs" : ""}.</div>`
+    : ancienne
+      ? `<div class="notice info">L’annonceur n’a pas confirmé cette annonce depuis ${U.daysSince(a.confirmee_le)} jours : vérifiez auprès de lui que le logement est toujours disponible.</div>`
+      : "";
+
+  const caracteristiques = [
+    [I("bolt") + " Compteur CIE", E(a.cie || "Non renseigné")],
+    [I("drop") + " Compteur SODECI", E(a.sodeci || "Non renseigné")],
+    ["Avance", `${Number(a.avance) || 0} mois`],
+    ["Caution", `${Number(a.caution) || 0} mois`],
+    [I("bed") + " Chambres", Number(a.chambres) || "Pièce unique"],
+    ["Étage", E(a.etage || "Non précisé")],
+  ]
+    .map(([k, v]) => `<div><small>${k}</small><strong>${v}</strong></div>`)
+    .join("");
+
+  // Somme à prévoir à l'entrée : (avance + caution) × loyer
+  const entree = ((Number(a.avance) || 0) + (Number(a.caution) || 0)) * (Number(a.loyer) || 0);
+
+  main.innerHTML = `
+  <a class="back-link" href="annonces.html">${I("arrow", "flip")} Retour aux annonces</a>
+  ${bandeau}
+  <div class="detail-heading">
+    <div>
+      <div class="listing-location">${I("pin")} ${E(a.commune)}${a.quartier ? " · " + E(a.quartier) : ""}</div>
+      <h1>${E(a.titre)}</h1>
+      <p>${E(a.type)}${ch ? " · " + ch : ""} · Confirmée ${U.daysAgo(a.confirmee_le)}</p>
+    </div>
+    <div class="badge-stack">
+      <span class="status-badge static ${a.statut === "Disponible" ? "available" : "unavailable"}">${E(a.statut)}</span>
+      ${a.proprietaire_verifie ? `<span class="verified-badge static">${I("check")} Propriétaire vérifié</span>` : ""}
+      ${pub ? U.favButton(a.id, "with-label") : ""}
+    </div>
   </div>
-  <aside class="contact-card"><span class="eyebrow">Prix annoncé</span><div class="detail-price">${U.money(a.loyer)}<small>/ mois</small></div><div class="contact-divider"></div>
-    <div class="condition-row"><span>Avance</span><strong>${Number(a.avance) || 0} mois</strong></div><div class="condition-row"><span>Caution</span><strong>${Number(a.caution) || 0} mois</strong></div><div class="condition-row"><span>Disponibilité</span><strong>${E(a.statut)}</strong></div>
-    <a class="btn btn-primary btn-block ${dis}" ${waAttr} id="whatsapp-contact">${I("whatsapp")} Contacter sur WhatsApp</a>
-    <a class="btn btn-outline btn-block ${dis}" ${dispo && phone ? `href="tel:+${full}"` : `aria-disabled="true"`}>${I("phone")} Appeler l’annonceur</a>
-    <button class="btn btn-outline btn-block" id="share-listing" type="button">${I("share")} Partager cette annonce</button>
-    <p class="fine-print">Disponibilité, prix et conditions à confirmer directement avec l’annonceur.</p><button class="report-link" id="report-listing" type="button">Signaler cette annonce</button><a class="support-link" href="${U.supportLink("Bonjour Domi, j’ai un doute sur cette annonce : " + a.titre + " — " + location.href)}" target="_blank" rel="noopener">Un doute ? Écrire au support</a></aside></div>
+  <div class="detail-layout">
+    <div class="detail-main-column">
+      <div class="detail-photo">
+        <img id="gallery-main" src="${E(photos[0])}" alt="${E(a.titre)}" onerror="this.onerror=null;this.src='${FALLBACK}'">
+        ${photos.length > 1 ? `<span class="photo-count">${photos.length} photos</span>` : ""}
+        ${video ? `<a class="video-overlay" href="${E(video)}" target="_blank" rel="noopener nofollow">${I("play")} Voir la visite vidéo</a>` : ""}
+      </div>
+      ${photos.length > 1 ? `<div class="thumbs">${photos.map((p, i) => `<button type="button" class="thumb ${i ? "" : "active"}" data-i="${i}" aria-label="Photo ${i + 1}"><img src="${E(p)}" alt="" loading="lazy"></button>`).join("")}</div>` : ""}
+      <section class="detail-section"><h2>Description</h2><p>${E(a.description || "Aucune description fournie.").replace(/\n/g, "<br>")}</p></section>
+      <section class="detail-section"><h2>Caractéristiques</h2><div class="feature-grid">${caracteristiques}</div></section>
+      <section class="safety-note"><strong>${I("shield")} Conseils de sécurité</strong><ul><li>Visitez le logement avant de verser de l’argent.</li><li>Vérifiez l’identité de l’annonceur et que c’est bien lui qui détient le bien.</li><li>Demandez un reçu écrit pour tout paiement.</li><li>Ne transmettez jamais de code confidentiel ni de code Mobile Money.</li></ul></section>
+      <section class="detail-section" id="reviews-section"></section>
+    </div>
+    <aside class="contact-card">
+      <span class="eyebrow">Loyer mensuel</span>
+      <div class="detail-price">${U.money(a.loyer)}<small>/ mois</small></div>
+      <div class="contact-divider"></div>
+      <div class="condition-row"><span>Avance</span><strong>${Number(a.avance) || 0} mois</strong></div>
+      <div class="condition-row"><span>Caution</span><strong>${Number(a.caution) || 0} mois</strong></div>
+      ${entree ? `<div class="condition-row total"><span>À prévoir à l’entrée</span><strong>${U.money(entree)}</strong></div>` : ""}
+      <a class="btn btn-primary btn-block ${dis}" ${waAttr} id="whatsapp-contact">${I("whatsapp")} Contacter sur WhatsApp</a>
+      <a class="btn btn-outline btn-block ${dis}" ${dispo && phone ? `href="tel:+${full}"` : `aria-disabled="true"`}>${I("phone")} Appeler l’annonceur</a>
+      <button class="btn btn-outline btn-block" id="share-listing" type="button">${I("share")} Partager cette annonce</button>
+      <p class="fine-print">Disponibilité, prix et conditions à confirmer directement avec l’annonceur.</p>
+      <button class="report-link" id="report-listing" type="button">${I("flag")} Signaler cette annonce</button>
+      <a class="support-link" href="${U.supportLink("Bonjour Domi, j’ai un doute sur cette annonce : " + a.titre + " (" + location.href + ")")}" target="_blank" rel="noopener">Un doute ? Écrire au support</a>
+    </aside>
+  </div>
   <div class="sticky-contact"><div><strong>${U.money(a.loyer)}</strong><small>/ mois</small></div><a class="btn btn-primary ${dis}" ${waAttr} id="whatsapp-sticky">${I("whatsapp")} WhatsApp</a></div>`;
 
   main.querySelectorAll(".thumb").forEach((b) =>

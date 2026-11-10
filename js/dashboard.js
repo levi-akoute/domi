@@ -8,6 +8,7 @@
    - sécurité du compte : email de récupération et mot de passe
    ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", async () => {
+  document.body.classList.add("is-dashboard");
   const U = ImmoUtils;
   const S = ImmoStorage;
   const A = ImmoAuth;
@@ -126,19 +127,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       })
       .join("")}</div>`;
 
-    host.querySelectorAll("[data-status]").forEach(
-      (b) =>
-        (b.onclick = () =>
-          act(() => S.updateAnnonce(b.dataset.status, { statut: b.dataset.to }), "Statut mis à jour"))
-    );
-    host.querySelectorAll("[data-confirm]").forEach(
-      (b) =>
-        (b.onclick = () =>
-          act(
-            () => S.updateAnnonce(b.dataset.confirm, { confirmee_le: new Date().toISOString() }),
-            "Annonce confirmée à jour"
-          ))
-    );
+    host
+      .querySelectorAll("[data-status]")
+      .forEach(
+        (b) =>
+          (b.onclick = () =>
+            act(
+              () => S.updateAnnonce(b.dataset.status, { statut: b.dataset.to }),
+              "Statut mis à jour"
+            ))
+      );
+    host
+      .querySelectorAll("[data-confirm]")
+      .forEach(
+        (b) =>
+          (b.onclick = () =>
+            act(
+              () => S.updateAnnonce(b.dataset.confirm, { confirmee_le: new Date().toISOString() }),
+              "Annonce confirmée à jour"
+            ))
+      );
     host
       .querySelectorAll("[data-edit]")
       .forEach((b) => (b.onclick = () => (location.href = "publier.html?edit=" + b.dataset.edit)));

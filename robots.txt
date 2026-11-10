@@ -1,0 +1,14 @@
+# Domi : règles pour les moteurs de recherche (Google, Bing…)
+# Les pages privées (espaces connectés) n'ont rien à faire dans Google.
+User-agent: *
+Disallow: /domi/admin.html
+Disallow: /domi/dashboard-proprietaire.html
+Disallow: /domi/publier.html
+Disallow: /domi/mot-de-passe-oublie.html
+Disallow: /domi/database/
+Disallow: /domi/docs/
+Disallow: /domi/supabase/
+
+# ⚠ Quand vous aurez votre nom de domaine : retirez « /domi » des chemins ci-dessus
+# et remplacez l'adresse ci-dessous (et celles de sitemap.xml).
+Sitemap: https://levi-akoute.github.io/domi/sitemap.xml

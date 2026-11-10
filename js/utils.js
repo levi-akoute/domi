@@ -295,6 +295,13 @@
 
     updateFavCount();
 
+    // Le bouton flottant se cache quand le pied de page est visible (il a déjà son bouton support)
+    const flot = document.querySelector(".wa-float");
+    if (flot && footer && "IntersectionObserver" in window)
+      new IntersectionObserver(([e]) =>
+        flot.classList.toggle("is-hidden", e.isIntersecting)
+      ).observe(footer);
+
     // Menu mobile : ouverture, fermeture au clic extérieur et avec Échap
     const toggle = document.querySelector(".menu-toggle");
     const nav = document.querySelector(".main-nav");

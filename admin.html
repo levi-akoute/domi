@@ -7,15 +7,26 @@
     <title>Administration — Domi</title>
     <meta
       name="description"
-      content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."
+      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
     />
     <meta property="og:title" content="Administration — Domi" />
     <meta
       property="og:description"
-      content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."
+      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
     />
     <meta property="og:type" content="website" />
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta property="og:site_name" content="Domi" />
+    <meta
+      property="og:image"
+      content="https://levi-akoute.github.io/domi/assets/img/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="robots" content="noindex" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -26,70 +37,120 @@
   </head>
   <body>
     <header id="site-header"></header>
-    <main class="container dashboard-main">
-      <div class="dashboard-title">
-        <div>
-          <span class="eyebrow">Gestion de la plateforme</span>
-          <h1>Administration Domi</h1>
-          <p class="muted">
-            Validez les annonces, traitez les signalements et les demandes de vérification.
-          </p>
-        </div>
-      </div>
-      <div id="admin-message" class="notice hidden"></div>
-      <div id="admin-stats" class="stats-grid"></div>
-      <section class="dashboard-panel">
-        <div class="panel-heading">
-          <div>
-            <h2>Annonces</h2>
-            <p>Toute nouvelle annonce doit être approuvée avant d’être visible du public.</p>
+    <div class="admin-shell container" id="admin-main">
+      <aside class="admin-side" aria-label="Menu d’administration">
+        <span class="eyebrow">Administration</span>
+        <nav>
+          <a href="#apercu" data-tab-link="apercu">Vue d’ensemble</a>
+          <a href="#annonces" data-tab-link="annonces"
+            >Annonces <b data-count="annonces" hidden></b
+          ></a>
+          <a href="#signalements" data-tab-link="signalements"
+            >Signalements <b data-count="signalements" hidden></b
+          ></a>
+          <a href="#verifications" data-tab-link="verifications"
+            >Vérifications <b data-count="verifications" hidden></b
+          ></a>
+          <a href="#avis" data-tab-link="avis">Avis <b data-count="avis" hidden></b></a>
+          <a href="#utilisateurs" data-tab-link="utilisateurs">Utilisateurs</a>
+        </nav>
+        <button type="button" id="admin-refresh" class="btn btn-outline btn-sm btn-block">
+          Actualiser
+        </button>
+      </aside>
+
+      <main class="admin-content">
+        <div id="admin-message" class="notice hidden"></div>
+
+        <section class="admin-tab" id="tab-apercu">
+          <div class="admin-head">
+            <h1>Vue d’ensemble</h1>
+            <p class="muted">L’essentiel de la plateforme et ce qui attend votre décision.</p>
           </div>
-          <select id="ads-filter" class="mini-select">
-            <option value="en_attente">À valider</option>
-            <option value="approuvee">Publiées</option>
-            <option value="rejetee">Refusées</option>
-            <option value="tous">Toutes</option>
-          </select>
-        </div>
-        <div id="admin-ads"></div>
-      </section>
-      <section class="dashboard-panel">
-        <div class="panel-heading">
-          <div>
-            <h2>Signalements</h2>
-            <p>Annonces signalées par les visiteurs.</p>
+          <div id="admin-stats" class="stats-grid"></div>
+          <div class="dashboard-panel">
+            <h2>À traiter</h2>
+            <div id="admin-todo" class="todo-list"></div>
           </div>
-        </div>
-        <div id="admin-reports"></div>
-      </section>
-      <section class="dashboard-panel">
-        <div class="panel-heading">
-          <div>
-            <h2>Demandes de vérification</h2>
-            <p>
+          <div class="dashboard-panel">
+            <h2>Annonces les plus consultées</h2>
+            <div id="admin-top"></div>
+          </div>
+        </section>
+
+        <section class="admin-tab" id="tab-annonces" hidden>
+          <div class="admin-head">
+            <h1>Annonces</h1>
+            <p class="muted">
+              Les annonces des propriétaires vérifiés sont publiées directement ; les autres
+              attendent votre validation.
+            </p>
+          </div>
+          <div class="admin-toolbar">
+            <input
+              id="ads-search"
+              type="search"
+              placeholder="Rechercher : titre, commune, annonceur…"
+            />
+            <select id="ads-filter" class="mini-select">
+              <option value="en_attente">À valider</option>
+              <option value="approuvee">Publiées</option>
+              <option value="rejetee">Refusées</option>
+              <option value="tous">Toutes</option>
+            </select>
+          </div>
+          <div id="admin-ads"></div>
+        </section>
+
+        <section class="admin-tab" id="tab-signalements" hidden>
+          <div class="admin-head">
+            <h1>Signalements</h1>
+            <p class="muted">
+              Une annonce signalée par 3 sources différentes est automatiquement retirée du public
+              en attendant votre décision.
+            </p>
+          </div>
+          <div class="admin-toolbar">
+            <input id="reps-search" type="search" placeholder="Rechercher : motif, annonce…" />
+          </div>
+          <div id="admin-reports"></div>
+        </section>
+
+        <section class="admin-tab" id="tab-verifications" hidden>
+          <div class="admin-head">
+            <h1>Demandes de vérification</h1>
+            <p class="muted">
               Les documents sont dans un espace privé, consultables par vous seul (lien valable 5
               minutes).
             </p>
           </div>
-        </div>
-        <div id="admin-verifications"></div>
-      </section>
-      <section class="dashboard-panel">
-        <div class="panel-heading">
-          <div>
-            <h2>Avis des utilisateurs</h2>
-            <p>Un avis n’est visible du public qu’après votre validation.</p>
+          <div id="admin-verifications"></div>
+        </section>
+
+        <section class="admin-tab" id="tab-avis" hidden>
+          <div class="admin-head">
+            <h1>Avis des utilisateurs</h1>
+            <p class="muted">Un avis n’est visible du public qu’après votre validation.</p>
           </div>
-        </div>
-        <div id="admin-reviews"></div>
-      </section>
-      <section class="dashboard-panel">
-        <div class="panel-heading">
-          <div><h2>Utilisateurs</h2></div>
-        </div>
-        <div id="admin-users"></div>
-      </section>
-    </main>
+          <div id="admin-reviews"></div>
+        </section>
+
+        <section class="admin-tab" id="tab-utilisateurs" hidden>
+          <div class="admin-head">
+            <h1>Utilisateurs</h1>
+            <p class="muted">Comptes propriétaires et agents inscrits sur Domi.</p>
+          </div>
+          <div class="admin-toolbar">
+            <input
+              id="users-search"
+              type="search"
+              placeholder="Rechercher : nom, téléphone, commune…"
+            />
+          </div>
+          <div id="admin-users"></div>
+        </section>
+      </main>
+    </div>
     <footer id="site-footer"></footer>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <script src="js/config.js"></script>

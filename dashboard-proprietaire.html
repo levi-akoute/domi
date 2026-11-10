@@ -7,15 +7,26 @@
     <title>Mon tableau de bord — Domi</title>
     <meta
       name="description"
-      content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."
+      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
     />
     <meta property="og:title" content="Mon tableau de bord — Domi" />
     <meta
       property="og:description"
-      content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."
+      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
     />
     <meta property="og:type" content="website" />
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta property="og:site_name" content="Domi" />
+    <meta
+      property="og:image"
+      content="https://levi-akoute.github.io/domi/assets/img/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="robots" content="noindex" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -81,7 +92,13 @@
             <form id="email-form" class="verify-form">
               <label
                 >Adresse email
-                <input name="email" type="email" maxlength="120" placeholder="nom@gmail.com" autocomplete="email" />
+                <input
+                  name="email"
+                  type="email"
+                  maxlength="120"
+                  placeholder="nom@gmail.com"
+                  autocomplete="email"
+                />
               </label>
               <button class="btn btn-outline">Enregistrer</button>
             </form>
@@ -91,7 +108,13 @@
             <form id="password-form" class="verify-form">
               <label
                 >Nouveau mot de passe (8 caractères minimum)
-                <input name="password" type="password" minlength="8" required autocomplete="new-password" />
+                <input
+                  name="password"
+                  type="password"
+                  minlength="8"
+                  required
+                  autocomplete="new-password"
+                />
               </label>
               <button class="btn btn-outline">Modifier</button>
             </form>

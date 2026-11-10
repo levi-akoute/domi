@@ -2103,3 +2103,680 @@ td small {
     text-align: left;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v5 : favoris, filtres complets, tableau de bord, administration,
+   mot de passe oublié, page 404. Ces règles viennent APRÈS les
+   anciennes : à priorité égale, la dernière règle écrite l'emporte.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ───────── Utilitaires ───────── */
+.center {
+  text-align: center;
+}
+.btn-sm {
+  padding: 9px 16px;
+  font-size: 0.85rem;
+}
+.icon-btn {
+  border: 0;
+  background: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--forest);
+  padding: 4px 8px;
+}
+.link-btn {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+.field-hint {
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.danger-text {
+  color: var(--bad) !important;
+  font-weight: 700;
+}
+.notice.compact {
+  padding: 9px 12px;
+  font-size: 0.82rem;
+  margin: 8px 0 0;
+}
+.notice .ic {
+  vertical-align: -0.2em;
+}
+
+/* ───────── En-tête : compteur de favoris ───────── */
+[data-fav-count] {
+  display: inline-grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font: 800 0.68rem/1 var(--sans);
+}
+[data-fav-count][hidden] {
+  display: none;
+}
+.home-btn.fav-link {
+  position: relative;
+}
+.home-btn.fav-link [data-fav-count] {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+}
+.main-nav .fav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ───────── Bouton favori (cœur) ───────── */
+.listing-card {
+  position: relative;
+}
+.fav-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 0;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--forest);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+  transition: transform 0.15s;
+}
+.fav-btn:hover {
+  transform: scale(1.08);
+}
+.fav-btn .ic {
+  width: 1.25em;
+  height: 1.25em;
+}
+.fav-btn.on {
+  color: var(--accent);
+}
+.fav-btn.on .ic {
+  fill: var(--accent);
+}
+.fav-btn.on-card {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+}
+.fav-btn.with-label {
+  box-shadow: none;
+  border: 1.5px solid var(--line);
+  background: #fff;
+}
+
+/* ───────── Cartes d'annonces ───────── */
+.verified-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ok);
+  font-weight: 700;
+}
+.verified-inline .ic {
+  color: var(--ok);
+}
+.listing-bottom {
+  gap: 10px;
+}
+.listing-bottom .listing-price {
+  margin: 0;
+}
+.listing-bottom .rt {
+  margin: 0;
+  white-space: nowrap;
+}
+.listing-card .freshness {
+  background: none;
+  padding: 0;
+  margin-top: 10px;
+  color: var(--muted);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ───────── Catalogue : filtres ───────── */
+.filter-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#close-filters,
+.filters-btn {
+  display: none;
+}
+.filter-card label.check {
+  font-size: 0.86rem;
+}
+.results-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sort-label {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.sort-label select {
+  width: auto;
+  padding: 9px 34px 9px 12px;
+  font-size: 0.85rem;
+}
+.filters-btn b {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.7rem;
+}
+.filters-btn b[hidden] {
+  display: none;
+}
+
+/* ───────── Fiche annonce ───────── */
+.detail-photo {
+  position: relative;
+}
+.photo-count {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  background: rgba(11, 59, 53, 0.85);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font: 700 0.75rem var(--sans);
+  pointer-events: none;
+}
+.condition-row.total {
+  border-top: 1px dashed var(--line);
+  margin-top: 6px;
+  padding-top: 12px;
+}
+.condition-row.total strong {
+  color: var(--accent-d);
+}
+.safety-note strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.report-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ───────── Bouton WhatsApp flottant ───────── */
+.wa-float.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+}
+
+/* ───────── Mot de passe oublié ───────── */
+.code-input {
+  font: 700 1.6rem var(--sans);
+  letter-spacing: 0.5em;
+  text-align: center;
+}
+.recovery-help {
+  margin-top: 24px;
+  padding: 18px;
+  background: var(--cream);
+  border-radius: 16px;
+  font-size: 0.9rem;
+}
+.recovery-help p {
+  color: var(--muted);
+  margin: 4px 0 12px;
+}
+
+/* ───────── Statistiques (tableau de bord et admin) ───────── */
+.stat-card {
+  position: relative;
+}
+.stat-card .stat-ic {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 22px;
+  height: 22px;
+  color: var(--accent);
+  opacity: 0.85;
+}
+.stat-card strong small {
+  font: 600 0.85rem var(--sans);
+  color: var(--muted);
+}
+
+/* ───────── Tableau de bord propriétaire ───────── */
+.owner-list {
+  display: grid;
+  gap: 14px;
+}
+.owner-item {
+  display: grid;
+  grid-template-columns: 112px 1fr auto;
+  gap: 18px;
+  align-items: start;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+}
+.owner-thumb img {
+  width: 112px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 12px;
+  background: var(--sand);
+}
+.owner-info h3 {
+  margin: 6px 0 4px;
+  font-size: 1.1rem;
+}
+.owner-info small {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.owner-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.owner-stats {
+  display: flex;
+  gap: 18px;
+  margin: 0;
+}
+.owner-stats div {
+  text-align: center;
+}
+.owner-stats dt {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.owner-stats dd {
+  margin: 2px 0 0;
+  font: 600 1.3rem var(--serif);
+  color: var(--forest);
+}
+.owner-item .table-actions {
+  grid-column: 2 / -1;
+}
+.account-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+.account-grid h3 {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+/* ───────── Administration ───────── */
+.is-admin .wa-float {
+  display: none;
+}
+.admin-shell {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  gap: 32px;
+  padding: 34px 0 90px;
+  align-items: start;
+}
+.admin-side {
+  position: sticky;
+  top: 98px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 20px;
+}
+.admin-side nav {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.admin-side nav a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+.admin-side nav a:hover {
+  background: rgba(11, 59, 53, 0.06);
+}
+.admin-side nav a.active {
+  background: var(--forest);
+  color: #fff;
+}
+.admin-side nav b {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--bad);
+  color: #fff;
+  font-size: 0.72rem;
+  display: inline-grid;
+  place-items: center;
+}
+.admin-side nav b[hidden] {
+  display: none;
+}
+.admin-shell:has(.access-denied) .admin-side {
+  display: none;
+}
+.admin-shell:has(.access-denied) {
+  grid-template-columns: 1fr;
+}
+.admin-content {
+  min-width: 0;
+}
+.admin-head {
+  margin-bottom: 20px;
+}
+.admin-head h1 {
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  margin-bottom: 4px;
+}
+.admin-head p {
+  margin: 0;
+}
+.admin-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.admin-toolbar input {
+  flex: 1;
+}
+.admin-content .dashboard-panel h2 {
+  font-size: 1.3rem;
+}
+.todo-list {
+  display: grid;
+  gap: 10px;
+}
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+  color: var(--forest);
+  font-weight: 600;
+}
+.todo-item strong {
+  font: 600 1.3rem var(--serif);
+}
+.todo-item span {
+  margin-left: auto;
+}
+.todo-item:hover {
+  background: #f8dfbf;
+}
+.cell-media {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.cell-media img {
+  width: 64px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex: none;
+  background: var(--sand);
+}
+.mini-btn.ok {
+  color: var(--ok);
+}
+.mini-btn.ok:hover {
+  border-color: var(--ok);
+}
+.mini-btn.ghost {
+  border-color: transparent;
+  padding: 7px 9px;
+}
+.mini-btn .ic {
+  vertical-align: -0.2em;
+}
+.stars-txt {
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+/* ───────── Page 404 ───────── */
+.notfound {
+  text-align: center;
+  padding: 90px 0 110px;
+}
+.notfound .big {
+  font: 600 clamp(5rem, 16vw, 9rem) / 1 var(--serif);
+  color: var(--accent);
+}
+.notfound p {
+  color: var(--muted);
+  max-width: 32em;
+  margin: 0 auto 26px;
+}
+.notfound .btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ───────── Tablettes ───────── */
+@media (max-width: 980px) {
+  .admin-shell {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding-top: 20px;
+  }
+  .admin-side {
+    position: static;
+    padding: 12px;
+  }
+  .admin-side .eyebrow,
+  #admin-refresh {
+    display: none;
+  }
+  .admin-side nav {
+    display: flex;
+    overflow-x: auto;
+    margin: 0;
+    gap: 6px;
+    scrollbar-width: none;
+  }
+  .admin-side nav a {
+    white-space: nowrap;
+    gap: 8px;
+  }
+
+  /* Filtres du catalogue : panneau qui s'ouvre par-dessus la page */
+  .filters-btn {
+    display: inline-flex;
+    gap: 8px;
+  }
+  #close-filters {
+    display: block;
+  }
+  .filter-card {
+    display: none;
+  }
+  .filter-card.open {
+    display: grid;
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 60;
+    max-height: 88vh;
+    overflow-y: auto;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.25);
+  }
+  .filter-card.open .two {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ───────── Téléphones ───────── */
+@media (max-width: 760px) {
+  /* Tableaux → cartes : chaque ligne devient un bloc, chaque cellule affiche son titre */
+  .admin-table thead {
+    display: none;
+  }
+  .admin-table,
+  .admin-table tbody,
+  .admin-table tr,
+  .admin-table td {
+    display: block;
+    width: 100%;
+  }
+  .admin-table tr {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 6px 14px;
+    margin-bottom: 12px;
+    background: #fff;
+  }
+  /* Le titre de colonne est placé à gauche en position absolue :
+     le contenu de la cellule reste un seul bloc, à droite (padding-left). */
+  .admin-table td {
+    border: 0;
+    padding: 8px 0 8px 112px;
+    position: relative;
+    min-height: 34px;
+  }
+  .admin-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    top: 11px;
+    width: 102px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .admin-toolbar {
+    flex-direction: column;
+  }
+  .admin-toolbar .mini-select {
+    width: 100%;
+  }
+
+  .owner-item {
+    grid-template-columns: 84px 1fr;
+  }
+  .owner-thumb img {
+    width: 84px;
+    height: 70px;
+  }
+  .owner-stats {
+    grid-column: 1 / -1;
+    justify-content: space-around;
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 8px;
+  }
+  .owner-item .table-actions {
+    grid-column: 1 / -1;
+  }
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  /* Cartes compactes sur 2 colonnes : on réaffiche le prix (dans .listing-bottom depuis la v5) */
+  .listing-card .listing-bottom {
+    display: flex;
+    border: 0;
+    padding-top: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .listing-card .listing-bottom .rt {
+    font-size: 0.72rem;
+  }
+  .listing-card .freshness {
+    display: none;
+  }
+  .fav-btn.on-card {
+    width: 34px;
+    height: 34px;
+    top: 8px;
+    right: 8px;
+  }
+  .sort-label span {
+    display: none;
+  }
+  .results-head {
+    flex-wrap: wrap;
+  }
+}
+
+/* ───────── v5 : corrections après tests visuels ───────── */
+/* minmax(0, 1fr) : la colonne ne s'élargit jamais au-delà de l'écran,
+   même si son contenu (menu d'onglets défilant) est très large. */
+.admin-shell {
+  grid-template-columns: 230px minmax(0, 1fr);
+}
+.admin-side {
+  min-width: 0;
+}
+.admin-table .status-badge,
+.admin-table td[data-label="Loyer"] {
+  white-space: nowrap;
+}
+/* Bouton WhatsApp flottant masqué là où un lien support est déjà présent */
+.is-detail .wa-float,
+.is-dashboard .wa-float {
+  display: none;
+}
+@media (max-width: 980px) {
+  .admin-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

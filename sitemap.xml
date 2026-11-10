@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Liste des pages publiques, pour aider Google à les trouver.
+     ⚠ Avec un nom de domaine : remplacez https://levi-akoute.github.io/domi/ partout. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://levi-akoute.github.io/domi/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://levi-akoute.github.io/domi/annonces.html</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://levi-akoute.github.io/domi/conseils.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://levi-akoute.github.io/domi/support.html</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://levi-akoute.github.io/domi/connexion.html</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://levi-akoute.github.io/domi/conditions.html</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://levi-akoute.github.io/domi/confidentialite.html</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+</urlset>

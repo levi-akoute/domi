@@ -7,15 +7,26 @@
     <title>Mot de passe oublié — Domi</title>
     <meta
       name="description"
-      content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."
+      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
     />
     <meta property="og:title" content="Mot de passe oublié — Domi" />
     <meta
       property="og:description"
-      content="Domi : annonces de logements examinées avant publication, propriétaires identifiés et contact direct en Côte d’Ivoire."
+      content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp."
     />
     <meta property="og:type" content="website" />
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/img/icon-180.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta property="og:site_name" content="Domi" />
+    <meta
+      property="og:image"
+      content="https://levi-akoute.github.io/domi/assets/img/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="robots" content="noindex" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -39,7 +50,13 @@
           </p>
           <label
             >Numéro de téléphone du compte
-            <input name="telephone" type="tel" required placeholder="Ex. 0700000000" autocomplete="tel" />
+            <input
+              name="telephone"
+              type="tel"
+              required
+              placeholder="Ex. 0700000000"
+              autocomplete="tel"
+            />
           </label>
           <button class="btn btn-primary btn-block" type="submit">Recevoir un code</button>
         </form>
@@ -62,16 +79,31 @@
           </label>
           <label
             >Nouveau mot de passe (8 caractères minimum)
-            <input name="password" type="password" minlength="8" required autocomplete="new-password" />
+            <input
+              name="password"
+              type="password"
+              minlength="8"
+              required
+              autocomplete="new-password"
+            />
           </label>
           <label
             >Confirmez le mot de passe
-            <input name="password2" type="password" minlength="8" required autocomplete="new-password" />
+            <input
+              name="password2"
+              type="password"
+              minlength="8"
+              required
+              autocomplete="new-password"
+            />
           </label>
           <button class="btn btn-primary btn-block" type="submit">Changer mon mot de passe</button>
           <p class="fine-print" style="margin: 0; text-align: center">
-            Pas de code ? <button type="button" class="text-link link-btn" id="resend">Renvoyer un code</button>
-            · <button type="button" class="text-link link-btn" id="change-number">Changer de numéro</button>
+            Pas de code ?
+            <button type="button" class="text-link link-btn" id="resend">Renvoyer un code</button> ·
+            <button type="button" class="text-link link-btn" id="change-number">
+              Changer de numéro
+            </button>
           </p>
         </form>
 
@@ -80,7 +112,12 @@
         <div class="recovery-help">
           <strong>Pas d’email enregistré sur votre compte ?</strong>
           <p>Notre équipe peut vous aider après vérification de votre identité.</p>
-          <a id="support-link" class="btn btn-outline btn-block" href="#" target="_blank" rel="noopener"
+          <a
+            id="support-link"
+            class="btn btn-outline btn-block"
+            href="#"
+            target="_blank"
+            rel="noopener"
             >Contacter le support sur WhatsApp</a
           >
         </div>

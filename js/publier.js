@@ -19,6 +19,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
   el("telephone").value = user.telephone || "";
+
+  // Modération mixte (database/08) : un compte vérifié publie sans attendre
+  if (user.verifie) {
+    form.querySelector("button.btn-primary").textContent = "Publier maintenant";
+    U.qs("#publish-intro").textContent =
+      "Votre compte est vérifié : votre annonce sera visible dès son envoi. Une annonce complète et honnête reçoit plus de contacts sérieux.";
+  }
   let existing = null;
   if (editId) {
     existing = await S.getAnnonce(editId).catch(() => null);
