@@ -1,0 +1,26 @@
+# .gitignore du site Domi (dépôt levi-akoute/domi)
+#
+# IMPORTANT : js/config.js n'est PAS ignoré ici, volontairement.
+# GitHub Pages en a besoin pour que le site se connecte à Supabase.
+# Il ne doit contenir que l'URL du projet et la clé « anon / publishable »
+# (publique par nature). JAMAIS la clé service_role ni un mot de passe.
+
+# ---- Secrets ----
+.env
+.env.*
+
+# ---- Systèmes d'exploitation ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Éditeurs ----
+.vscode/
+.idea/
+*.swp
+
+# ---- Divers ----
+node_modules/
+*.log
+*.tmp
+*.bak

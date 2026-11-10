@@ -1,0 +1,15 @@
+# Fins de ligne : tous les fichiers texte sont stockés et extraits en LF,
+# quel que soit l'ordinateur (Windows, Mac, Linux). Évite les faux
+# « fichiers modifiés » quand seuls les caractères invisibles de fin de ligne changent.
+* text=auto eol=lf
+
+# Fichiers binaires : Git ne doit jamais les convertir
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.gif  binary
+*.ico  binary
+*.mp4  binary
+*.woff binary
+*.woff2 binary
