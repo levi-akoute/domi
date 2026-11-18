@@ -285,7 +285,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             "Actions",
             `<div class="table-actions">
               ${v.document_path ? `<button class="mini-btn" data-doc="${E(v.document_path)}">Voir le document</button>` : ""}
-              ${v.status === "en_attente" ? `<button class="mini-btn ok" data-ver="${E(v.id)}" data-ok="1">Valider</button><button class="mini-btn danger" data-ver="${E(v.id)}" data-ok="0">Refuser</button>` : ""}
+              ${v.status === "en_attente" ? `<button class="mini-btn ok" data-ver="${E(v.id)}" data-path="${E(v.document_path || "")}" data-ok="1">Valider</button><button class="mini-btn danger" data-ver="${E(v.id)}" data-path="${E(v.document_path || "")}" data-ok="0">Refuser</button>` : ""}
+              ${v.status !== "en_attente" && v.document_path ? `<button class="mini-btn danger" data-docdel="${E(v.id)}" data-path="${E(v.document_path)}">Effacer le document</button>` : ""}
             </div>`
           )}
         </tr>`
@@ -375,7 +376,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       const ok = d.ok === "1";
       const note = ok ? null : prompt("Motif du refus (visible par l’utilisateur) :");
       if (!ok && note === null) return; // « Annuler » dans la boîte de dialogue
-      run(() => S.decideVerification(d.ver, ok, note), ok ? "Compte vérifié" : "Demande refusée");
+      // Décision, puis suppression immédiate de la pièce d'identité (promis dans la
+      // politique de confidentialité : on ne garde pas les pièces après la vérification)
+      run(async () => {
+        await S.decideVerification(d.ver, ok, note);
+        await S.supprimerDocument(d.ver, d.path);
+      }, ok ? "Compte vérifié, document supprimé" : "Demande refusée, document supprimé");
+    } else if (d.docdel) {
+      // effacer la pièce d'une demande déjà traitée (demandes traitées avant la v7)
+      if (confirm("Supprimer définitivement cette pièce d’identité ?"))
+        run(() => S.supprimerDocument(d.docdel, d.path), "Document supprimé");
     } else if (d.doc) {
       // voir une pièce d'identité
       // On ouvre l'onglet TOUT DE SUITE (sinon le navigateur bloque la fenêtre), puis on y charge le lien

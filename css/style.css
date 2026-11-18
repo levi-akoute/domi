@@ -118,6 +118,24 @@ h3 {
 .hidden {
   display: none !important; /* cache un élément (ajouté / retiré par le JavaScript) */
 }
+/* Passage d'une page légale que Levi doit encore compléter (surligné en jaune, bien visible).
+   Quand tout est rempli, il ne doit plus rester aucun <mark class="a-completer"> dans le site :
+   le script de publication (scripts/build.mjs) affiche un avertissement sinon. */
+.a-completer {
+  background: #fff3a3; /* jaune clair */
+  color: #5a4500; /* texte brun foncé : contraste suffisant sur le jaune */
+  padding: 0 4px;
+  border-radius: 4px;
+}
+/* Champ piège anti-robot (js/utils.js, protectForm) : placé hors de l'écran plutôt que
+   « display: none », car certains robots ignorent les champs cachés en display: none */
+.hp-field {
+  position: absolute !important; /* sorti du flux de la page */
+  left: -10000px; /* très loin à gauche, invisible */
+  width: 1px;
+  height: 1px;
+  overflow: hidden; /* rien ne dépasse */
+}
 .muted {
   color: var(--muted); /* texte gris secondaire */
 }
@@ -2100,7 +2118,7 @@ td small {
 }
 .tip .num {
   font: 600 2.2rem/1 var(--serif); /* « 01 » en grand orange */
-  color: var(--accent);
+  color: var(--accent-d); /* orange foncé : l’orange vif (2,7:1) était trop pâle sur le crème (WCAG AA) */
 }
 .tip h3 {
   margin: 0 0 6px;
@@ -2141,7 +2159,7 @@ td small {
 }
 .notfound .big {
   font: 600 clamp(5rem, 16vw, 9rem) / 1 var(--serif); /* « 404 » géant */
-  color: var(--accent);
+  color: var(--accent-d); /* orange foncé : contraste suffisant sur le crème (WCAG AA) */
 }
 .notfound p {
   color: var(--muted);
@@ -2558,13 +2576,13 @@ td small {
     font-size: 0.74rem;
   }
   .status-badge {
-    font-size: 0.62rem; /* pastilles plus petites */
+    font-size: 0.7rem; /* pastilles plus petites (0,62rem = 9,9 px était trop petit à lire) */
     padding: 3px 8px;
     top: 8px;
     left: 8px;
   }
   .verified-badge {
-    font-size: 0.62rem;
+    font-size: 0.7rem; /* 11 px minimum : lisible sans zoom */
     padding: 3px 8px;
     top: 8px;
     right: 8px;
@@ -2611,6 +2629,52 @@ td small {
   }
   .tip {
     grid-template-columns: 48px 1fr;
+  }
+}
+
+/* ═══════════ 21 bis. CORRECTIONS MOBILE (audit 375 px du 2026-11-17) ═══════════ */
+
+/* Une colonne de grille « 1fr » ne rétrécit pas sous la largeur de son contenu (min-width: auto).
+   La rangée de miniatures et les cartes de la page annonce élargissaient donc la page à 646 px
+   sur un téléphone de 375 px (défilement horizontal). min-width: 0 autorise le rétrécissement :
+   les miniatures défilent alors DANS leur rangée (overflow-x: auto), pas la page entière. */
+.detail-layout > *,
+.catalog-layout > * {
+  min-width: 0;
+}
+.auth-pane > *,
+.auth-wrap > * {
+  min-width: 0; /* même problème pour la carte « Mot de passe oublié » / connexion */
+}
+
+/* Points du carrousel : 10 px, c'est trop petit pour un doigt. On garde le même point visible,
+   mais la zone cliquable fait 24 x 24 px (padding transparent : background-clip: content-box). */
+.dots button {
+  box-sizing: content-box; /* la largeur 10 px = le point ; le padding s'ajoute autour */
+  padding: 7px;
+  background-clip: content-box; /* la couleur ne remplit que le point, pas le padding */
+}
+
+/* Bouton croix (fermer le message d'installation…) : zone de clic d'au moins 40 x 40 px */
+.icon-btn {
+  min-width: 40px;
+  min-height: 40px;
+}
+
+@media (max-width: 480px) {
+  /* Les longs boutons (« Contacter le support sur WhatsApp ») peuvent passer à la ligne :
+     sinon ils élargissent la page au-delà de l'écran */
+  .btn {
+    white-space: normal;
+    text-align: center;
+  }
+  /* Carte des formulaires : moins de marge intérieure, plus de place pour les champs */
+  .auth-card {
+    padding: 26px 20px;
+  }
+  /* Listes de la recherche de l'accueil : hauteur confortable pour le doigt (44 px) */
+  .search-bar select {
+    min-height: 44px;
   }
 }
 

@@ -98,6 +98,10 @@ async function main() {
   for (const nom of await fs.readdir(RACINE)) {
     if (!nom.endsWith(".html")) continue; // on ne garde que les .html
     const html = await fs.readFile(path.join(RACINE, nom), "utf8");
+    // Rappel : passages des pages légales encore à compléter (surlignés en jaune sur le site).
+    // Simple avertissement : la publication continue (voir docs/AVANT_LANCEMENT.md).
+    const reste = (html.match(/class="a-completer"/g) || []).length;
+    if (reste) console.warn(`⚠ ${nom} : ${reste} passage(s) encore à compléter (surlignés en jaune).`);
     await fs.writeFile(path.join(SORTIE, nom), await minHtml(html));
   }
 

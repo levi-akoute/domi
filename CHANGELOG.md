@@ -1,5 +1,43 @@
 # CHANGELOG : Domi, site de location de maisons
 
+## v7.0 « pré-lancement » (2026-11-17)
+
+Tout ce qui est indispensable avant de présenter le site et d'acheter le nom de domaine.
+Ce qui reste à faire par Levi (informations personnelles, SQL, annonces d'exemple) : `docs/AVANT_LANCEMENT.md`.
+
+### Pages légales
+- `confidentialite.html` réécrite d'après ce que le code fait réellement : données collectées, utilité et durée
+  de chaque donnée, stockage dans le navigateur (pas de cookie publicitaire, donc pas de bandeau), prestataires
+  (Supabase, Brevo, GitHub Pages, Google Fonts, jsDelivr, WhatsApp), droits et marche à suivre pour la suppression, ARTCI.
+- `conditions.html` complétée : éditeur, compte, règles de publication, interdictions, sanctions, contenus, droit ivoirien.
+- Les informations que seul Levi connaît sont surlignées en jaune (`.a-completer`) ; `npm run build` les compte.
+
+### Pièces d'identité supprimées après décision
+- `database/10_suppression_pieces_identite.sql` : l'admin peut supprimer les fichiers du bucket `verifications`,
+  fonction `forget_verification_document`.
+- Admin : valider ou refuser une demande supprime aussitôt la pièce ; bouton « Effacer le document » pour les anciennes.
+
+### Référencement et partage
+- Titre unique (moins de 60 caractères) et description unique (moins de 155) sur chaque page ; avant, les
+  14 pages avaient la même description.
+- `og:url`, `link rel="canonical"`, `twitter:title` et `twitter:description` ; `noindex` sur les favoris.
+
+### Anti-spam
+- Champ piège invisible (honeypot) et chronomètre sur l'inscription et le signalement d'annonce
+  (`protectForm` / `botCheck` dans `js/utils.js`). Les limites en base (database/09) restent la vraie protection.
+
+### Mobile et accessibilité (audit automatique à 375 px et 1280 px)
+- Corrigé : la page d'une annonce défilait horizontalement sur téléphone (646 px au lieu de 375), comme
+  « Mot de passe oublié » (448 px). Cause : colonnes de grille sans `min-width: 0` et boutons sans retour à la ligne.
+- Contraste WCAG AA : « 01…05 » des conseils et « 404 » en orange foncé (2,7:1 → plus de 4,5:1).
+- Pastilles « Disponible » et « Vérifié » agrandies sur mobile (9,9 px → 11 px).
+- Zones tactiles : points du carrousel 24 × 24 px, croix 40 × 40 px, listes de recherche 44 px de haut.
+- Liens : aucun lien brisé (pages, images, scripts, liens externes).
+
+### Nom de domaine
+- `scripts/changer-domaine.mjs` : remplace l'adresse du site partout en une commande.
+- `docs/GUIDE_NOM_DE_DOMAINE.md` : DNS, GitHub Pages (HTTPS forcé), Supabase, Brevo, Google Search Console.
+
 ## v6.0 (2026-11-10)
 
 ### Application installable (PWA)

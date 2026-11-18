@@ -23,18 +23,23 @@
     <!-- Titre affiché dans l'onglet et dans les résultats Google -->
     <title>Politique de confidentialité — Domi</title>
     <!-- Résumé affiché par Google sous le titre -->
-    <meta name="description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
+    <meta name="description" content="Les données que Domi collecte, pourquoi, combien de temps elles sont gardées et comment demander leur suppression." />
 
     <!-- Aperçu quand le lien est partagé sur WhatsApp / Facebook (protocole « Open Graph ») -->
     <meta property="og:title" content="Politique de confidentialité — Domi" />
-    <meta property="og:description" content="Domi : logements à louer en Côte d’Ivoire. Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp." />
+    <meta property="og:description" content="Les données que Domi collecte, pourquoi, combien de temps elles sont gardées et comment demander leur suppression." />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Domi" />
+    <!-- Adresse officielle de la page (⚠ à changer avec le nom de domaine : scripts/changer-domaine.mjs) -->
+    <meta property="og:url" content="https://levi-akoute.github.io/domi/confidentialite.html" />
+    <link rel="canonical" href="https://levi-akoute.github.io/domi/confidentialite.html" />
     <meta property="og:image" content="https://levi-akoute.github.io/domi/assets/img/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <!-- Même aperçu, en grand, sur X (Twitter) -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Politique de confidentialité — Domi" />
+    <meta name="twitter:description" content="Les données que Domi collecte, pourquoi, combien de temps elles sont gardées et comment demander leur suppression." />
 
     <!-- Icône de l'onglet (logo Domi en SVG : net à toutes les tailles) -->
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
@@ -65,23 +70,82 @@
     <main class="container legal-main">
       <span class="eyebrow">Informations légales</span>
       <h1>Politique de confidentialité</h1>
-      <!-- Avertissement : ce texte est un modèle à faire valider -->
-      <div class="notice info">Modèle de départ : à compléter avec vos informations et à faire valider par un juriste avant l’ouverture au public.</div>
-      <!-- Section : Données collectées -->
-      <h2>Données collectées</h2>
-      <p>Nom, prénom, numéro de téléphone, commune, email de récupération (facultatif), annonces publiées et, si vous demandez le badge « Propriétaire vérifié », un document d’identité ou justificatif. Vos favoris sont enregistrés uniquement dans votre navigateur.</p>
-      <!-- Section : Utilisation -->
-      <h2>Utilisation</h2>
-      <p>Ces données servent à faire fonctionner votre compte, afficher vos annonces, récupérer votre mot de passe et modérer la plateforme. Le numéro de contact d’une annonce est visible publiquement pour permettre d’être contacté.</p>
-      <!-- Section : Documents d’identité -->
-      <h2>Documents d’identité</h2>
-      <p>Stockés dans un espace privé, consultables uniquement par les administrateurs habilités, uniquement pour la vérification. [Indiquer la durée de conservation.]</p>
-      <!-- Section : Vos droits -->
-      <h2>Vos droits</h2>
-      <p>Vous pouvez demander l’accès, la rectification ou la suppression de vos données via le support. [Mentionner les formalités auprès de l’ARTCI et l’hébergeur des données (Supabase).]</p>
-      <!-- Section : Contact -->
-      <h2>Contact</h2>
-      <p>[Responsable du traitement, email, numéro du support]</p>
+      <!-- Date de la version : à changer à chaque modification du texte -->
+      <p class="muted">Dernière mise à jour : 18 novembre 2026</p>
+      <!-- Informations de l’éditeur complétées le 18/11/2026 (RCCM et ARTCI à ajouter plus tard, voir docs/AVANT_LANCEMENT.md).
+           Le texte décrit ce que le site fait
+           VRAIMENT (vérifié dans le code) : si le site change, ce texte doit changer aussi. -->
+      <p>Cette page explique quelles informations Domi collecte, pourquoi, combien de temps elles sont gardées et comment en demander la suppression. Domi applique la loi ivoirienne n° 2013-450 du 19 juin 2013 relative à la protection des données à caractère personnel.</p>
+
+      <!-- Section 1 : qui est responsable des données -->
+      <h2>1. Responsable des données</h2>
+      <p>Domi est édité par AKOUTE Levi Koffi Nagnon, Gagnoa, Côte d’Ivoire. Contact : <a class="text-link" href="mailto:suppordomi@gmail.com">suppordomi@gmail.com</a> ou sur WhatsApp depuis la page <a class="text-link" href="support.html">Aide et contact</a>.</p>
+
+      <!-- Section 2 : liste des données, avec leur but et leur durée -->
+      <h2>2. Les données collectées, leur utilité et leur durée de conservation</h2>
+      <h3>Votre compte (propriétaires et agents)</h3>
+      <p><strong>Données :</strong> prénom, nom, numéro de téléphone, profil (propriétaire ou agent), commune et, si vous le donnez, un email de récupération. Votre mot de passe est enregistré sous une forme chiffrée : personne, pas même Domi, ne peut le lire.<br />
+        <strong>Utilité :</strong> vous connecter, publier et gérer vos annonces, vous contacter pour la modération, vous envoyer un code si vous oubliez votre mot de passe.<br />
+        <strong>Durée :</strong> tant que votre compte existe. Après une demande de suppression, le compte et ses données sont supprimés dans un délai de 30 jours.</p>
+      <h3>Vos annonces</h3>
+      <p><strong>Données :</strong> titre, description, photos, type de logement, loyer, avance, caution, commune, quartier et numéro de contact WhatsApp.<br />
+        <strong>Utilité :</strong> les afficher publiquement pour que les personnes intéressées vous contactent. Le numéro de contact est donc visible par tous.<br />
+        <strong>Durée :</strong> jusqu’à ce que vous supprimiez l’annonce (ou que la modération la retire). Une annonce non confirmée depuis 45 jours est masquée automatiquement.</p>
+      <h3>Pièce d’identité (badge « Propriétaire vérifié »)</h3>
+      <p><strong>Données :</strong> la pièce d’identité ou le justificatif que vous envoyez, uniquement si vous demandez le badge.<br />
+        <strong>Utilité :</strong> vérifier que vous êtes bien la personne qui publie, pour protéger les locataires contre les fausses annonces.<br />
+        <strong>Qui la voit :</strong> uniquement les administrateurs de Domi, par un lien temporaire valable 5 minutes. Elle est rangée dans un espace privé, jamais public.<br />
+        <strong>Durée :</strong> la pièce est <strong>supprimée dès que la demande est validée ou refusée</strong>. Domi garde seulement la trace de la décision (date et résultat).</p>
+      <h3>Avis et signalements</h3>
+      <p><strong>Données :</strong> pour un avis, la note, le commentaire et le nom affiché ; pour un signalement, le motif, les détails et votre compte si vous êtes connecté (un signalement peut aussi être anonyme).<br />
+        <strong>Utilité :</strong> informer les autres visiteurs et repérer les annonces frauduleuses.<br />
+        <strong>Durée :</strong> un avis reste visible tant que l’annonce existe ou jusqu’à sa suppression. Un signalement est conservé 12 mois après son traitement.</p>
+      <h3>Code de récupération du mot de passe</h3>
+      <p>Si vous demandez un nouveau mot de passe, un code à usage unique est envoyé à votre email de récupération. Il n’est valable que 10 minutes.</p>
+      <h3>Statistiques des annonces</h3>
+      <p>Domi compte le nombre de vues et de clics sur « Contacter » de chaque annonce. Ce sont de simples compteurs : ils ne contiennent aucune information sur les visiteurs. Domi n’utilise <strong>aucun outil de mesure d’audience</strong> (pas de Google Analytics ni d’équivalent).</p>
+
+      <!-- Section 3 : ce qui est stocké dans le navigateur (équivalent des cookies) -->
+      <h2>3. Cookies et stockage dans votre navigateur</h2>
+      <p>Domi ne dépose <strong>aucun cookie publicitaire ni traceur</strong>. Seules ces informations, indispensables au fonctionnement du site, sont gardées dans votre navigateur :</p>
+      <ul>
+        <li><strong>Votre session de connexion</strong>, pour rester connecté d’une page à l’autre. Elle disparaît quand vous vous déconnectez.</li>
+        <li><strong>Vos favoris</strong>, uniquement sur votre appareil : Domi ne les reçoit pas.</li>
+        <li><strong>Votre choix sur le message « Installer l’application »</strong>, pour ne pas vous le reproposer sans cesse.</li>
+        <li><strong>Une copie des pages du site</strong>, pour qu’il s’ouvre plus vite et affiche un message clair sans connexion.</li>
+      </ul>
+      <p>Comme rien de tout cela ne sert à vous suivre ou à faire de la publicité, aucun consentement n’est demandé. Vous pouvez tout effacer à tout moment depuis les réglages de votre navigateur (« Effacer les données du site »).</p>
+
+      <!-- Section 4 : les entreprises qui aident à faire tourner le site -->
+      <h2>4. Prestataires techniques</h2>
+      <p>Domi s’appuie sur ces services, qui traitent certaines données pour son compte. Certains sont situés hors de Côte d’Ivoire.</p>
+      <ul>
+        <li><strong>Supabase</strong> : base de données, comptes et stockage des photos et pièces d’identité (ses serveurs peuvent être situés hors de Côte d’Ivoire).</li>
+        <li><strong>Brevo</strong> : envoi de l’email contenant le code de récupération du mot de passe.</li>
+        <li><strong>GitHub Pages</strong> : hébergement du site. Comme tout hébergeur, il enregistre l’adresse IP des visiteurs dans ses journaux techniques.</li>
+        <li><strong>Google Fonts</strong> et <strong>jsDelivr</strong> : fourniture des polices d’écriture et d’une bibliothèque technique. Ces services reçoivent l’adresse IP de votre appareil au chargement de la page.</li>
+        <li><strong>WhatsApp</strong> : quand vous cliquez sur « Contacter », la conversation se passe sur WhatsApp, hors de Domi, selon les règles de WhatsApp.</li>
+      </ul>
+      <p>Domi ne vend, ne loue et ne partage jamais vos données à des fins publicitaires.</p>
+
+      <!-- Section 5 : sécurité -->
+      <h2>5. Sécurité</h2>
+      <p>Le site est servi en HTTPS (connexion chiffrée). Des règles de sécurité dans la base de données empêchent chaque utilisateur de lire ou modifier les données des autres, et les pièces d’identité ne sont accessibles qu’aux administrateurs.</p>
+
+      <!-- Section 6 : droits des personnes et marche à suivre pour la suppression -->
+      <h2>6. Vos droits et comment supprimer vos données</h2>
+      <p>Vous pouvez à tout moment demander l’accès à vos données, leur correction ou leur suppression, ou vous opposer à leur utilisation.</p>
+      <ol>
+        <li>Écrivez à Domi sur WhatsApp depuis la page <a class="text-link" href="support.html">Aide et contact</a>, <strong>depuis le numéro de votre compte</strong> (cela prouve que la demande vient bien de vous), ou par email à <a class="text-link" href="mailto:suppordomi@gmail.com">suppordomi@gmail.com</a>.</li>
+        <li>Précisez votre demande : « supprimer mon compte », « corriger mon nom », « recevoir mes données »…</li>
+        <li>Domi vous répond dans un délai maximum de 30 jours.</li>
+      </ol>
+      <p>Vous pouvez aussi supprimer vous-même vos annonces à tout moment depuis votre espace annonceur. Si vous estimez que vos droits ne sont pas respectés, vous pouvez saisir l’<strong>ARTCI</strong> (Autorité de Régulation des Télécommunications/TIC de Côte d’Ivoire), autorité de protection des données : <a class="text-link" href="https://www.artci.ci" rel="noopener" target="_blank">www.artci.ci</a>.</p>
+      <!-- À AJOUTER après la déclaration ARTCI : <p>Ce traitement a été déclaré auprès de l’ARTCI sous le numéro …</p> -->
+
+      <!-- Section 7 : changements de la politique -->
+      <h2>7. Modifications</h2>
+      <p>Cette page peut évoluer avec le site. La date de mise à jour en haut de page indique la dernière version.</p>
     </main>
 
     <!-- Pied de page : vide ici, construit lui aussi par js/utils.js -->

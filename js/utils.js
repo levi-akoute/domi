@@ -306,8 +306,42 @@
     true // true = phase de « capture » : indispensable car l'erreur d'image ne remonte pas
   );
 
+  /* ───────── 8 bis. Anti-robot des formulaires ─────────
+     Deux pièges simples contre les robots qui remplissent les formulaires à la chaîne :
+       1. un champ « piège » (honeypot) invisible pour un humain : un robot remplit tous
+          les champs qu'il trouve, donc s'il est rempli, c'est un robot ;
+       2. un chronomètre : un humain met plusieurs secondes à remplir un formulaire,
+          un robot l'envoie instantanément.
+     Ce n'est qu'une première barrière : les vraies limites (nombre d'annonces, de
+     signalements…) sont dans la base (database/09_securite_renforcee.sql). */
+  const formStart = new WeakMap(); // heure d'ouverture de chaque formulaire protégé
+
+  // À appeler à l'ouverture du formulaire (au chargement, ou à l'ouverture d'une fenêtre)
+  function protectForm(form) {
+    formStart.set(form, Date.now()); // démarre (ou redémarre) le chronomètre
+    if (form.querySelector(".hp-field")) return; // piège déjà posé
+    const trap = document.createElement("label"); // bloc du champ piège
+    trap.className = "hp-field"; // classe CSS qui le place hors de l'écran
+    trap.setAttribute("aria-hidden", "true"); // ignoré par les lecteurs d'écran
+    // name="site_web" : un nom attirant pour un robot ; tabindex=-1 : la touche Tab le saute ;
+    // autocomplete=off : le navigateur ne le remplit pas tout seul
+    trap.innerHTML = 'Site web <input name="site_web" type="text" tabindex="-1" autocomplete="off" />';
+    form.prepend(trap); // ajouté au début du formulaire
+  }
+
+  // Renvoie "piege" (robot sûr), "trop-vite" (envoi suspect) ou "" (humain)
+  function botCheck(form, minMs = 2500) {
+    const trap = form.querySelector('input[name="site_web"]');
+    if (trap && trap.value.trim() !== "") return "piege"; // le champ invisible a été rempli
+    const t0 = formStart.get(form); // heure d'ouverture
+    if (t0 && Date.now() - t0 < minMs) return "trop-vite"; // envoyé en moins de 2,5 s
+    return "";
+  }
+
   window.ImmoUtils = {
     // Ce que les autres fichiers peuvent utiliser :
+    protectForm, // anti-robot : pose le piège et démarre le chronomètre
+    botCheck, // anti-robot : contrôle à l'envoi
     money, // format des prix
     escapeHtml, // sécurité du texte
     safeUrl, // sécurité des liens

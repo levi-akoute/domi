@@ -213,11 +213,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   dlg.className = "report-dialog";
   dlg.innerHTML = `<form><h3>Signaler cette annonce</h3><label>Motif<select name="reason"><option>Arnaque / demande d’argent suspecte</option><option>Faux prix</option><option>Déjà loué / indisponible</option><option>Photos qui ne correspondent pas</option><option>Autre</option></select></label><label>Détails (facultatif)<textarea name="details" rows="3" maxlength="1000"></textarea></label><div class="publish-actions"><button type="button" class="btn btn-outline" data-close>Annuler</button><button type="submit" class="btn btn-primary">Envoyer</button></div></form>`;
   document.body.appendChild(dlg);
-  U.qs("#report-listing").addEventListener("click", () => dlg.showModal()); // ouvre la fenêtre
+  const reportForm = dlg.querySelector("form");
+  U.qs("#report-listing").addEventListener("click", () => {
+    U.protectForm(reportForm); // anti-robot : champ piège + chronomètre (js/utils.js)
+    dlg.showModal(); // ouvre la fenêtre
+  });
   dlg.querySelector("[data-close]").addEventListener("click", () => dlg.close()); // « Annuler »
   // Envoi du signalement
-  dlg.querySelector("form").addEventListener("submit", async (e) => {
+  reportForm.addEventListener("submit", async (e) => {
     e.preventDefault(); // pas de rechargement de page
+    const bot = U.botCheck(reportForm, 1500); // signalement court : 1,5 s minimum
+    if (bot === "piege") {
+      dlg.close(); // robot : on fait comme si c'était envoyé
+      return;
+    }
+    if (bot === "trop-vite") {
+      U.toast("Envoi trop rapide, réessayez dans un instant.", "error");
+      return;
+    }
     const d = new FormData(e.target); // lit les champs du formulaire
     try {
       await S.signaler({

@@ -51,8 +51,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // INSCRIPTION
+  U.protectForm(register); // anti-robot : champ piège + chronomètre (js/utils.js)
   register.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const bot = U.botCheck(register); // contrôle anti-robot
+    if (bot === "piege") return; // robot : on ne fait rien, sans lui dire pourquoi
+    if (bot === "trop-vite") {
+      U.showMessage(msg, "Envoi trop rapide. Vérifiez vos informations puis réessayez.", "error");
+      U.protectForm(register); // relance le chronomètre
+      return;
+    }
     const d = new FormData(register);
     busy(register, true);
     try {

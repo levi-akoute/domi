@@ -184,6 +184,19 @@
     if (error) throw new Error(fixMsg(error.message));
     return data.signedUrl; // le lien signé (inutilisable après 5 minutes)
   };
+  // Pièce d'identité : suppression définitive après la décision de l'admin (database/10).
+  // 1. supprime le fichier du bucket privé ; 2. efface son chemin dans la demande.
+  const supprimerDocument = async (id, path) => {
+    if (path) {
+      const { data, error } = await client().storage.from("verifications").remove([path]);
+      if (error) throw new Error(fixMsg(error.message));
+      // Supabase ne signale pas toujours un refus : si rien n'a été supprimé, c'est que la
+      // règle de suppression manque (fichier database/10 pas encore exécuté)
+      if (!data || data.length === 0)
+        throw new Error("Document non supprimé : exécutez database/10_suppression_pieces_identite.sql dans Supabase.");
+    }
+    return ok(client().rpc("forget_verification_document", { p_id: id }));
+  };
 
   /* ───────── Avis ───────── */
 
@@ -327,6 +340,7 @@
     getVerifications,
     decideVerification,
     lienDocument,
+    supprimerDocument,
     uploadPhotos,
     soumettreVerification,
     getAvis,
