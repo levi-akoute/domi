@@ -1,5 +1,25 @@
 # CHANGELOG : Domi, site de location de maisons
 
+## v7.1 « audit de sécurité » (2026-11-18)
+
+Audit complet : code SQL, Edge Function et JavaScript, historique Git (aucun secret), tests en ligne en
+visiteur anonyme (toutes les données sensibles bien protégées). 12 failles trouvées, aucune critique,
+toutes corrigées. Détail et gravité : `docs/SECURITE.md`. À faire par Levi : `docs/AVANT_LANCEMENT.md` (2 bis).
+
+- `database/11_audit_securite.sql` : essais des codes de récupération atomiques (prise de contrôle de compte
+  par requêtes simultanées), numéro du profil lié à l'identifiant de connexion, dates fixées par le serveur
+  (limites anti-spam contournables), signalements par comptes jetables neutralisés, quotas de stockage,
+  photos limitées au stockage Domi, vidéos limitées aux plateformes connues, numéro de contact changé →
+  revalidation, chemin des pièces d'identité contrôlé, liste publique des photos fermée, droits des fonctions.
+- Edge Function `reinitialiser-mot-de-passe` : utilise les fonctions verrouillées, déconnecte tous les
+  appareils après un changement de mot de passe, n'affiche plus les messages d'erreur techniques.
+- CSP de toutes les pages : seul le fichier exact de la librairie Supabase et notre projet Supabase sont
+  autorisés (scripts, connexions, images) ; CSP stricte sur `offline.html`.
+- Anti-cadre (clickjacking) : page cachée si elle est affichée dans le cadre d'un autre site, même « sandbox ».
+- Photos effacées du stockage avec l'annonce et lors de leur remplacement.
+- Formulaire de publication : lien vidéo vérifié, avertissement « visible publiquement » sur le repère.
+- Vérifié dans Edge après correction : 12 pages, 0 erreur console, photos et annonces chargées.
+
 ## v7.0 « pré-lancement » (2026-11-17)
 
 Tout ce qui est indispensable avant de présenter le site et d'acheter le nom de domaine.

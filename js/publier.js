@@ -17,6 +17,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const editId = U.getParam("edit"); // identifiant de l'annonce à modifier (ou null)
   const files = U.qs("#photos"); // champ de choix des photos
   const prev = U.qs("#photo-preview"); // zone d'aperçu des photos
+  // Plateformes vidéo acceptées (même liste que la règle listings_video_hosts, database/11).
+  // ([a-z0-9-]+\.)* autorise www., m., vm.… ; (\/|$) empêche « youtube.com.site-pirate.com »
+  const VIDEO_OK =
+    /^https:\/\/([a-z0-9-]+\.)*(youtube\.com|youtu\.be|tiktok\.com|facebook\.com|fb\.watch|instagram\.com|vimeo\.com|drive\.google\.com)(\/|$)/i;
 
   U.fillCommunes(el("commune")); // liste des communes
 
@@ -123,6 +127,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         telephone: ImmoAuth.normalize(d.get("telephone")), // 10 chiffres (erreur sinon)
       };
       if (!row.commune) throw new Error("Choisissez une commune."); // commune obligatoire
+      // Lien vidéo : seulement les grandes plateformes vidéo (même règle dans la base,
+      // database/11). Un lien vers un faux site de « paiement » est un piège classique.
+      if (row.video && !VIDEO_OK.test(row.video))
+        throw new Error(
+          "Lien vidéo refusé : utilisez un lien YouTube, TikTok, Facebook, Instagram, Vimeo ou Google Drive commençant par https://"
+        );
       const picked = [...files.files]; // photos choisies
       if (!existing && !picked.length) throw new Error("Ajoutez au moins une photo du logement.");
       if (picked.length) {
@@ -131,8 +141,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         row.images = urls; // toutes les photos
         row.image = urls[0]; // la première = photo principale
       }
-      if (existing)
+      if (existing) {
         await S.updateAnnonce(existing.id, row); // modification
+        // Nouvelles photos : les anciennes qui ne servent plus sont effacées du stockage
+        if (row.images) {
+          const anciennes = [existing.image, ...(existing.images || [])];
+          await S.supprimerPhotos(anciennes.filter((u) => u && !row.images.includes(u)));
+        }
+      }
       else await S.ajouterAnnonce({ ...row, owner_id: user.id }); // création ({...row} = copie de row)
       location.href = "dashboard-proprietaire.html?publie=1"; // retour au tableau de bord
     } catch (err) {

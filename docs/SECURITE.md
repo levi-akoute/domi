@@ -63,6 +63,40 @@ moment d'acheter le nom de domaine.
 Code à 6 chiffres tiré de façon cryptographique, stocké uniquement sous forme d'empreinte SHA-256,
 valable 10 minutes, 5 essais maximum, 3 envois par heure, comparaison à temps constant, réponse
 identique que le numéro existe ou non, appels acceptés uniquement depuis le site (CORS).
+Depuis la v7.1, les essais et les envois sont comptés dans la base de façon atomique (fonctions
+`reset_creer`, `reset_essai`, `reset_terminer`), et un changement de mot de passe déconnecte tous les appareils.
+
+## Audit de sécurité du 2026-11-18 (v7.1)
+
+Méthode : lecture de tout le code (SQL, Edge Function, JavaScript), recherche de secrets dans les 14
+commits de l'historique Git, tests en conditions réelles sur le site en ligne en tant que visiteur
+anonyme (lectures uniquement), vérification dans le navigateur après correction.
+
+**Ce qui tenait déjà** : aucune table sensible lisible par un visiteur (profils, codes, pièces
+d'identité, signalements : réponse vide en production), bucket des pièces d'identité fermé, fonctions
+admin refusées, aucune faille XSS (tout le texte est échappé, CSP sans script inline), aucun secret dans
+l'historique Git (seule la clé publique `anon`), service worker sans cache des données, GitHub Actions
+avec droits minimaux.
+
+| # | Gravité | Faille | Correction |
+|---|---|---|---|
+| 1 | Élevée | Codes de récupération : essais lus puis écrits en deux temps. Des requêtes simultanées contournaient la limite de 5 essais → prise de contrôle d'un compte possible | Essai compté avant comparaison, en une opération verrouillée (`reset_essai`) ; sessions coupées après changement |
+| 2 | Moyenne | Numéro du profil envoyé à part de l'identifiant de connexion : un pirate pouvait « prendre » le numéro d'une personne (elle ne pouvait plus s'inscrire) et l'afficher sur son compte | Numéro lu dans l'identifiant de connexion ; inscription hors format refusée |
+| 3 | Moyenne | Dates de création modifiables : limite de 10 annonces/jour et limites des signalements contournables, annonce épinglée en tête pour toujours | Dates fixées par le serveur (annonces, signalements, avis, demandes) |
+| 4 | Moyenne | 3 comptes jetables suffisaient à masquer n'importe quelle annonce | Seuls les comptes de plus de 7 jours comptent ; 5 sources pour un propriétaire vérifié |
+| 5 | Moyenne | Envoi illimité de fichiers : stockage gratuit (1 Go) saturable par un seul compte | Quotas : 150 fichiers / 60 Mo (photos), 5 fichiers / 25 Mo (pièces), 2 Mo par photo |
+| 6 | Moyenne | Photos acceptant n'importe quelle adresse (traceur d'adresse IP des visiteurs, photos volées) ; lien vidéo vers n'importe quel site (faux site de paiement) | Photos obligatoirement dans le dossier de l'annonceur sur le stockage Domi ; vidéos limitées aux grandes plateformes ; CSP `img-src` restreinte |
+| 7 | Moyenne | Numéro de contact d'une annonce publiée modifiable sans nouvelle validation (même vérifié), et certains champs (avance, caution…) hors revalidation | Numéro changé → toujours revalidé ; tous les champs comptent |
+| 8 | Faible | Demande de vérification pouvant désigner le fichier d'une autre personne | Chemin forcé dans le dossier du demandeur |
+| 9 | Faible | Liste publique de toutes les photos du stockage (identifiants des annonceurs, photos d'annonces refusées) | Liste réservée à l'annonceur et à l'admin (les photos restent affichées) |
+| 10 | Faible | Photos jamais supprimées avec l'annonce (contraire à la politique de confidentialité) | Suppression des photos avec l'annonce et lors de leur remplacement |
+| 11 | Faible | CSP trop large : tout jsDelivr et tous les projets Supabase autorisés (canal de fuite en cas d'injection) | CSP limitée au fichier exact de la librairie et à notre projet ; anti-cadre renforcé (page cachée même dans un cadre « sandbox ») |
+| 12 | Faible | Champ « Repère ou adresse » téléchargeable par tous alors que le site ne l'affiche pas | Avertissement dans le formulaire (décision à prendre : l'afficher ou le rendre privé) |
+
+**Risques acceptés (connus, faible impact)** : compteurs de vues et de clics gonflables par un robot ;
+un numéro de téléphone peut être utilisé à l'inscription sans être celui de la personne (il faudrait une
+vérification par SMS, payante) ; on peut savoir si un numéro est inscrit (message d'inscription), mais les
+numéros des annonces sont publics de toute façon.
 
 ## Réglages à faire vous-même dans Supabase (tableau de bord)
 

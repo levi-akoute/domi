@@ -127,6 +127,10 @@ h3 {
   padding: 0 4px;
   border-radius: 4px;
 }
+/* Anti-clickjacking (js/utils.js) : page affichée dans le cadre d'un autre site → rien de visible */
+html.framed body {
+  visibility: hidden !important;
+}
 /* Champ piège anti-robot (js/utils.js, protectForm) : placé hors de l'écran plutôt que
    « display: none », car certains robots ignorent les champs cachés en display: none */
 .hp-field {

@@ -12,8 +12,11 @@
 
     <!-- SÉCURITÉ : politique de contenu (CSP). Le navigateur refuse tout script, style ou
          connexion qui ne vient pas des adresses listées ici. Une injection de code par un
-         pirate (dans une annonce par exemple) est donc bloquée. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+         pirate (dans une annonce par exemple) est donc bloquée.
+         v7.1 (audit 2026-11-18) : seuls le fichier exact de la librairie Supabase et NOTRE projet Supabase
+         sont autorisés (avant : tout jsDelivr et tous les projets Supabase du monde). ⚠ Si le projet
+         Supabase change, remplacer « mplbhzqmffaywlhbxleb » dans cette ligne, sur chaque page. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://mplbhzqmffaywlhbxleb.supabase.co; connect-src 'self' https://mplbhzqmffaywlhbxleb.supabase.co; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" />
     <!-- SÉCURITÉ : quand un visiteur quitte Domi par un lien, le site visité ne voit que
          « domi » et pas l'adresse complète de la page (qui peut contenir un identifiant) -->
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -124,7 +127,12 @@
             <!-- Quartier -->
             <label>Quartier <input name="quartier" maxlength="120" placeholder="Ex. Angré 8e tranche" /></label>
             <!-- Repère : facultatif -->
-            <label class="full">Repère ou adresse (facultatif) <input name="adresse" maxlength="200" placeholder="Ex. Derrière la pharmacie…" /></label>
+            <!-- Ce champ est enregistré avec l'annonce : il peut être lu par n'importe qui (audit 2026-11-18) -->
+            <label class="full">
+              Repère ou adresse (facultatif)
+              <input name="adresse" maxlength="200" placeholder="Ex. Derrière la pharmacie…" />
+              <small class="field-hint">Visible publiquement : indiquez un repère (pharmacie, école…), pas votre adresse exacte.</small>
+            </label>
           </div>
         </div>
 
@@ -171,7 +179,7 @@
             <!-- Aperçu des photos choisies (rempli par js/publier.js) -->
             <div id="photo-preview" class="photo-preview full"></div>
             <!-- Lien vidéo : type="url" vérifie le format ; seuls http(s) sont acceptés (safeUrl) -->
-            <label class="full">Lien d’une visite vidéo (YouTube, TikTok, Facebook… facultatif) <input name="video" type="url" placeholder="https://…" /></label>
+            <label class="full">Lien d’une visite vidéo (YouTube, TikTok, Facebook, Instagram, Vimeo ou Google Drive, facultatif) <input name="video" type="url" placeholder="https://…" /></label>
           </div>
           <p class="fine-print">Les photos sont allégées automatiquement. Utilisez uniquement des photos de ce logement.</p>
         </div>

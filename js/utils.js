@@ -29,8 +29,15 @@
   // ANTI-CLICKJACKING : un site pirate pourrait afficher Domi dans un cadre invisible
   // (iframe) pour faire cliquer le visiteur à son insu. Si la page est dans un cadre…
   if (window.top !== window.self) {
-    // …on remplace la page « parente » par Domi lui-même : le cadre disparaît.
-    window.top.location = window.self.location.href;
+    // v7.1 : on cache d'abord TOUTE la page (classe « framed », css/style.css). Ainsi, même
+    // si le site pirate empêche la redirection (iframe « sandbox »), il n'y a rien à cliquer.
+    document.documentElement.classList.add("framed");
+    try {
+      // …puis on remplace la page « parente » par Domi lui-même : le cadre disparaît.
+      window.top.location = window.self.location.href;
+    } catch (e) {
+      // redirection interdite par le cadre : la page reste cachée, c'est suffisant
+    }
   }
 
   // AVERTISSEMENT CONSOLE : les escrocs demandent parfois de « coller un code » dans

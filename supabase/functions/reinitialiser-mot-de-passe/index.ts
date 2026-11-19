@@ -1,5 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════
-// Edge Function « reinitialiser-mot-de-passe » (Domi v6)
+// Edge Function « reinitialiser-mot-de-passe » (Domi v7.1, audit de sécurité du 2026-11-18)
+// ⚠ Nécessite database/11_audit_securite.sql (fonctions reset_creer, reset_essai, reset_terminer) :
+//   exécuter ce fichier SQL AVANT de déployer cette version.
 //
 // S'exécute sur les serveurs de Supabase, JAMAIS dans le navigateur.
 // C'est pour ça qu'elle a le droit d'utiliser la clé service_role
@@ -22,9 +24,11 @@
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
 // ───────── Réglages ─────────
+// ⚠ Depuis la v7.1, la durée (10 min), les 5 essais et la limite de 3 codes par heure sont
+// APPLIQUÉS dans la base (database/11). Ces valeurs servent ici aux messages : si vous les
+// changez, changez aussi le fichier SQL.
 const CODE_VALIDITE_MIN = 10; // un code est valable 10 minutes
 const MAX_ESSAIS = 5; // 5 essais par code, ensuite il est annulé
-const MAX_DEMANDES_HEURE = 3; // 3 codes envoyés par compte et par heure
 const MDP_MIN = 8; // longueur minimale du nouveau mot de passe
 
 // ───────── Sites autorisés à appeler cette fonction (CORS) ─────────
@@ -146,37 +150,18 @@ async function demander(req: Request, tel: string) {
     .maybeSingle();
   if (!profil?.email_recuperation) return reponse(req, true, MSG_ENVOI); // pas de compte ou pas d'email : même message
 
-  // Ménage : supprime les codes de ce compte vieux de plus d'un jour
-  await admin
-    .from("password_resets")
-    .delete()
-    .eq("user_id", profil.id)
-    .lt("created_at", new Date(Date.now() - 86400_000).toISOString());
-
-  // Limite : 3 codes par heure et par compte (évite le harcèlement par email)
-  const ilYaUneHeure = new Date(Date.now() - 3600_000).toISOString();
-  const { count } = await admin
-    .from("password_resets")
-    .select("id", { count: "exact", head: true }) // on compte sans télécharger les lignes
-    .eq("user_id", profil.id)
-    .gte("created_at", ilYaUneHeure);
-  if ((count ?? 0) >= MAX_DEMANDES_HEURE) return reponse(req, true, MSG_ENVOI); // limite atteinte : même message
-
-  // Un seul code actif à la fois : les anciens sont annulés
-  await admin
-    .from("password_resets")
-    .update({ used_at: new Date().toISOString() })
-    .eq("user_id", profil.id)
-    .is("used_at", null);
-
+  // v7.1 (audit de sécurité) : ménage, limite de 3 codes par heure, annulation des anciens
+  // codes et création du nouveau se font EN UNE SEULE opération verrouillée dans la base
+  // (fonction SQL reset_creer, database/11). Avant, des requêtes envoyées en même temps
+  // pouvaient toutes passer la limite et faire pleuvoir les emails sur la victime.
   const code = nouveauCode(); // nouveau code
-  await admin.from("password_resets").insert({
-    user_id: profil.id,
-    code_hash: await empreinte(profil.id, code), // seulement l'empreinte
-    expires_at: new Date(Date.now() + CODE_VALIDITE_MIN * 60_000).toISOString(), // expiration
+  const { data: cree, error } = await admin.rpc("reset_creer", {
+    p_user: profil.id,
+    p_hash: await empreinte(profil.id, code), // seulement l'empreinte, jamais le code
   });
-  await envoyerEmail(profil.email_recuperation, profil.prenom ?? "", code); // envoi
-  return reponse(req, true, MSG_ENVOI);
+  if (error) throw error; // fonction SQL absente (database/11 pas exécuté) : visible dans les Logs
+  if (cree === true) await envoyerEmail(profil.email_recuperation, profil.prenom ?? "", code); // envoi
+  return reponse(req, true, MSG_ENVOI); // même message dans tous les cas (limite atteinte ou non)
 }
 
 // ───────── Action 2 : vérifier le code et changer le mot de passe ─────────
@@ -197,38 +182,32 @@ async function valider(req: Request, tel: string, code: unknown, password: unkno
     .maybeSingle();
   if (!profil) return reponse(req, false, INVALIDE);
 
-  // Dernier code non utilisé et non expiré
-  const { data: reset } = await admin
-    .from("password_resets")
-    .select("*")
-    .eq("user_id", profil.id)
-    .is("used_at", null) // pas encore utilisé
-    .gt("expires_at", new Date().toISOString()) // pas expiré
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (!reset) return reponse(req, false, INVALIDE);
+  // v7.1 (audit de sécurité) : l'essai est compté AVANT la comparaison, dans la base, en
+  // une seule opération verrouillée (fonction SQL reset_essai, database/11).
+  // FAILLE corrigée : avant, on lisait « 0 essai », on comparait, puis on écrivait « 1 ».
+  // Des centaines de requêtes simultanées lisaient toutes « 0 » : la limite de 5 essais
+  // ne servait plus à rien et un pirate pouvait tester des milliers de codes.
+  const { data: lignes, error: errEssai } = await admin.rpc("reset_essai", { p_user: profil.id });
+  if (errEssai) throw errEssai; // fonction SQL absente : visible dans les Logs
+  const reset = Array.isArray(lignes) ? lignes[0] : null; // { reset_id, code_hash, essai } ou rien
+  if (!reset) return reponse(req, false, INVALIDE); // pas de code actif, expiré ou 5 essais déjà faits
 
-  // Mauvais code : on compte l'essai, et on annule le code au 5e échec
+  // Mauvais code : l'essai est déjà compté ; au 5e échec la base a annulé le code
   if (!egaux(reset.code_hash, await empreinte(profil.id, c))) {
-    const essais = reset.attempts + 1;
-    await admin
-      .from("password_resets")
-      .update({ attempts: essais, used_at: essais >= MAX_ESSAIS ? new Date().toISOString() : null })
-      .eq("id", reset.id);
-    return essais >= MAX_ESSAIS
+    return reset.essai >= MAX_ESSAIS
       ? reponse(req, false, "Trop d’essais. Ce code est annulé : demandez-en un nouveau.")
-      : reponse(req, false, `Code incorrect. Il vous reste ${MAX_ESSAIS - essais} essai(s).`);
+      : reponse(req, false, `Code incorrect. Il vous reste ${MAX_ESSAIS - reset.essai} essai(s).`);
   }
 
   // Code correct : on change le mot de passe avec les droits administrateur
   const { error } = await admin.auth.admin.updateUserById(profil.id, { password: pw });
-  if (error) return reponse(req, false, "Le mot de passe n’a pas pu être changé : " + error.message);
-  // Le code est « consommé » : il ne pourra plus servir
-  await admin
-    .from("password_resets")
-    .update({ used_at: new Date().toISOString() })
-    .eq("id", reset.id);
+  if (error) {
+    console.error("Changement de mot de passe refusé :", error.message); // détail dans les Logs seulement
+    return reponse(req, false, "Le mot de passe n’a pas pu être changé. Réessayez dans quelques minutes.");
+  }
+  // Code consommé + déconnexion de tous les appareils (une session pirate éventuelle est coupée)
+  const { error: errFin } = await admin.rpc("reset_terminer", { p_user: profil.id });
+  if (errFin) console.error("reset_terminer :", errFin.message); // le mot de passe est changé quand même
   return reponse(req, true, "Mot de passe modifié. Vous pouvez maintenant vous connecter.");
 }
 

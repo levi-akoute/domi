@@ -124,8 +124,30 @@
   const ajouterAnnonce = (d) => ok(L().insert(d).select().single());
   // Modifie l'annonce id avec les champs p
   const updateAnnonce = (id, p) => ok(L().update(p).eq("id", id).select().single());
-  // Supprime l'annonce id (la base refuse si ce n'est pas la sienne)
-  const supprimerAnnonce = (id) => ok(L().delete().eq("id", id));
+  // Chemin d'une photo dans le bucket « annonces », à partir de son adresse publique :
+  // « https://….supabase.co/storage/v1/object/public/annonces/UID/123.webp » → « UID/123.webp »
+  const cheminPhoto = (url) => {
+    const m = String(url || "").match(/\/storage\/v1\/object\/public\/annonces\/([^?#]+)$/);
+    return m ? decodeURIComponent(m[1]) : null; // null : ce n'est pas une photo de notre stockage
+  };
+  // Supprime des photos du stockage (v7.1, audit de sécurité). Avant, une photo restait
+  // accessible en ligne pour toujours, même après la suppression de l'annonce, alors que la
+  // politique de confidentialité promet l'inverse. Les règles de stockage n'autorisent que
+  // l'annonceur (son dossier) et l'admin. Une erreur ici ne bloque jamais le reste.
+  const supprimerPhotos = async (urls) => {
+    const chemins = [...new Set((urls || []).map(cheminPhoto).filter(Boolean))]; // sans doublons
+    if (!chemins.length) return;
+    try {
+      await client().storage.from("annonces").remove(chemins);
+    } catch (e) {} // ménage seulement : on n'empêche pas l'action principale
+  };
+  // Supprime l'annonce id (la base refuse si ce n'est pas la sienne), puis ses photos
+  const supprimerAnnonce = async (id) => {
+    const avant = await ok(L().select("image, images").eq("id", id).maybeSingle()); // photos à effacer
+    // .select("id") : renvoie les lignes réellement supprimées (vide si la base a refusé)
+    const supprimees = await ok(L().delete().eq("id", id).select("id"));
+    if (avant && supprimees && supprimees.length) await supprimerPhotos([avant.image, ...(avant.images || [])]);
+  };
   // Dernière demande de vérification d'identité de l'utilisateur
   const maVerification = (uid) =>
     ok(
@@ -331,6 +353,7 @@
     ajouterAnnonce,
     updateAnnonce,
     supprimerAnnonce,
+    supprimerPhotos,
     maVerification,
     updateMonProfil,
     adminAnnonces,

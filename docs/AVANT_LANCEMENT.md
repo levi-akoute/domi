@@ -35,7 +35,7 @@ date « Dernière mise à jour », puis publie avec `/commit`.
 ⚠ Ces textes sont des modèles sérieux, mais Claude n'est pas juriste. Si Domi devient une activité commerciale,
 fais-les relire par un juriste.
 
-## 2. Exécuter le fichier SQL 10 dans Supabase (2 minutes)
+## 2. Exécuter le fichier SQL 10 dans Supabase ✅ fait (vérifié en ligne le 2026-11-18)
 
 `database/10_suppression_pieces_identite.sql` : SQL Editor › coller › Run. Le résultat doit afficher une ligne
 `verif_files_delete_admin`.
@@ -47,7 +47,21 @@ suppression.
 Ensuite, dans l'admin, onglet Vérifications : clique sur « Effacer le document » pour chaque ancienne demande déjà
 traitée qui garde encore sa pièce.
 
-## 3. Supprimer les annonces d'exemple (1 minute) ⚠ IMPORTANT
+## 2 bis. Corrections de l'audit de sécurité (10 minutes) ⚠ IMPORTANT, DANS CET ORDRE
+
+1. **SQL** : `database/11_audit_securite.sql` › SQL Editor › coller tout › Run. Le résultat doit être
+   **vide** (aucune ligne). S'il y a des lignes, les montrer à Claude.
+2. **Edge Function** : Supabase › Edge Functions › `reinitialiser-mot-de-passe` › Code › remplacer tout par le
+   contenu de `supabase/functions/reinitialiser-mot-de-passe/index.ts` › Deploy. (Pas avant l'étape 1 : la
+   nouvelle version utilise les fonctions créées par le fichier 11.)
+3. **Test** : sur le site, « Mot de passe oublié » avec ton numéro → le code arrive → change le mot de passe
+   → reconnecte-toi.
+4. **Réglage des mots de passe** : Supabase › Authentication › Providers › Email (ou Sign In / Providers) ›
+   *Minimum password length* = **8**, et exiger lettres + chiffres si l'option est proposée. Sans ce réglage,
+   quelqu'un qui passe par l'API peut se créer un mot de passe de 6 caractères.
+5. **Compte admin** : un mot de passe long et unique (12 caractères ou plus), jamais utilisé ailleurs.
+
+## 3. Supprimer les annonces d'exemple ✅ fait le 2026-11-18 (gardé pour mémoire)
 
 Les 4 annonces fictives de `02_donnees_exemple.sql` sont **en ligne aujourd'hui** (photos de banque d'images,
 numéro 0700000000). Présenter le site avec elles, c'est montrer de fausses annonces sur un site qui promet des
