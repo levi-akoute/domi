@@ -30,6 +30,23 @@ un dépôt privé ne peut pas être publié avec GitHub Pages. Les alternatives 
 dépôt privé : Cloudflare Pages, Netlify ou Vercel. C'est une décision à prendre plus tard, par exemple au
 moment d'acheter le nom de domaine.
 
+### Ce que la base renvoie à un visiteur (v7.3, fichier `13`)
+
+Le code n'est pas le seul à se voir avec F12 : l'onglet « Réseau » montre aussi chaque réponse de la
+base. Depuis la v7.3, un visiteur ne reçoit plus que ce que le site affiche :
+
+| Information d'une annonce | Avant la v7.3 | Depuis la v7.3 |
+|---------------------------|---------------|----------------|
+| Titre, prix, photos, commune, description, conditions | visible | visible (c'est affiché à l'écran) |
+| Numéro de l'annonceur | celui de TOUTES les annonces, en une requête | seulement après un clic sur « Contacter », une annonce à la fois |
+| Vues, clics WhatsApp | visibles | cachés (propriétaire et admin seulement) |
+| Repère / adresse | visible | caché (propriétaire et admin seulement) |
+| Dates de création et de modification, fin de « À la une » | visibles | cachées |
+| Identifiant du propriétaire, de l'auteur d'un avis | visibles | cachés |
+
+Comment : les visiteurs lisent par les fonctions `annonces_publiques()` et `avis_publics()`, qui
+choisissent les colonnes ; la table complète n'est lisible que par son propriétaire et l'admin.
+
 ## Les protections en place
 
 ### Dans le navigateur (pages et JavaScript)
@@ -49,6 +66,7 @@ moment d'acheter le nom de domaine.
 | Menace | Protection | Fichier |
 |--------|------------|---------|
 | Lire les données d'un autre utilisateur | Règles RLS sur toutes les tables | `01` |
+| Aspirer d'un coup les numéros des annonceurs, lire vues, repère, identifiants (F12) | Lecture publique par fonctions qui choisissent les colonnes ; numéro donné au clic, une annonce à la fois | `13` |
 | Se donner le rôle admin ou le badge vérifié | Trigger `protect_profile` | `01`, `09` |
 | Changer son numéro de téléphone (identité) | Trigger `protect_profile` | `09` |
 | Valider sa propre annonce, truquer vues ou notes | Trigger `protect_listing` | `06`, `08` |

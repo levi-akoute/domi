@@ -46,7 +46,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Mode modification : on charge l'annonce et on pré-remplit les champs
   let existing = null; // l'annonce existante (null = nouvelle annonce)
   if (editId) {
-    existing = await S.getAnnonce(editId).catch(() => null);
+    // getMonAnnonce : l'annonce COMPLÈTE (numéro, repère…), que la base ne donne qu'à son propriétaire
+    existing = await S.getMonAnnonce(editId).catch(() => null);
     // Sécurité d'affichage : seule SA propre annonce est modifiable
     // (la base le vérifie aussi avec la règle RLS listing_update)
     if (!existing || existing.owner_id !== user.id) {

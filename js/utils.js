@@ -177,6 +177,48 @@
     return n ? `${n} chambre${n > 1 ? "s" : ""}` : ""; // 0 → chaîne vide
   };
 
+  // Largeur réelle d'une photo en pixels (v7.2, vitrine de l'accueil et admin).
+  // On charge l'image en mémoire sans l'afficher, puis on lit naturalWidth.
+  // Renvoie 0 si elle ne charge pas en 8 secondes (adresse cassée, connexion lente).
+  const largeurImage = (url) =>
+    new Promise((ok) => {
+      if (!url) return ok(0); // pas d'adresse
+      const img = new Image();
+      const fin = setTimeout(() => ok(0), 8000); // abandon après 8 s
+      img.onload = () => {
+        clearTimeout(fin);
+        ok(img.naturalWidth || 0);
+      };
+      img.onerror = () => {
+        clearTimeout(fin);
+        ok(0);
+      };
+      img.src = url; // lance le téléchargement
+    });
+
+  // Annonce « À la une » en cours ? (v7.2) Date de fin dans le futur ET propriétaire vérifié.
+  // v7.3 : la lecture publique (database/13) donne directement le résultat (a_la_une, vrai/faux)
+  // et cache la date de fin. L'admin et le propriétaire lisent la table : on calcule avec la date.
+  // Avant l'exécution de database/12, la colonne n'existe pas : undefined → false, rien ne change.
+  const estALaUne = (a) =>
+    typeof a.a_la_une === "boolean"
+      ? a.a_la_une
+      : !!a.a_la_une_jusqu_au &&
+        new Date(a.a_la_une_jusqu_au) > new Date() &&
+        !!a.proprietaire_verifie;
+
+  // Ordre de priorité des listes : annonces « À la une » d'abord, mélangées au hasard
+  // (chacune est vue autant, visite après visite), puis les autres dans l'ordre reçu
+  // (de la plus récente à la plus ancienne). Mélange de Fisher-Yates : chaque ordre a la même chance.
+  const ordreVitrine = (list) => {
+    const une = list.filter(estALaUne); // les annonces à la une
+    for (let i = une.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1)); // position au hasard entre 0 et i
+      [une[i], une[j]] = [une[j], une[i]]; // échange des deux éléments
+    }
+    return [...une, ...list.filter((a) => !estALaUne(a))];
+  };
+
   /* ───────── 5. Raccourcis et messages ───────── */
 
   // qs(".classe") = document.querySelector(".classe") : trouve le premier élément correspondant
@@ -332,7 +374,8 @@
     trap.setAttribute("aria-hidden", "true"); // ignoré par les lecteurs d'écran
     // name="site_web" : un nom attirant pour un robot ; tabindex=-1 : la touche Tab le saute ;
     // autocomplete=off : le navigateur ne le remplit pas tout seul
-    trap.innerHTML = 'Site web <input name="site_web" type="text" tabindex="-1" autocomplete="off" />';
+    trap.innerHTML =
+      'Site web <input name="site_web" type="text" tabindex="-1" autocomplete="off" />';
     form.prepend(trap); // ajouté au début du formulaire
   }
 
@@ -355,6 +398,9 @@
     daysAgo, // « il y a 3 jours »
     daysSince, // nombre de jours
     chambresLabel, // « 2 chambres »
+    largeurImage, // largeur réelle d'une photo (vitrine)
+    estALaUne, // annonce mise en avant en ce moment ?
+    ordreVitrine, // « À la une » d'abord
     qs, // raccourci querySelector
     getParam, // lire l'adresse
     showMessage, // message dans un bloc

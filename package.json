@@ -1,6 +1,6 @@
 {
   "name": "domi",
-  "version": "7.1.0",
+  "version": "7.3.0",
   "private": true,
   "description": "Domi : plateforme de location de logements en Côte d'Ivoire",
   "type": "module",

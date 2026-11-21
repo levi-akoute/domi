@@ -71,28 +71,58 @@
     return new Date(Date.now() - jours * 86400000).toISOString(); // date au format standard ISO
   };
 
-  /* ───────── Public (visiteurs) ───────── */
+  /* ───────── Public (visiteurs) ─────────
+     Depuis la v7.3, les visiteurs ne lisent plus la table « listings » directement.
+     Ils passent par la fonction SQL annonces_publiques() (database/13), qui ne renvoie
+     QUE ce que le site affiche. Restent cachés, même avec F12 : le numéro de l'annonceur
+     (demandé au clic, voir contacterAnnonce), les vues, les clics, le repère, les dates
+     de création et de modification, la fin de la mise « À la une » et l'identifiant du
+     propriétaire.
 
-  // Toutes les annonces publiées et fraîches.
-  // SQL équivalent : SELECT * FROM listings WHERE moderation='approuvee'
-  //   AND confirmee_le >= <il y a 45 jours> ORDER BY created_at DESC LIMIT 500
+     Repli : tant que database/13 n'est pas exécuté dans Supabase, la fonction n'existe
+     pas (code d'erreur PGRST202). On lit alors la table comme avant, pour que le site
+     continue de marcher. Ce repli pourra être retiré une fois le fichier 13 exécuté. */
+
+  // Vrai si l'erreur dit « cette fonction SQL n'existe pas (encore) »
+  const fonctionAbsente = (e) => !!e && e.code === "PGRST202";
+  let sansFichier13 = false; // passe à vrai au premier PGRST202 (on ne réessaie plus)
+
+  // Lecture publique des annonces. filtres(requete, viaFonction) ajoute les filtres voulus.
+  // viaFonction : vrai si la requête passe par la fonction, faux pour le repli sur la table.
+  // Renvoie toujours une LISTE (éventuellement vide).
+  const publiques = async (filtres) => {
+    if (!sansFichier13) {
+      const { data, error } = await filtres(client().rpc("annonces_publiques"), true);
+      if (!error) return data || []; // cas normal
+      if (!fonctionAbsente(error)) throw new Error(fixMsg(error.message)); // vraie erreur
+      sansFichier13 = true; // fichier 13 pas encore exécuté : repli sur la table
+    }
+    return ok(filtres(L().select("*").eq("moderation", "approuvee"), false));
+  };
+
+  // Toutes les annonces publiées et fraîches (confirmées depuis moins de 45 jours),
+  // les plus récentes d'abord, 500 au maximum.
   const getAnnonces = () =>
-    ok(
-      L()
-        .select("*") // toutes les colonnes
-        .eq("moderation", "approuvee") // eq = « égal à » : seulement les annonces validées
+    publiques((q, viaFonction) =>
+      q
         .gte("confirmee_le", limiteFraicheur()) // gte = « supérieur ou égal » : confirmées récemment
-        .order("created_at", { ascending: false }) // les plus récentes d'abord
-        .limit(500) // 500 au maximum
+        // La fonction cache la date de publication : elle donne un « rang » (1 = la plus récente)
+        .order(viaFonction ? "rang" : "created_at", { ascending: viaFonction })
+        .limit(500)
     );
 
-  // Une seule annonce par son identifiant (maybeSingle : null si elle n'existe pas)
-  const getAnnonce = (id) => ok(L().select("*").eq("id", id).maybeSingle());
+  // Une seule annonce par son identifiant (null si elle n'existe pas ou n'est pas visible).
+  // Une annonce pas encore validée n'est pas publique : on la cherche alors dans la table,
+  // où seuls son propriétaire et l'admin peuvent la lire (aperçu avant validation).
+  const getAnnonce = async (id) => {
+    const r = await publiques((q) => q.eq("id", id).limit(1)); // eq = « égal à »
+    return r[0] || ok(L().select("*").eq("id", id).maybeSingle());
+  };
 
   // Plusieurs annonces à partir d'une liste d'identifiants (page Favoris)
   const getAnnoncesParIds = (ids) =>
     ids.length
-      ? ok(L().select("*").in("id", ids).eq("moderation", "approuvee")) // in = « fait partie de la liste »
+      ? publiques((q) => q.in("id", ids)) // in = « fait partie de la liste »
       : []; // liste vide : pas de requête inutile
 
   // Compteurs : on appelle des fonctions SQL (rpc = « remote procedure call »).
@@ -112,6 +142,22 @@
         () => {}
       );
 
+  // Numéro de l'annonceur (v7.3) : il n'est plus envoyé avec les annonces. On le demande
+  // seulement quand un visiteur clique sur « Contacter », pour UNE annonce. La fonction SQL
+  // compte aussi le clic (statistique du propriétaire) et renvoie null si l'annonce n'est
+  // plus disponible.
+  // repli : numéro déjà présent dans l'annonce (base sans le fichier 13) ; on compte alors
+  // le clic avec l'ancienne fonction.
+  const contacterAnnonce = async (id, repli) => {
+    const { data, error } = await client().rpc("contacter_annonce", { p_id: id });
+    if (!error) return data || null;
+    if (fonctionAbsente(error) && repli) {
+      clicWhatsapp(id);
+      return repli;
+    }
+    throw new Error(fixMsg(error.message));
+  };
+
   // Enregistre un signalement (la base limite le nombre : database/09)
   const signaler = (r) => ok(client().from("reports").insert(r));
 
@@ -120,6 +166,9 @@
   // Les annonces du propriétaire uid (toutes, même en attente : la règle RLS le permet pour SES annonces)
   const getMesAnnonces = (uid) =>
     ok(L().select("*").eq("owner_id", uid).order("created_at", { ascending: false }));
+  // UNE annonce complète (numéro, repère…), pour la modifier. Lue dans la table : la base
+  // ne la renvoie qu'à son propriétaire et à l'admin (null pour les autres).
+  const getMonAnnonce = (id) => ok(L().select("*").eq("id", id).maybeSingle());
   // Crée une annonce et renvoie la ligne créée (.select().single())
   const ajouterAnnonce = (d) => ok(L().insert(d).select().single());
   // Modifie l'annonce id avec les champs p
@@ -222,9 +271,17 @@
 
   /* ───────── Avis ───────── */
 
-  // Avis publiés d'une annonce (30 plus récents)
-  const getAvis = (id) =>
-    ok(
+  // Avis publiés d'une annonce (30 plus récents).
+  // v7.3 : par la fonction SQL avis_publics (database/13), qui cache l'identifiant de
+  // l'auteur. Repli sur la table tant que le fichier 13 n'est pas exécuté.
+  const getAvis = async (id) => {
+    const { data, error } = await client()
+      .rpc("avis_publics", { p_listing: id }) // avis publiés de cette annonce
+      .order("created_at", { ascending: false }) // les plus récents d'abord
+      .limit(30);
+    if (!error) return data || [];
+    if (!fonctionAbsente(error)) throw new Error(fixMsg(error.message));
+    return ok(
       client()
         .from("reviews")
         .select("*")
@@ -233,6 +290,7 @@
         .order("created_at", { ascending: false })
         .limit(30)
     );
+  };
   // L'avis de l'utilisateur uid sur l'annonce id (ou null)
   const monAvis = async (id, uid) => {
     const r = await ok(
@@ -348,8 +406,10 @@
     getAnnoncesParIds,
     vue,
     clicWhatsapp,
+    contacterAnnonce,
     signaler,
     getMesAnnonces,
+    getMonAnnonce,
     ajouterAnnonce,
     updateAnnonce,
     supprimerAnnonce,

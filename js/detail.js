@@ -35,7 +35,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const user = await A.currentUser(); // visiteur connecté ? (null sinon)
-  const mine = user && user.id === a.owner_id; // est-ce SON annonce ?
+  // Est-ce SON annonce ? La lecture publique donne est_a_moi (l'identifiant du propriétaire
+  // reste caché depuis la v7.3) ; la lecture complète (propriétaire, admin) donne owner_id.
+  const mine = !!user && (a.est_a_moi === true || user.id === a.owner_id);
   const pub = a.moderation === "approuvee"; // annonce publiée ?
 
   /* ───────── 2. Compteurs et contact ───────── */
@@ -54,18 +56,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     .filter(Boolean); // retire les adresses refusées (chaînes vides)
   if (!photos.length) photos.push(FALLBACK); // aucune photo : image de secours
 
-  // Numéro au format international pour WhatsApp (225 + 10 chiffres)
-  const phone = String(a.telephone || "").replace(/\D/g, ""); // chiffres uniquement
-  const full = phone.startsWith("225") ? phone : "225" + phone; // ajoute l'indicatif si besoin
+  /* Contact. v7.3 : le numéro de l'annonceur n'est PLUS envoyé avec l'annonce (sinon
+     n'importe qui le verrait avec F12, sans même cliquer). Les boutons de contact le
+     demandent à la base au premier clic (voir « Contact » dans la partie 4). */
   const dispo = a.statut === "Disponible" && pub; // on ne peut contacter que si dispo ET publiée
-  // Lien WhatsApp avec un message pré-rempli (titre + lien de l'annonce)
-  const wa = phone
-    ? `https://wa.me/${full}?text=${encodeURIComponent("Bonjour, je vous contacte au sujet de votre annonce Domi : " + a.titre + "\n" + location.href)}`
-    : "#";
-  // Attributs du bouton : lien actif, ou désactivé (aria-disabled) si non disponible
-  const waAttr =
-    dispo && phone ? `href="${wa}" target="_blank" rel="noopener"` : `aria-disabled="true"`;
-  const dis = dispo && phone ? "" : "disabled-link"; // classe CSS grisée
+  // Attributs d'un bouton de contact : actif (data-contact = "wa" ou "tel"), ou désactivé
+  const contactAttr = (type) =>
+    dispo ? `href="#" data-contact="${type}"` : `aria-disabled="true"`;
+  const dis = dispo ? "" : "disabled-link"; // classe CSS grisée
   const ch = U.chambresLabel(a.chambres); // « 2 chambres »
   const video = U.safeUrl(a.video); // lien vidéo vérifié (bloque javascript:)
   const ancienne = pub && U.daysSince(a.confirmee_le) >= U.JOURS_RAPPEL; // pas confirmée depuis 30 jours ?
@@ -128,15 +126,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div class="condition-row"><span>Avance</span><strong>${Number(a.avance) || 0} mois</strong></div>
       <div class="condition-row"><span>Caution</span><strong>${Number(a.caution) || 0} mois</strong></div>
       ${entree ? `<div class="condition-row total"><span>À prévoir à l’entrée</span><strong>${U.money(entree)}</strong></div>` : ""}
-      <a class="btn btn-primary btn-block ${dis}" ${waAttr} id="whatsapp-contact">${I("whatsapp")} Contacter sur WhatsApp</a>
-      <a class="btn btn-outline btn-block ${dis}" ${dispo && phone ? `href="tel:+${full}"` : `aria-disabled="true"`}>${I("phone")} Appeler l’annonceur</a>
+      <a class="btn btn-primary btn-block ${dis}" ${contactAttr("wa")} id="whatsapp-contact">${I("whatsapp")} Contacter sur WhatsApp</a>
+      <a class="btn btn-outline btn-block ${dis}" ${contactAttr("tel")} id="appel-contact">${I("phone")} Appeler l’annonceur</a>
       <button class="btn btn-outline btn-block" id="share-listing" type="button">${I("share")} Partager cette annonce</button>
       <p class="fine-print">Disponibilité, prix et conditions à confirmer directement avec l’annonceur.</p>
       <button class="report-link" id="report-listing" type="button">${I("flag")} Signaler cette annonce</button>
       <a class="support-link" href="${U.supportLink("Bonjour Domi, j’ai un doute sur cette annonce : " + a.titre + " (" + location.href + ")")}" target="_blank" rel="noopener">Un doute ? Écrire au support</a>
     </aside>
   </div>
-  <div class="sticky-contact"><div><strong>${U.money(a.loyer)}</strong><small>/ mois</small></div><a class="btn btn-primary ${dis}" ${waAttr} id="whatsapp-sticky">${I("whatsapp")} WhatsApp</a></div>`;
+  <div class="sticky-contact"><div><strong>${U.money(a.loyer)}</strong><small>/ mois</small></div><a class="btn btn-primary ${dis}" ${contactAttr("wa")} id="whatsapp-sticky">${I("whatsapp")} WhatsApp</a></div>`;
   // (sticky-contact : barre fixée en bas de l'écran sur téléphone)
 
   /* ───────── 4. Interactions ───────── */
@@ -149,10 +147,55 @@ document.addEventListener("DOMContentLoaded", async () => {
     })
   );
 
-  // Clic sur un bouton WhatsApp → +1 clic dans la base (statistique du propriétaire)
-  ["#whatsapp-contact", "#whatsapp-sticky"].forEach((s) =>
-    U.qs(s)?.addEventListener("click", () => {
-      if (dispo) S.clicWhatsapp(a.id);
+  // Contact : au premier clic sur un bouton de contact, on demande le numéro à la base
+  // (S.contacterAnnonce compte aussi le clic pour les statistiques du propriétaire).
+  // Ensuite, les trois boutons deviennent de vrais liens (WhatsApp ou appel) et on ouvre
+  // tout de suite celui qui a été touché.
+  let numero = null; // numéro international (225 + 10 chiffres), connu après le 1er clic
+  let enCours = false; // évite deux demandes en même temps (double clic)
+  // Adresse du contact : appel téléphonique, ou WhatsApp avec un message pré-rempli
+  const lienContact = (type) =>
+    type === "tel"
+      ? `tel:+${numero}`
+      : `https://wa.me/${numero}?text=${encodeURIComponent("Bonjour, je vous contacte au sujet de votre annonce Domi : " + a.titre + "\n" + location.href)}`;
+  main.querySelectorAll("[data-contact]").forEach((bouton) =>
+    bouton.addEventListener("click", async (e) => {
+      if (numero) return; // numéro déjà connu : le lien s'ouvre normalement
+      e.preventDefault(); // pas encore de numéro : on le demande d'abord
+      if (enCours) return;
+      enCours = true;
+      try {
+        // a.telephone n'existe que si la base n'a pas encore le fichier 13 (repli)
+        const recu = await S.contacterAnnonce(a.id, a.telephone);
+        const chiffres = String(recu || "").replace(/\D/g, ""); // chiffres uniquement
+        if (!chiffres)
+          throw new Error("Contact indisponible : cette annonce n’est plus disponible.");
+        numero = chiffres.startsWith("225") ? chiffres : "225" + chiffres; // ajoute l'indicatif
+        // Les boutons deviennent de vrais liens (les clics suivants les ouvrent directement)
+        main.querySelectorAll("[data-contact]").forEach((l) => {
+          l.href = lienContact(l.dataset.contact);
+          if (l.dataset.contact === "wa") {
+            l.target = "_blank"; // WhatsApp dans un nouvel onglet
+            l.rel = "noopener"; // la page WhatsApp ne peut pas agir sur Domi
+          }
+        });
+        // Ouvre tout de suite le contact demandé
+        if (bouton.dataset.contact === "tel") location.href = lienContact("tel");
+        else {
+          const w = window.open(lienContact("wa"), "_blank");
+          if (!w) {
+            U.toast("Touchez à nouveau le bouton pour ouvrir WhatsApp."); // ouverture bloquée
+          } else {
+            try {
+              w.opener = null; // même protection que rel="noopener"
+            } catch (e) {} // certains navigateurs l'interdisent : sans gravité
+          }
+        }
+      } catch (err) {
+        U.toast(err.message, "error");
+      } finally {
+        enCours = false;
+      }
     })
   );
 

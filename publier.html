@@ -127,11 +127,12 @@
             <!-- Quartier -->
             <label>Quartier <input name="quartier" maxlength="120" placeholder="Ex. Angré 8e tranche" /></label>
             <!-- Repère : facultatif -->
-            <!-- Ce champ est enregistré avec l'annonce : il peut être lu par n'importe qui (audit 2026-11-18) -->
+            <!-- v7.3 (database/13) : ce champ n'est plus lisible par les visiteurs, même avec F12.
+                 Seuls le propriétaire et l'admin peuvent le lire. -->
             <label class="full">
               Repère ou adresse (facultatif)
               <input name="adresse" maxlength="200" placeholder="Ex. Derrière la pharmacie…" />
-              <small class="field-hint">Visible publiquement : indiquez un repère (pharmacie, école…), pas votre adresse exacte.</small>
+              <small class="field-hint">Visible seulement par vous et l’équipe Domi : les visiteurs ne le voient pas.</small>
             </label>
           </div>
         </div>

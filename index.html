@@ -71,93 +71,93 @@
 
     <!-- Contenu principal de la page d'accueil -->
     <main>
-      <!-- ═══ HAUT DE PAGE : carrousel + barre de recherche ═══ -->
+      <!-- ═══ HAUT DE PAGE (v7.2) : titre FIXE + recherche + vitrine photo qui défile ═══
+           Sur ordinateur : deux parties (texte et recherche à gauche, photos à droite).
+           Sur téléphone : titre, photos, recherche, puis bandeau anti-arnaque.
+           S'il n'y a aucune bonne photo, home.js ajoute la classe « sans-photo » :
+           la vitrine disparaît et un dessin de maison la remplace (bannière fixe de secours). -->
       <div class="container hero">
-        <!-- Carrousel : bannières qui défilent (logique dans js/home.js).
-             aria-roledescription / aria-label : décrivent le bloc aux lecteurs d'écran -->
-        <div class="banner" id="banner" aria-roledescription="carrousel" aria-label="À la une">
-          <!-- Bande qui contient toutes les bannières côte à côte (décalée par home.js) -->
-          <div class="slides" id="slides">
-            <!-- Bannière 1 : message principal -->
-            <div class="slide txt">
-              <!-- Grand dessin décoratif de maison, à droite -->
-              <svg class="slide-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z" /><path d="M10 20v-6h4v6" /></svg>
-              <!-- Texte de la bannière -->
-              <div class="slide-copy">
-                <!-- Petit surtitre orange en majuscules -->
-                <span class="eyebrow">Location · Côte d’Ivoire</span>
-                <!-- Titre principal de la page (un seul h1 par page, important pour Google) -->
-                <h1>Le logement qu’il vous faut, <em>sans mauvaise surprise.</em></h1>
-                <!-- Phrase d'accroche -->
-                <p>Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp.</p>
-                <!-- Bouton vers le catalogue -->
-                <a class="btn btn-accent" href="annonces.html">Voir les annonces</a>
-              </div>
-            </div>
-            <!-- Bannière 2 : conseil de sécurité -->
-            <div class="slide txt">
-              <svg class="slide-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z" /><path d="M8.5 12l2.5 2.5 4.5-5" /></svg>
-              <div class="slide-copy">
-                <span class="eyebrow">Notre conseil n°1</span>
-                <h2>Visitez avant de payer.</h2>
-                <p>Domi ne reçoit jamais votre argent. Découvrez les réflexes simples qui évitent les arnaques.</p>
-                <a class="btn btn-accent" href="conseils.html">Lire les conseils</a>
-              </div>
-            </div>
-            <!-- Bannière 3 : invitation aux propriétaires -->
-            <div class="slide txt">
-              <svg class="slide-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="14" r="4" /><path d="M11 11l9-9M16 6l3 3" /></svg>
-              <div class="slide-copy">
-                <span class="eyebrow">Propriétaires et agents</span>
-                <h2>Vous avez un bien à louer ?</h2>
-                <p>Publiez gratuitement, avec photos, et recevez des demandes directement sur WhatsApp.</p>
-                <a class="btn btn-accent" href="connexion.html?inscription=1">Publier une annonce</a>
-              </div>
-            </div>
-            <!-- (home.js ajoute ensuite jusqu'à 3 bannières photo avec de vraies annonces) -->
-          </div>
-          <!-- Flèche « précédente » (aria-label : texte lu par les lecteurs d'écran) -->
-          <button class="arrow l" id="banner-prev" type="button" aria-label="Bannière précédente">
-            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
-          </button>
-          <!-- Flèche « suivante » -->
-          <button class="arrow r" id="banner-next" type="button" aria-label="Bannière suivante">
-            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
-          </button>
-          <!-- Points de navigation : créés par home.js (un par bannière) -->
-          <div class="dots" id="banner-dots"></div>
-        </div>
+        <div class="hero-box" id="hero-box">
+          <!-- Partie gauche : texte fixe (il ne défile jamais) -->
+          <div class="hero-copy">
+            <!-- Petit surtitre orange en majuscules -->
+            <span class="eyebrow">Location · Côte d’Ivoire</span>
+            <!-- Titre principal de la page (un seul h1 par page, important pour Google) -->
+            <h1>Le logement qu’il vous faut, <em>sans mauvaise surprise.</em></h1>
+            <!-- Phrase d'accroche -->
+            <p class="hero-lead">Annonces contrôlées, propriétaires identifiés, contact direct sur WhatsApp.</p>
 
-        <!-- Barre de recherche : envoie vers annonces.html avec les filtres (js/annonces.js) -->
-        <form id="home-search" class="search-bar">
-          <!-- Liste des communes : remplie par fillCommunes() avec les communes de config.js -->
-          <label>Commune <select id="search-commune"></select></label>
-          <!-- Type de bien -->
-          <label>
-            Type de bien
-            <select id="search-type">
-              <option value="">Tous les types</option>
-              <option>Studio</option>
-              <option>Appartement</option>
-              <option>Maison</option>
-              <option>Villa</option>
-            </select>
-          </label>
-          <!-- Budget maximum (value = montant en FCFA envoyé au catalogue) -->
-          <label>
-            Budget mensuel
-            <select id="search-budget">
-              <option value="">Tous budgets</option>
-              <option value="60000">Jusqu’à 60 000 FCFA</option>
-              <option value="100000">Jusqu’à 100 000 FCFA</option>
-              <option value="150000">Jusqu’à 150 000 FCFA</option>
-              <option value="250000">Jusqu’à 250 000 FCFA</option>
-              <option value="400000">Jusqu’à 400 000 FCFA</option>
-            </select>
-          </label>
-          <!-- Bouton d'envoi (type="submit" : déclenche l'événement submit du formulaire) -->
-          <button class="btn btn-accent" type="submit">Rechercher</button>
-        </form>
+            <!-- Barre de recherche : envoie vers annonces.html avec les filtres (js/annonces.js) -->
+            <form id="home-search" class="search-bar">
+              <!-- Liste des communes : remplie par fillCommunes() avec les communes de config.js -->
+              <label>Commune <select id="search-commune"></select></label>
+              <!-- Type de bien -->
+              <label>
+                Type de bien
+                <select id="search-type">
+                  <option value="">Tous les types</option>
+                  <option>Studio</option>
+                  <option>Appartement</option>
+                  <option>Maison</option>
+                  <option>Villa</option>
+                </select>
+              </label>
+              <!-- Budget maximum (value = montant en FCFA envoyé au catalogue) -->
+              <label>
+                Budget mensuel
+                <select id="search-budget">
+                  <option value="">Tous budgets</option>
+                  <option value="60000">Jusqu’à 60 000 FCFA</option>
+                  <option value="100000">Jusqu’à 100 000 FCFA</option>
+                  <option value="150000">Jusqu’à 150 000 FCFA</option>
+                  <option value="250000">Jusqu’à 250 000 FCFA</option>
+                  <option value="400000">Jusqu’à 400 000 FCFA</option>
+                </select>
+              </label>
+              <!-- Bouton d'envoi (type="submit" : déclenche l'événement submit du formulaire) -->
+              <button class="btn btn-accent" type="submit">Rechercher</button>
+            </form>
+
+            <!-- Bandeau anti-arnaque PERMANENT (avant : une bannière qui passait 5 s de temps en temps).
+                 Phrase choisie pour rester vraie même le jour où la mise en avant sera payante. -->
+            <a class="hero-warning" href="conseils.html">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z" /><path d="M12 8v5M12 16.5v.01" /></svg>
+              <span><b>Ne payez rien avant d’avoir visité le logement.</b> Lire nos conseils</span>
+            </a>
+          </div>
+
+          <!-- Partie droite : la vitrine photo (logique dans js/home.js).
+               Elle contient les annonces « À la une » d'abord, puis les dernières annonces (6 au maximum).
+               « chargement » : gris animé tant que home.js mesure les photos. -->
+          <div class="vitrine chargement" id="vitrine">
+            <!-- La photo (format 4:3) -->
+            <div class="banner" id="banner" aria-roledescription="carrousel" aria-label="Annonces en vitrine">
+              <!-- Bande qui contient toutes les photos côte à côte (décalée par home.js) -->
+              <div class="slides" id="slides"></div>
+              <!-- Flèche « précédente » (aria-label : texte lu par les lecteurs d'écran) -->
+              <button class="arrow l" id="banner-prev" type="button" aria-label="Photo précédente">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
+              </button>
+              <!-- Flèche « suivante » -->
+              <button class="arrow r" id="banner-next" type="button" aria-label="Photo suivante">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+              </button>
+            </div>
+            <!-- Commandes SOUS la photo (pas dessus : sur téléphone, elles cachaient l'étiquette « À la une ») :
+                 points (un par photo, créés par home.js) + bouton pause -->
+            <div class="banner-ctrl">
+              <div class="dots" id="banner-dots"></div>
+              <!-- Bouton pause / lecture (règle d'accessibilité : ce qui bouge seul doit pouvoir s'arrêter) -->
+              <button class="pause-btn" id="banner-pause" type="button" aria-label="Mettre le défilement en pause" aria-pressed="false">
+                <svg class="ic i-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
+                <svg class="ic i-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bannière fixe de secours : grand dessin de maison, visible seulement sans photo -->
+          <svg class="hero-ill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z" /><path d="M10 20v-6h4v6" /></svg>
+        </div>
       </div>
 
       <!-- ═══ DERNIÈRES ANNONCES ═══ -->
@@ -196,6 +196,15 @@
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z" /><path d="M10 20v-6h4v6" /></svg>
               <div><b>Visitez avant de payer</b><span>Domi ne reçoit jamais votre argent</span></div>
             </div>
+          </div>
+          <!-- Appel aux propriétaires (avant : 3e bannière du carrousel) -->
+          <div class="owner-cta">
+            <div>
+              <span class="eyebrow eyebrow-light">Propriétaires et agents</span>
+              <h2>Vous avez un bien à louer ?</h2>
+              <p>Publiez gratuitement, avec photos. Les nouvelles annonces passent dans la vitrine de l’accueil, et les demandes arrivent directement sur WhatsApp.</p>
+            </div>
+            <a class="btn btn-accent" href="connexion.html?inscription=1">Publier une annonce</a>
           </div>
         </div>
       </section>

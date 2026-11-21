@@ -205,11 +205,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const q = U.qs("#ads-search").value; // texte recherché
     const list = data.ads.filter(
       (a) =>
-        (f === "tous" || a.moderation === f) &&
+        (f === "tous" || a.moderation === f || (f === "une" && U.estALaUne(a))) &&
         match(q, a.titre, a.commune, a.quartier, a.profiles?.nom, a.profiles?.prenom, a.telephone)
     );
     U.qs("#admin-ads").innerHTML = table(
-      ["Annonce", "Annonceur", "Loyer", "État", "Actions"],
+      ["Annonce", "Annonceur", "Loyer", "État", "À la une", "Actions"],
       list.map((a) => {
         const img = U.safeUrl(a.image) || "assets/img/placeholder.svg"; // miniature
         const p = a.profiles; // auteur de l'annonce
@@ -221,6 +221,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           ${td("Annonceur", `${owner}<small>${E(p?.telephone || a.telephone || "")}</small>`)}
           ${td("Loyer", U.money(a.loyer))}
           ${td("État", st(MOD, a.moderation))}
+          ${td("À la une", celluleUne(a))}
           ${td(
             "Actions",
             `<div class="table-actions">
@@ -233,6 +234,62 @@ document.addEventListener("DOMContentLoaded", async () => {
         </tr>`;
       }),
       "Aucune annonce dans cette catégorie."
+    );
+  }
+
+  // Cellule « À la une » d'une annonce (v7.2) :
+  //   - en cours : date de fin + boutons « +7 j », « +30 j » (prolonger) et « Retirer » ;
+  //   - possible (publiée, propriétaire vérifié) : boutons « 7 j » et « 30 j » ;
+  //   - sinon : la raison, en petit.
+  function celluleUne(a) {
+    const enCours = U.estALaUne(a);
+    if (!enCours && a.moderation !== "approuvee") return '<small class="muted">Non publiée</small>';
+    if (!enCours && !a.proprietaire_verifie)
+      return '<small class="muted">Propriétaire non vérifié</small>';
+    const id = E(a.id);
+    const fin = enCours
+      ? `${badge("pending", `${I("star")} jusqu’au ${date(a.a_la_une_jusqu_au)}`)}`
+      : "";
+    return `${fin}<div class="table-actions">
+      <button class="mini-btn ok" data-une="${id}" data-jours="7">${enCours ? "+7 j" : "7 jours"}</button>
+      <button class="mini-btn ok" data-une="${id}" data-jours="30">${enCours ? "+30 j" : "30 jours"}</button>
+      ${enCours ? `<button class="mini-btn danger" data-une="${id}" data-jours="0">Retirer</button>` : ""}
+    </div>`;
+  }
+
+  // Met une annonce à la une (jours > 0 : ajoutés à la date de fin actuelle si elle est
+  // dans le futur, sinon à aujourd'hui) ou la retire (jours = 0).
+  async function changerUne(id, jours) {
+    const a = data.ads.find((x) => x.id === id);
+    if (!a) return;
+    let fin = null; // null = retirer
+    if (jours > 0) {
+      // Photo trop petite : l'annonce sera en tête des listes, mais pas dans la vitrine
+      const l = await U.largeurImage(U.safeUrl(a.image));
+      if (
+        l < 800 &&
+        !confirm(
+          `La photo principale fait ${l || "?"} px de large (minimum 800 pour la vitrine).\n` +
+            "L’annonce sera en tête des listes avec l’étiquette, mais PAS dans la vitrine photo.\n" +
+            "Demandez une photo plus grande au propriétaire. Continuer quand même ?"
+        )
+      )
+        return;
+      const depart = U.estALaUne(a) ? new Date(a.a_la_une_jusqu_au) : new Date();
+      fin = new Date(depart.getTime() + jours * 86400000).toISOString(); // 86 400 000 ms = 1 jour
+    } else if (!confirm("Retirer cette annonce de la une dès maintenant ?")) return;
+    run(
+      async () => {
+        try {
+          await S.updateAnnonce(id, { a_la_une_jusqu_au: fin });
+        } catch (e) {
+          // Colonne absente : le fichier SQL 12 n'a pas encore été exécuté
+          if (/a_la_une/.test(e.message) && /column|colonne|schema/i.test(e.message))
+            throw new Error("Exécutez d’abord database/12_a_la_une.sql dans Supabase.");
+          throw e;
+        }
+      },
+      fin ? `À la une jusqu’au ${date(fin)}` : "Annonce retirée de la une"
     );
   }
 
@@ -354,7 +411,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const b = e.target.closest("button"); // bouton cliqué (ou contenant l'élément cliqué)
     if (!b) return;
     const d = b.dataset; // ses attributs data-*
-    if (d.mod)
+    if (d.une) changerUne(d.une, Number(d.jours));
+    // mettre / retirer à la une
+    else if (d.mod)
       // approuver / refuser une annonce
       run(
         () => S.updateAnnonce(d.mod, { moderation: d.to }),
@@ -378,10 +437,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!ok && note === null) return; // « Annuler » dans la boîte de dialogue
       // Décision, puis suppression immédiate de la pièce d'identité (promis dans la
       // politique de confidentialité : on ne garde pas les pièces après la vérification)
-      run(async () => {
-        await S.decideVerification(d.ver, ok, note);
-        await S.supprimerDocument(d.ver, d.path);
-      }, ok ? "Compte vérifié, document supprimé" : "Demande refusée, document supprimé");
+      run(
+        async () => {
+          await S.decideVerification(d.ver, ok, note);
+          await S.supprimerDocument(d.ver, d.path);
+        },
+        ok ? "Compte vérifié, document supprimé" : "Demande refusée, document supprimé"
+      );
     } else if (d.docdel) {
       // effacer la pièce d'une demande déjà traitée (demandes traitées avant la v7)
       if (confirm("Supprimer définitivement cette pièce d’identité ?"))

@@ -16,6 +16,8 @@
   let all = []; // toutes les annonces chargées depuis la base
   let shown = PAGE; // combien on en affiche actuellement
 
+  const une = U.estALaUne; // annonce « À la une » en cours ? (règle dans utils.js)
+
   /* ───────── Carte d'une annonce ─────────
      Renvoie le code HTML d'une carte. a = une annonce (une ligne de la table listings).
      SÉCURITÉ : chaque valeur venant de la base passe par E() (escapeHtml) ou par
@@ -39,6 +41,7 @@
           <img src="${E(img)}" alt="${E(a.titre)}" loading="lazy" data-fallback="${FALLBACK}">
           <span class="status-badge ${dispo ? "available" : "unavailable"}">${E(a.statut || "")}</span>
           ${a.video ? `<span class="video-badge">${I("play")} Vidéo</span>` : ""}
+          ${une(a) ? `<span class="une-badge">${I("star")} À la une</span>` : ""}
         </a>
         ${U.favButton(a.id, "on-card")}
         <div class="listing-body">
@@ -116,8 +119,8 @@
         (!verifie || a.proprietaire_verifie) && // propriétaire vérifié si demandé
         (!video || !!a.video) // vidéo si demandée
     );
-    // Tri. Sans tri choisi, l'ordre de la base est gardé (les plus récentes d'abord).
-    // sort((a, b) => …) : un résultat négatif place a avant b.
+    // Tri. Sans tri choisi, l'ordre préparé au chargement est gardé : « À la une » d'abord,
+    // puis les plus récentes (v7.2). sort((a, b) => …) : un résultat négatif place a avant b.
     if (tri === "prix-asc")
       r.sort((a, b) => a.loyer - b.loyer); // moins cher d'abord
     else if (tri === "prix-desc")
@@ -208,7 +211,9 @@
 
     U.qs("#all-listings").innerHTML = skeleton(6); // squelettes pendant le chargement
     try {
-      all = await S.getAnnonces(); // chargement depuis la base
+      // Chargement depuis la base, puis « À la une » en tête (mélangées UNE fois : l'ordre ne
+      // change pas à chaque frappe dans un filtre)
+      all = U.ordreVitrine(await S.getAnnonces());
     } catch (e) {
       // Échec : on affiche le message d'erreur à la place de la liste
       U.qs("#all-listings").innerHTML = "";
@@ -228,8 +233,8 @@
     try {
       // Annonces disponibles uniquement
       const dispo = (await S.getAnnonces()).filter((a) => a.statut === "Disponible");
-      if (window.ImmoCarousel) window.ImmoCarousel.addListings(dispo); // 3 annonces dans le carrousel
-      const list = dispo.slice(0, 8); // 8 dernières
+      if (window.ImmoCarousel) window.ImmoCarousel.addListings(dispo); // vitrine photo (6 au maximum)
+      const list = U.ordreVitrine(dispo).slice(0, 8); // « À la une » d'abord, puis les dernières (8 en tout)
       host.innerHTML = list.length
         ? list.map(card).join("")
         : '<div class="empty-state span-all"><h3>Les premières annonces arrivent bientôt</h3><p>Vous proposez un bien ? Soyez parmi les premiers à publier.</p></div>';

@@ -1,5 +1,68 @@
 # CHANGELOG : Domi, site de location de maisons
 
+## v7.3 « annonces confidentielles » (2026-11-21)
+
+### Ce qu'un curieux voit avec F12 (Inspecter)
+- Avant : la base renvoyait TOUTES les colonnes des annonces publiées. Une seule requête donnait le
+  numéro de tous les annonceurs, et chaque annonce montrait ses vues, ses clics WhatsApp, son repère,
+  ses dates et l'identifiant de son propriétaire.
+- `database/13_annonces_confidentielles.sql` : les visiteurs lisent les annonces par la fonction
+  `annonces_publiques()`, qui ne renvoie que ce que le site affiche. La table complète n'est plus
+  lisible que par son propriétaire et l'admin. Même principe pour les avis (`avis_publics`) :
+  l'identifiant de l'auteur ne sort plus.
+- Le numéro de l'annonceur n'est plus dans la page. Il est demandé au clic sur « Contacter sur
+  WhatsApp » ou « Appeler », une annonce à la fois (`contacter_annonce`, qui compte aussi le clic).
+  Si le navigateur bloque l'ouverture de WhatsApp, un message invite à toucher de nouveau le bouton.
+- Le champ « Repère » n'est plus public (texte d'aide du formulaire corrigé).
+- Le site fonctionne avant ET après l'exécution du fichier 13 (repli automatique sur l'ancienne table).
+- `database/99_verifier_installation.sql` (lecture seule) : une ligne par fichier SQL, ✅ installé ou
+  ❌ manque, pour voir d'un coup ce qui a été exécuté dans Supabase.
+- Limite honnête : un programmeur peut encore demander les numéros annonce par annonce, comme sur
+  tous les sites d'annonces. Mais il n'y a plus de liste complète en une requête.
+
+### Vérifié dans Edge (2026-11-21)
+- 14 scénarios avec le vrai code du site et une base simulée (avant et après le fichier 13), plus la
+  vraie base en lecture seule : catalogue, accueil, favoris, page annonce (ordinateur et téléphone),
+  annonce déjà louée, en attente, plus disponible, ouverture bloquée, version construite.
+- Aucun numéro, repère, nombre de vues ni identifiant dans la page avant le clic ; une seule demande
+  de numéro par page ; 0 erreur console (hors le 404 attendu tant que le fichier 13 n'est pas exécuté).
+
+## v7.2 « vitrine photo et À la une » (2026-11-21)
+
+### Accueil
+- Les 3 bannières de texte sont supprimées. Titre, recherche et bandeau « Ne payez rien avant
+  d'avoir visité le logement » sont FIXES ; seules des photos d'annonces défilent (vitrine).
+- Ordinateur : bloc en deux parties (texte et recherche à gauche, photos 4:3 à droite).
+  Téléphone : titre, photos, recherche, bandeau.
+- Vitrine : 6 photos au maximum, « À la une » d'abord puis les dernières annonces ; photos de
+  moins de 800 px écartées (floues en grand) ; 5 s par photo ; arrêt dès qu'on touche ;
+  bouton pause / lecture ; pause au survol. Aucune bonne photo : bannière fixe de secours.
+- « Vous avez un bien à louer ? » descend en bas de l'accueil (bloc vert).
+
+### « À la une » (mise en avant)
+- `database/12_a_la_une.sql` : colonne `a_la_une_jusqu_au` (date de fin, fin automatique),
+  modifiable seulement par un admin, propriétaires vérifiés seulement, 93 jours au maximum.
+- Admin › Annonces : colonne « À la une » (7 jours, 30 jours, +7 j, +30 j, Retirer), filtre
+  « À la une », alerte si la photo est trop petite pour la vitrine.
+- Étiquette « À la une » sur la vitrine et les cartes ; en tête de l'accueil et de la page
+  Annonces (tri par défaut), dans un ordre tiré au hasard à chaque visite.
+
+### Corrections
+- Le point actif du carrousel s'affichait en grosse pilule orange (44 × 24 px au lieu de 30 × 10 px) :
+  son « background » annulait le réglage de la v7 (zone tactile agrandie). Défaut présent depuis la v7.
+- Petites cartes sur téléphone : étiquettes « Vidéo » et « À la une » compactes, elles ne se touchent pas.
+
+### Vérifié dans Edge (2026-11-21)
+- 14 scénarios (ordinateur 1280 et 950 px, tablette 820 px, téléphone 375 px ; vitrine pleine,
+  1 photo, photos trop petites, aucune annonce ; vraies annonces en source et en version construite ;
+  catalogue ; admin) : 0 erreur console, aucune page plus large que l'écran.
+- Défilement toutes les 5 s, pause, arrêt au toucher, glissement ; avec « animations réduites »
+  (Windows ou téléphone), la vitrine démarre en pause (bouton ▶).
+
+### Sécurité
+- `database/12` verrouille les rôles : plus personne ne peut changer un rôle depuis le site,
+  même un admin. Seul le SQL Editor de Supabase le peut.
+
 ## v7.1 « audit de sécurité » (2026-11-18)
 
 Audit complet : code SQL, Edge Function et JavaScript, historique Git (aucun secret), tests en ligne en

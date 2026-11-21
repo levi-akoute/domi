@@ -61,6 +61,26 @@ traitée qui garde encore sa pièce.
    quelqu'un qui passe par l'API peut se créer un mot de passe de 6 caractères.
 5. **Compte admin** : un mot de passe long et unique (12 caractères ou plus), jamais utilisé ailleurs.
 
+## 2 ter. Exécuter le fichier SQL 12 (v7.2, 2 minutes)
+
+`database/12_a_la_une.sql` : Supabase › SQL Editor › New query › coller tout › Run.
+La dernière requête doit afficher 2 lignes (`protect_a_la_une_trigger`, `lock_role_trigger`).
+Sans ce fichier le site marche, mais les boutons « À la une » de l'admin affichent une erreur.
+
+## 2 quater. Exécuter le fichier SQL 13 (v7.3, 2 minutes) ⚠ APRÈS la publication
+
+1. Publier la v7.3 (`/commit`) et attendre que le site en ligne soit à jour (onglet Actions en vert).
+2. Exécuter le fichier 12 s'il ne l'est pas encore (le 13 refuse de s'exécuter sans lui).
+3. `database/13_annonces_confidentielles.sql` : Supabase › SQL Editor › New query › coller tout › Run.
+   La dernière requête doit afficher 5 lignes (3 fonctions et 2 règles).
+
+⚠ Pas avant la publication : l'ancien site lit la table directement, il n'afficherait plus aucune annonce.
+Tant que ce fichier n'est pas exécuté, le site marche comme avant (numéros encore lisibles avec F12) et la
+console du navigateur montre une erreur 404 sans gravité sur `annonces_publiques`.
+
+**Voir à tout moment ce qui est installé** : `database/99_verifier_installation.sql` (lecture seule, ne
+modifie rien). Une ligne par fichier : ✅ installé, ❌ manque (avec le détail), ➖ ponctuel.
+
 ## 3. Supprimer les annonces d'exemple ✅ fait le 2026-11-18 (gardé pour mémoire)
 
 Les 4 annonces fictives de `02_donnees_exemple.sql` sont **en ligne aujourd'hui** (photos de banque d'images,

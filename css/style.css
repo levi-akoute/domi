@@ -614,14 +614,7 @@ label.check input {
 .hero {
   padding: 12px 0 0; /* petit espace sous l'en-tête */
 }
-/* Carrousel */
-.banner {
-  position: relative; /* repère pour les flèches et les points */
-  height: 430px; /* hauteur du carrousel */
-  border-radius: 28px;
-  overflow: hidden; /* cache les bannières qui dépassent (celles hors écran) */
-  background: var(--forest);
-}
+/* Carrousel : voir la section 9 bis « Accueil v7.2 » plus bas */
 .slides {
   display: flex; /* bannières côte à côte… */
   height: 100%;
@@ -633,51 +626,6 @@ label.check input {
   height: 100%;
   position: relative;
   display: block;
-}
-.slide.txt {
-  display: flex; /* bannière texte : contenu centré verticalement */
-  align-items: center;
-  padding: 0 76px 74px; /* place pour les flèches et la barre de recherche */
-  overflow: hidden;
-}
-.slide-copy {
-  max-width: 560px; /* largeur du texte */
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 18px;
-  position: relative;
-  z-index: 1; /* au-dessus du grand dessin décoratif */
-}
-.slide-copy h1,
-.slide-copy h2 {
-  color: #fff; /* titres blancs sur fond vert */
-  font-size: clamp(1.9rem, 4.2vw, 3rem);
-  line-height: 1.1;
-  margin: 0;
-}
-.slide-copy em {
-  color: #f3b173; /* mots en italique orange clair */
-  font-style: italic;
-  font-weight: 500;
-}
-.slide-copy p {
-  margin: 0;
-  color: #c6dad6;
-  font-size: 1.05rem;
-}
-.slide .eyebrow {
-  color: #f3b173; /* surtitre orange clair */
-  margin: 0;
-}
-.slide-ic {
-  position: absolute; /* grand dessin décoratif à droite */
-  right: 60px;
-  top: 50%;
-  width: 300px;
-  height: 300px;
-  margin-top: -170px; /* remonté de la moitié de sa hauteur (centrage vertical) */
-  color: rgba(255, 255, 255, 0.17); /* blanc très transparent */
 }
 .slide.photo {
   background: var(--sand); /* bannière photo (annonce) */
@@ -770,12 +718,6 @@ label.check input {
   border-radius: 22px;
   padding: 8px;
   box-shadow: var(--shadow);
-}
-.hero .search-bar {
-  position: relative; /* posée à cheval sur le bas du carrousel… */
-  z-index: 3; /* …par-dessus */
-  width: min(960px, 100% - 24px);
-  margin: -44px auto 0; /* remontée de 44 px sur le carrousel, centrée */
 }
 .search-bar label {
   padding: 9px 18px;
@@ -2122,7 +2064,9 @@ td small {
 }
 .tip .num {
   font: 600 2.2rem/1 var(--serif); /* « 01 » en grand orange */
-  color: var(--accent-d); /* orange foncé : l’orange vif (2,7:1) était trop pâle sur le crème (WCAG AA) */
+  color: var(
+    --accent-d
+  ); /* orange foncé : l’orange vif (2,7:1) était trop pâle sur le crème (WCAG AA) */
 }
 .tip h3 {
   margin: 0 0 6px;
@@ -2335,9 +2279,6 @@ td small {
   .strip .it {
     border-bottom: 1px solid var(--line);
   }
-  .slide-ic {
-    display: none; /* pas de grand dessin décoratif */
-  }
   .owner-rating {
     margin-left: 0;
   }
@@ -2517,30 +2458,8 @@ td small {
   .sticky-contact .btn {
     padding: 13px 24px;
   }
-  /* Carrousel plus petit */
-  .banner {
-    height: 360px;
-    border-radius: 22px;
-  }
-  .slide.txt {
-    padding: 0 26px 84px;
-  }
   .arrow {
     display: none; /* pas de flèches : on glisse au doigt */
-  }
-  .slide.photo .tag {
-    left: 16px;
-    bottom: 92px;
-  }
-  .hero .search-bar {
-    grid-template-columns: 1fr;
-    margin-top: -40px;
-  }
-  .hero .search-bar label:nth-child(2) {
-    display: none; /* on retire « Type de bien » pour gagner de la place */
-  }
-  .hero .search-bar label {
-    border: 0;
   }
   /* Cartes compactes, 2 par ligne */
   .listing-grid,
@@ -2653,7 +2572,10 @@ td small {
 
 /* Points du carrousel : 10 px, c'est trop petit pour un doigt. On garde le même point visible,
    mais la zone cliquable fait 24 x 24 px (padding transparent : background-clip: content-box). */
-.dots button {
+.dots button,
+.dots button.on {
+  /* .on répété ici (v7.2) : son « background: » remettait le fond sous le padding, et le point
+     actif s'affichait en grosse pilule de 44 x 24 px au lieu de 30 x 10 px */
   box-sizing: content-box; /* la largeur 10 px = le point ; le padding s'ajoute autour */
   padding: 7px;
   background-clip: content-box; /* la couleur ne remplit que le point, pas le padding */
@@ -2689,5 +2611,326 @@ td small {
   * {
     transition: none !important;
     animation: none !important;
+  }
+}
+
+/* ═══════════ 9 bis. ACCUEIL v7.2 : titre fixe + vitrine photo ═══════════
+   Placée en fin de fichier pour l'emporter sur les anciennes règles du carrousel.
+   Bloc vert #hero-box : à gauche le texte et la recherche (fixes), à droite la vitrine
+   (photos d'annonces qui défilent). Sur téléphone, tout s'empile. */
+.hero-box {
+  position: relative; /* repère pour le dessin de secours */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); /* texte | photos */
+  gap: 40px;
+  align-items: center;
+  padding: 44px;
+  border-radius: 28px;
+  background: var(--forest); /* fond vert Domi */
+  overflow: hidden;
+}
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  position: relative;
+  z-index: 1; /* au-dessus du dessin de secours */
+  min-width: 0;
+}
+.hero-copy .eyebrow {
+  color: #f3b173; /* surtitre orange clair sur fond vert */
+  margin: 0;
+}
+.hero-copy h1 {
+  color: #fff; /* titre blanc */
+  font-size: clamp(1.75rem, 3.6vw, 2.9rem);
+  line-height: 1.1;
+  margin: 0;
+}
+.hero-copy h1 em {
+  color: #f3b173; /* « sans mauvaise surprise. » en orange clair */
+  font-style: italic;
+  font-weight: 500;
+}
+.hero-lead {
+  margin: 0;
+  color: #c6dad6; /* vert très pâle */
+  font-size: 1.02rem;
+}
+/* Recherche dans le bloc vert : 2 colonnes (Commune | Type, Budget | bouton) */
+.hero-box .search-bar {
+  width: 100%;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 6px;
+}
+.hero-box .search-bar label:nth-child(1) {
+  border-bottom: 1px solid var(--line); /* trait sous la 1re ligne */
+}
+.hero-box .search-bar label:nth-child(2) {
+  border-right: 0;
+  border-bottom: 1px solid var(--line);
+}
+.hero-box .search-bar .btn {
+  grid-column: auto; /* à côté de « Budget » (une règle tablette le mettait seul sur une ligne) */
+  margin: 6px 0 0 6px;
+  padding: 12px 18px;
+}
+/* Bandeau anti-arnaque permanent */
+.hero-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 16px;
+  border-radius: 14px;
+  background: rgba(243, 177, 115, 0.14); /* voile orange */
+  border: 1px solid rgba(243, 177, 115, 0.45);
+  color: #f6d7b8;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.hero-warning b {
+  color: #fff;
+}
+.hero-warning span {
+  text-decoration: underline transparent; /* soulignement qui apparaît au survol */
+}
+.hero-warning:hover span {
+  text-decoration-color: currentColor;
+}
+.hero-warning .ic {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: #f3b173;
+  margin-top: 1px;
+}
+/* Vitrine : la photo, puis la rangée de commandes en dessous */
+.vitrine {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+/* La photo : format 4:3 (celui des photos prises au téléphone, peu rognées) */
+.hero-box .banner {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--forest-2);
+}
+/* Pendant la mesure des photos : reflet animé (comme les cartes en chargement) */
+.vitrine.chargement .banner {
+  background: linear-gradient(90deg, #1b5a52 25%, #24685f 40%, #1b5a52 60%);
+  background-size: 400% 100%;
+  animation: reflet 1.4s infinite;
+}
+.vitrine.chargement .arrow {
+  display: none; /* pas de flèches tant que rien n'est chargé */
+}
+.vitrine.chargement .banner-ctrl {
+  visibility: hidden; /* rangée invisible mais qui garde sa place (la page ne saute pas) */
+}
+.hero-box .slide.photo .tag {
+  left: 16px; /* étiquette blanche en bas à gauche de la photo */
+  bottom: 16px;
+  padding: 10px 16px;
+  border-radius: 14px;
+}
+.hero-box .tag strong {
+  font-size: 1.05rem;
+  overflow: hidden; /* titre trop long : coupé avec « … » */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hero-box .arrow {
+  margin-top: -23px; /* centrage vertical (moitié de 46 px) */
+}
+/* Commandes sous la photo : points + pause, centrés */
+.banner-ctrl {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  min-height: 34px;
+}
+.banner-ctrl .dots {
+  position: static; /* dans la rangée, plus posés sur la photo */
+  gap: 0;
+}
+.pause-btn {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+.pause-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+.pause-btn .ic {
+  width: 14px;
+  height: 14px;
+}
+.pause-btn .i-play,
+.pause-btn.is-paused .i-pause {
+  display: none; /* en lecture on montre ❚❚, en pause on montre ▶ */
+}
+.pause-btn.is-paused .i-play {
+  display: block;
+}
+/* Une seule photo : ni flèches, ni points, ni pause (rien ne défile) */
+.hero-box.une-seule .arrow,
+.hero-box.une-seule .banner-ctrl {
+  display: none;
+}
+/* Étiquette « À la une » (vitrine et cartes d'annonces) */
+.une-badge {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-d);
+  font: 800 0.72rem var(--sans);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.une-badge .ic {
+  width: 13px;
+  height: 13px;
+}
+.slide .une-badge {
+  top: 14px; /* vitrine : en haut à gauche */
+  left: 14px;
+}
+.listing-image .une-badge {
+  right: 12px; /* carte : en bas à droite de la photo (la pastille « Vidéo » est à gauche) */
+  bottom: 12px;
+}
+.status-badge {
+  gap: 4px; /* espace entre l'étoile et « jusqu'au … » (admin) */
+}
+/* Bannière fixe de secours (aucune photo assez grande) : la vitrine disparaît,
+   un grand dessin de maison apparaît à droite */
+.hero-ill {
+  display: none;
+}
+.hero-box.sans-photo .vitrine {
+  display: none;
+}
+.hero-box.sans-photo .hero-ill {
+  display: block;
+  justify-self: center;
+  width: min(300px, 100%);
+  height: auto;
+  color: rgba(255, 255, 255, 0.17); /* blanc très transparent */
+}
+/* Appel aux propriétaires (bas de l'accueil) */
+.owner-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin-top: 56px;
+  padding: 36px 40px;
+  border-radius: 24px;
+  background: var(--forest);
+}
+.owner-cta h2 {
+  color: #fff;
+  margin: 0 0 8px;
+}
+.owner-cta p {
+  color: #c6dad6;
+  margin: 0;
+  max-width: 36em;
+}
+.owner-cta .eyebrow {
+  margin-bottom: 10px;
+}
+
+/* Tablettes et petits ordinateurs : tout s'empile, la vitrine passe sous le titre */
+@media (max-width: 900px) {
+  .hero-box {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 28px;
+  }
+  .hero-box .vitrine {
+    order: 1; /* ordre d'affichage : titre (copy), photos, puis… */
+  }
+  .hero-copy {
+    display: contents; /* les enfants de .hero-copy deviennent des éléments de la grille */
+  }
+  .hero-copy > * {
+    order: 0; /* surtitre, titre, accroche avant les photos */
+  }
+  .hero-copy .search-bar,
+  .hero-copy .hero-warning {
+    order: 2; /* recherche et bandeau après les photos */
+  }
+  .hero-box.sans-photo .hero-ill {
+    display: none; /* sur petit écran, pas de dessin : le titre et la recherche suffisent */
+  }
+  .owner-cta {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 28px 24px;
+  }
+}
+/* Téléphones */
+@media (max-width: 700px) {
+  .hero-box {
+    padding: 22px 16px;
+    border-radius: 22px;
+    gap: 14px;
+  }
+  .hero-lead {
+    font-size: 0.95rem;
+  }
+  .hero-box .banner {
+    border-radius: 16px;
+  }
+  .hero-box .search-bar {
+    grid-template-columns: 1fr;
+  }
+  .hero-box .search-bar label:nth-child(2) {
+    display: none; /* on retire « Type de bien » pour gagner de la place */
+  }
+  .hero-box .search-bar label {
+    border-right: 0;
+  }
+  .hero-box .search-bar .btn {
+    margin: 6px 0 0;
+    padding: 14px;
+  }
+  .hero-box .slide.photo .tag {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    max-width: none;
+    padding: 8px 12px;
+  }
+  .hero-box .tag strong {
+    font-size: 0.95rem;
+  }
+  /* Petites cartes (2 par ligne) : étiquette compacte, comme « Vidéo », pour qu'elles ne se touchent pas */
+  .listing-image .une-badge {
+    font-size: 0.62rem;
+    padding: 4px 8px;
+    right: 8px;
+    bottom: 8px;
+    gap: 3px;
+  }
+  .listing-image .une-badge .ic {
+    width: 10px;
+    height: 10px;
   }
 }
