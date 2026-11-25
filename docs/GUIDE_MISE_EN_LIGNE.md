@@ -55,7 +55,7 @@ La page admin n'est pas liée dans le menu public. Même si quelqu'un devine l'a
 - [ ] Remplacer l'image du hero (`index.html`, adresse Unsplash) par une vraie photo, idéalement placée dans `assets/img/`.
 - [ ] Renseigner `SUPPORT_WHATSAPP` et compléter `conditions.html` et `confidentialite.html` (à faire valider ; loi ivoirienne sur les données personnelles, ARTCI).
 - [ ] Publier 20 à 30 vraies annonces vérifiées pour que le site ne soit pas vide.
-- [ ] Le projet Supabase gratuit peut être mis en pause après une période d'inactivité et n'offre pas de sauvegardes complètes : passez à un plan payant dès le lancement réel.
+- [ ] Sauvegardes : l'offre gratuite de Supabase n'en fait aucune. Lancer `npm run sauvegarder` chaque semaine (voir `docs/SAUVEGARDE.md`). Le projet gratuit est aussi mis en pause après 7 jours sans activité : on le relance d'un clic dans Supabase. L'offre payante (25 $ par mois) ne devient utile que si le site dépasse les limites gratuites.
 
 ## Mot de passe oublié
 Il n'y a pas d'envoi de SMS/email. L'utilisateur contacte votre WhatsApp support (page « Mot de passe oublié »). Vous exécutez `database/04_reinitialiser_mot_de_passe.sql` avec son numéro et un mot de passe temporaire ; il le change ensuite dans « Mon espace ».

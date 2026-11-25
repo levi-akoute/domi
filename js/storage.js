@@ -158,6 +158,29 @@
     throw new Error(fixMsg(error.message));
   };
 
+  // Point exact d'une annonce (v8.2), demandé seulement au clic sur « Itinéraire » (comme le numéro).
+  // null si l'annonceur n'a pas posé d'épingle, ne veut pas donner le point exact, ou si l'annonce
+  // n'est plus disponible.
+  const itineraire = async (id) => {
+    const { data, error } = await client().rpc("itineraire_annonce", { p_id: id });
+    if (error) throw new Error(fixMsg(error.message));
+    const p = Array.isArray(data) ? data[0] : data;
+    return p && Number.isFinite(p.latitude) && Number.isFinite(p.longitude) ? p : null;
+  };
+
+  // La base connaît-elle la carte (fichier 14 exécuté) ? Sert au formulaire de publication : avant
+  // ce fichier, la base n'a pas les colonnes de position et refuserait l'annonce.
+  let carteDispo = null; // réponse gardée en mémoire (une seule question)
+  const carteActive = async () => {
+    if (carteDispo === null) {
+      const { error } = await client().rpc("itineraire_annonce", {
+        p_id: "00000000-0000-4000-8000-000000000000", // annonce inexistante : réponse vide
+      });
+      carteDispo = !fonctionAbsente(error); // seule la fonction absente désactive la carte
+    }
+    return carteDispo;
+  };
+
   // Enregistre un signalement (la base limite le nombre : database/09)
   const signaler = (r) => ok(client().from("reports").insert(r));
 
@@ -183,8 +206,13 @@
   // accessible en ligne pour toujours, même après la suppression de l'annonce, alors que la
   // politique de confidentialité promet l'inverse. Les règles de stockage n'autorisent que
   // l'annonceur (son dossier) et l'admin. Une erreur ici ne bloque jamais le reste.
+  // v8.1 : chaque photo a aussi une petite version « -mini » (voir uploadPhotos) : on efface les deux.
+  // Une petite version absente (photo d'avant la v8.1) est simplement ignorée par Supabase.
+  const avecMiniature = (chemin) => [chemin, chemin.replace(/\.(webp|jpg)$/, "-mini.$1")];
   const supprimerPhotos = async (urls) => {
-    const chemins = [...new Set((urls || []).map(cheminPhoto).filter(Boolean))]; // sans doublons
+    const chemins = [
+      ...new Set((urls || []).map(cheminPhoto).filter(Boolean).flatMap(avecMiniature)),
+    ]; // sans doublons
     if (!chemins.length) return;
     try {
       await client().storage.from("annonces").remove(chemins);
@@ -192,10 +220,13 @@
   };
   // Supprime l'annonce id (la base refuse si ce n'est pas la sienne), puis ses photos
   const supprimerAnnonce = async (id) => {
-    const avant = await ok(L().select("image, images").eq("id", id).maybeSingle()); // photos à effacer
+    const avant = await ok(L().select("image, images, video").eq("id", id).maybeSingle()); // fichiers à effacer
     // .select("id") : renvoie les lignes réellement supprimées (vide si la base a refusé)
     const supprimees = await ok(L().delete().eq("id", id).select("id"));
-    if (avant && supprimees && supprimees.length) await supprimerPhotos([avant.image, ...(avant.images || [])]);
+    if (avant && supprimees && supprimees.length) {
+      await supprimerPhotos([avant.image, ...(avant.images || [])]);
+      await supprimerVideo(avant.video);
+    }
   };
   // Dernière demande de vérification d'identité de l'utilisateur
   const maVerification = (uid) =>
@@ -216,6 +247,12 @@
      Ces requêtes ne renvoient des données QUE si l'utilisateur est admin :
      les règles RLS utilisent la fonction SQL is_admin(). */
 
+  // Espace utilisé par les fichiers, par dossier (v8.3, database/14). null si la fonction n'existe pas encore.
+  const espaceUtilise = async () => {
+    const { data, error } = await client().rpc("espace_utilise");
+    if (error) return null;
+    return data || [];
+  };
   // Toutes les annonces + le profil de leur auteur (jointure via owner_id)
   const adminAnnonces = () =>
     ok(
@@ -264,7 +301,9 @@
       // Supabase ne signale pas toujours un refus : si rien n'a été supprimé, c'est que la
       // règle de suppression manque (fichier database/10 pas encore exécuté)
       if (!data || data.length === 0)
-        throw new Error("Document non supprimé : exécutez database/10_suppression_pieces_identite.sql dans Supabase.");
+        throw new Error(
+          "Document non supprimé : exécutez database/10_suppression_pieces_identite.sql dans Supabase."
+        );
     }
     return ok(client().rpc("forget_verification_document", { p_id: id }));
   };
@@ -343,8 +382,10 @@
 
   // Compresse une photo DANS le navigateur avant l'envoi (WebP, 1280 px max) :
   // pages plus rapides, forfait mobile et stockage Supabase préservés.
-  async function compress(file, max = 1280) {
-    const bmp = await createImageBitmap(file); // décode l'image
+  // source : un fichier, ou une image déjà décodée (ImageBitmap) pour ne pas la décoder deux fois.
+  // q : qualité WebP de 0 à 1 (0,8 pour la grande photo, moins pour la miniature).
+  async function compress(source, max = 1280, q = 0.8) {
+    const bmp = source instanceof ImageBitmap ? source : await createImageBitmap(source); // décode l'image
     const r = Math.min(1, max / Math.max(bmp.width, bmp.height)); // rapport de réduction (jamais d'agrandissement)
     const c = document.createElement("canvas"); // « toile » invisible pour redessiner l'image
     c.width = Math.round(bmp.width * r); // nouvelle largeur
@@ -352,32 +393,71 @@
     c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height); // dessine l'image réduite
     // toBlob : transforme la toile en fichier (t = type, q = qualité de 0 à 1)
     const toBlob = (t, q) => new Promise((res) => c.toBlob(res, t, q));
-    const w = await toBlob("image/webp", 0.8); // essai en WebP (format léger), qualité 80 %
+    const w = await toBlob("image/webp", q); // essai en WebP (format léger)
     // Certains vieux navigateurs ne savent pas produire du WebP : repli en JPEG
     return w && w.type === "image/webp"
       ? { blob: w, ext: "webp" }
-      : { blob: await toBlob("image/jpeg", 0.82), ext: "jpg" };
+      : { blob: await toBlob("image/jpeg", Math.min(0.92, q + 0.02)), ext: "jpg" };
   }
 
   // Envoie jusqu'à 6 photos et renvoie leurs adresses publiques.
   // Chaque utilisateur range ses photos dans un dossier à son identifiant :
   // la règle de stockage « annonces_insert_own » refuse tout autre dossier.
+  // v8.1 : chaque photo part aussi en petite version (480 px, « -mini »), utilisée dans les
+  // listes (utils.js, miniature). Seule l'adresse de la grande photo est enregistrée.
   async function uploadPhotos(files, uid) {
     const urls = []; // adresses des photos envoyées
+    const envoyer = (chemin, blob) =>
+      client()
+        .storage.from("annonces") // bucket public des photos
+        .upload(chemin, blob, { contentType: blob.type, cacheControl: "31536000" }); // cache 1 an
     for (const f of [...files].slice(0, 6)) {
       // 6 photos maximum
       if (!f.type.startsWith("image/")) continue; // ignore ce qui n'est pas une image
-      const { blob, ext } = await compress(f); // compresse
-      // Nom unique : dossier de l'utilisateur / date en millisecondes - 6 caractères aléatoires . extension
-      const path = `${uid}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const { error } = await client()
-        .storage.from("annonces") // bucket public des photos
-        .upload(path, blob, { contentType: blob.type, cacheControl: "31536000" }); // cache 1 an
+      const bmp = await createImageBitmap(f); // décodée une seule fois pour les deux versions
+      const grande = await compress(bmp, 1280, 0.8); // photo de la fiche
+      const petite = await compress(bmp, 480, 0.72); // miniature des listes
+      bmp.close(); // libère la mémoire (téléphones modestes)
+      // Nom unique : dossier de l'utilisateur / date en millisecondes - 6 caractères aléatoires
+      const base = `${uid}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const { error } = await envoyer(`${base}.${grande.ext}`, grande.blob);
       if (error) throw new Error(fixMsg(error.message));
-      urls.push(client().storage.from("annonces").getPublicUrl(path).data.publicUrl); // adresse publique
+      // Miniature : un échec ne bloque pas l'annonce (les listes afficheront la grande photo)
+      if (petite.ext === grande.ext)
+        await envoyer(`${base}-mini.${petite.ext}`, petite.blob).catch(() => {});
+      urls.push(
+        client().storage.from("annonces").getPublicUrl(`${base}.${grande.ext}`).data.publicUrl
+      ); // adresse publique
     }
     return urls;
   }
+
+  // Envoie la vidéo préparée (js/video.js) dans le dossier de l'annonceur et renvoie son adresse.
+  // Le dossier « videos » (database/14) accepte MP4 et WebM, 40 Mo au maximum par fichier.
+  async function uploadVideo(blob, uid) {
+    const type = blob.type.split(";")[0]; // « video/mp4 » : sans le détail des codecs
+    const ext = type === "video/webm" ? "webm" : "mp4";
+    const chemin = `${uid}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await client()
+      .storage.from("videos") // dossier public des vidéos
+      .upload(chemin, blob, { contentType: type, cacheControl: "31536000" }); // cache 1 an
+    if (error) throw new Error(fixMsg(error.message));
+    return client().storage.from("videos").getPublicUrl(chemin).data.publicUrl;
+  }
+
+  // Chemin d'une vidéo dans le dossier « videos », à partir de son adresse (null sinon)
+  const cheminVideo = (url) => {
+    const m = String(url || "").match(/\/storage\/v1\/object\/public\/videos\/([^?#]+)$/);
+    return m ? decodeURIComponent(m[1]) : null;
+  };
+  // Supprime une vidéo du stockage (ménage : une erreur ne bloque jamais le reste)
+  const supprimerVideo = async (url) => {
+    const chemin = cheminVideo(url);
+    if (!chemin) return; // pas une vidéo de Domi
+    try {
+      await client().storage.from("videos").remove([chemin]);
+    } catch (e) {}
+  };
 
   // Envoie une pièce d'identité (bucket PRIVÉ) et crée la demande de vérification
   async function soumettreVerification(file, type, uid) {
@@ -405,6 +485,10 @@
     getAnnonce,
     getAnnoncesParIds,
     vue,
+    itineraire, // point exact au clic (v8.2)
+    uploadVideo, // envoi de la vidéo préparée (v8.3)
+    supprimerVideo, // ménage des vidéos (v8.3)
+    carteActive, // la base connaît-elle la carte ? (v8.2)
     clicWhatsapp,
     contacterAnnonce,
     signaler,
@@ -421,6 +505,7 @@
     adminReports,
     updateReport,
     getVerifications,
+    espaceUtilise, // admin : espace utilisé (v8.3)
     decideVerification,
     lienDocument,
     supprimerDocument,

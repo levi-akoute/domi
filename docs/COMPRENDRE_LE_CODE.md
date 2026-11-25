@@ -83,8 +83,10 @@ sans conflit.
 | `home.js` | index | Carrousel de l'accueil |
 | `annonces.js` | index, annonces, favoris | Carte d'annonce, catalogue et filtres, dernières annonces |
 | `favoris.js` | favoris | Charge et affiche les annonces favorites |
-| `detail.js` | maison-detail | Fiche complète, galerie, contact, signalement, avis |
-| `publier.js` | publier | Formulaire de publication et de modification |
+| `detail.js` | maison-detail | Fiche complète, galerie, vidéo, carte, itinéraire, visite, contact, signalement, avis |
+| `publier.js` | publier | Formulaire de publication et de modification (épingle et vidéo) |
+| `carte.js` | maison-detail, publier | Carte OpenStreetMap (Leaflet, rangé dans `assets/vendor/`) : chargée au clic seulement |
+| `video.js` | publier | Réduit la vidéo (2 à 3 minutes) dans le téléphone avant l'envoi |
 | `dashboard.js` | dashboard-proprietaire | Espace annonceur : statistiques, annonces, badge, sécurité |
 | `admin.js` | admin | Administration en onglets |
 | `connexion.js` | connexion | Onglets connexion / inscription |
@@ -230,4 +232,4 @@ Détails dans `docs/SECURITE.md`.
 - **Modules ES** (`import` / `export`) à la place des objets sur `window` : dépendances explicites.
 - **Pagination côté serveur** (`.range()`) quand il y aura plusieurs centaines d'annonces.
 - **Tests automatiques** des règles RLS (essayer d'écrire ce qui doit être refusé).
-- **Carte** des logements (Leaflet + OpenStreetMap, gratuit).
+- **Carte de toutes les annonces** et « Autour de moi » (la carte d'une annonce existe depuis la v8.2).

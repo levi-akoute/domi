@@ -16,7 +16,7 @@
          v7.1 (audit 2026-11-18) : seuls le fichier exact de la librairie Supabase et NOTRE projet Supabase
          sont autorisés (avant : tout jsDelivr et tous les projets Supabase du monde). ⚠ Si le projet
          Supabase change, remplacer « mplbhzqmffaywlhbxleb » dans cette ligne, sur chaque page. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://mplbhzqmffaywlhbxleb.supabase.co; connect-src 'self' https://mplbhzqmffaywlhbxleb.supabase.co; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://mplbhzqmffaywlhbxleb.supabase.co https://tile.openstreetmap.org; connect-src 'self' https://mplbhzqmffaywlhbxleb.supabase.co; media-src 'self' blob: https://mplbhzqmffaywlhbxleb.supabase.co; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" />
     <!-- SÉCURITÉ : quand un visiteur quitte Domi par un lien, le site visité ne voit que
          « domi » et pas l'adresse complète de la page (qui peut contenir un identifiant) -->
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -134,6 +134,22 @@
               <input name="adresse" maxlength="200" placeholder="Ex. Derrière la pharmacie…" />
               <small class="field-hint">Visible seulement par vous et l’équipe Domi : les visiteurs ne le voient pas.</small>
             </label>
+            <!-- v8.2 : épingle sur la carte (facultative). Caché tant que la base ne connaît pas la carte
+                 (database/14) : js/publier.js l'affiche après une vérification. -->
+            <div class="full carte-bloc" id="carte-bloc" hidden>
+              <strong class="carte-titre">Emplacement sur la carte (facultatif, mais très utile)</strong>
+              <small class="field-hint">Les visiteurs voient seulement une zone d’environ 300 m autour du logement. Le point exact n’est donné qu’à la personne qui appuie sur « Itinéraire », si vous l’acceptez ci-dessous.</small>
+              <div class="carte-boutons">
+                <button type="button" class="btn btn-outline" id="ma-position">Utiliser ma position</button>
+                <button type="button" class="btn btn-outline" id="placer-carte">Placer sur la carte</button>
+                <button type="button" class="btn btn-outline" id="retirer-position" hidden>Retirer l’épingle</button>
+              </div>
+              <div class="carte" id="carte" hidden></div>
+              <p class="field-hint" id="position-texte" role="status"></p>
+              <label class="check" id="itineraire-choix" hidden><input name="itineraire" type="checkbox" checked /> J’accepte que les visiteurs qui appuient sur « Itinéraire » reçoivent l’emplacement exact.</label>
+              <input name="latitude" type="hidden" />
+              <input name="longitude" type="hidden" />
+            </div>
           </div>
         </div>
 
@@ -179,10 +195,18 @@
             <label class="full">Photos du logement (1 à 6, la première sera la photo principale) <input id="photos" type="file" accept="image/*" multiple /></label>
             <!-- Aperçu des photos choisies (rempli par js/publier.js) -->
             <div id="photo-preview" class="photo-preview full"></div>
-            <!-- Lien vidéo : type="url" vérifie le format ; seuls http(s) sont acceptés (safeUrl) -->
-            <label class="full">Lien d’une visite vidéo (YouTube, TikTok, Facebook, Instagram, Vimeo ou Google Drive, facultatif) <input name="video" type="url" placeholder="https://…" /></label>
+            <!-- v8.3 : la vidéo est envoyée sur Domi, plus de lien externe (TikTok, YouTube…). Caché tant
+                 que la base n'a pas le dossier des vidéos (database/14) : voir js/publier.js. -->
+            <div class="full video-bloc" id="video-bloc" hidden>
+              <strong class="carte-titre">Vidéo de présentation (facultatif, 2 à 3 minutes)</strong>
+              <small class="field-hint">Filmez la maison pièce par pièce, avec la cour et les compteurs CIE et SODECI. Filmez en parlant, sans musique : le son est gardé. La vidéo est préparée dans votre téléphone puis envoyée : cela prend environ le temps de la vidéo.</small>
+              <input id="video" type="file" accept="video/*" />
+              <p class="field-hint" id="video-info" role="status"></p>
+              <video id="video-apercu" class="video-apercu" controls playsinline preload="metadata" hidden></video>
+              <label class="check" id="video-retirer-choix" hidden><input name="video_retirer" type="checkbox" /> Retirer la vidéo actuelle de l’annonce</label>
+            </div>
           </div>
-          <p class="fine-print">Les photos sont allégées automatiquement. Utilisez uniquement des photos de ce logement.</p>
+          <p class="fine-print">Les photos et la vidéo sont allégées automatiquement. Utilisez uniquement des images de ce logement.</p>
         </div>
 
         <!-- Boutons : annuler (retour) ou envoyer -->
@@ -215,6 +239,10 @@
     <script src="js/storage.js"></script>
     <!-- 5. Comptes : connexion, inscription, utilisateur courant -->
     <script src="js/auth.js"></script>
+    <!-- Carte OpenStreetMap (v8.2) : chargée seulement si on l'ouvre -->
+    <script src="js/carte.js"></script>
+    <!-- Préparation de la vidéo (v8.3) : lue seulement quand une vidéo est choisie -->
+    <script src="js/video.js"></script>
     <!-- Script propre à cette page -->
     <script src="js/publier.js"></script>
   </body>

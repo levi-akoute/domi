@@ -12,11 +12,13 @@ https://levi-akoute.github.io/domi/
 | `docs/SECURITE.md` | Ce qui est protégé, la question « Inspecter », réglages Supabase |
 | `docs/GUIDE_MOT_DE_PASSE_OUBLIE.md` | Activer la récupération du mot de passe par code email |
 | `docs/GUIDE_MISE_EN_LIGNE.md` | Première installation complète |
+| `docs/SAUVEGARDE.md` | Sauvegarder la base et les photos chaque semaine |
 | `CHANGELOG.md` | Historique des versions |
 
 ## Repères
 
-- Base de données : `database/01` à `09`, à exécuter dans l'ordre dans Supabase → SQL Editor.
+- Base de données : `database/01` à `14`, à exécuter dans l'ordre dans Supabase → SQL Editor.
+- Sauvegarde : `npm run sauvegarder` une fois par semaine (copie sur le PC, voir `docs/SAUVEGARDE.md`).
 - Fonction serveur : `supabase/functions/reinitialiser-mot-de-passe/index.ts`.
 - Configuration : `js/config.js` (URL et clé **anon** uniquement, jamais la clé `service_role`).
 - Couleurs : variables en haut de `css/style.css`. Logo : `MARK` dans `js/utils.js` et `assets/img/`.

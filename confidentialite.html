@@ -74,7 +74,7 @@
       <span class="eyebrow">Informations légales</span>
       <h1>Politique de confidentialité</h1>
       <!-- Date de la version : à changer à chaque modification du texte -->
-      <p class="muted">Dernière mise à jour : 18 novembre 2026</p>
+      <p class="muted">Dernière mise à jour : 25 novembre 2026</p>
       <!-- Informations de l’éditeur complétées le 18/11/2026 (RCCM et ARTCI à ajouter plus tard, voir docs/AVANT_LANCEMENT.md).
            Le texte décrit ce que le site fait
            VRAIMENT (vérifié dans le code) : si le site change, ce texte doit changer aussi. -->
@@ -91,9 +91,9 @@
         <strong>Utilité :</strong> vous connecter, publier et gérer vos annonces, vous contacter pour la modération, vous envoyer un code si vous oubliez votre mot de passe.<br />
         <strong>Durée :</strong> tant que votre compte existe. Après une demande de suppression, le compte et ses données sont supprimés dans un délai de 30 jours.</p>
       <h3>Vos annonces</h3>
-      <p><strong>Données :</strong> titre, description, photos, type de logement, loyer, avance, caution, commune, quartier et numéro de contact WhatsApp.<br />
-        <strong>Utilité :</strong> les afficher publiquement pour que les personnes intéressées vous contactent. Le numéro de contact est donc visible par tous.<br />
-        <strong>Durée :</strong> jusqu’à ce que vous supprimiez l’annonce (ou que la modération la retire). Une annonce non confirmée depuis 45 jours est masquée automatiquement.</p>
+      <p><strong>Données :</strong> titre, description, photos, vidéo de présentation (si vous en envoyez une), type de logement, loyer, avance, caution, commune, quartier, emplacement sur la carte (si vous placez une épingle) et numéro de contact WhatsApp.<br />
+        <strong>Utilité :</strong> les afficher publiquement pour que les personnes intéressées vous contactent. Le numéro de contact est donné à toute personne qui clique sur « Contacter ». Sur la carte, les visiteurs voient une zone d’environ 300 m ; l’emplacement exact n’est donné qu’à la personne qui appuie sur « Itinéraire », si vous l’avez accepté. Domi ne suit jamais votre position : elle est lue une seule fois, si vous appuyez sur « Utiliser ma position », et uniquement pour placer l’épingle.<br />
+        <strong>Durée :</strong> jusqu’à ce que vous supprimiez l’annonce (ou que la modération la retire). La vidéo et la position sont effacées avec elle. Une annonce non confirmée depuis 45 jours est masquée automatiquement.</p>
       <h3>Pièce d’identité (badge « Propriétaire vérifié »)</h3>
       <p><strong>Données :</strong> la pièce d’identité ou le justificatif que vous envoyez, uniquement si vous demandez le badge.<br />
         <strong>Utilité :</strong> vérifier que vous êtes bien la personne qui publie, pour protéger les locataires contre les fausses annonces.<br />
@@ -123,7 +123,9 @@
       <h2>4. Prestataires techniques</h2>
       <p>Domi s’appuie sur ces services, qui traitent certaines données pour son compte. Certains sont situés hors de Côte d’Ivoire.</p>
       <ul>
-        <li><strong>Supabase</strong> : base de données, comptes et stockage des photos et pièces d’identité (ses serveurs peuvent être situés hors de Côte d’Ivoire).</li>
+        <li><strong>Supabase</strong> : base de données, comptes et stockage des photos, vidéos et pièces d’identité (ses serveurs peuvent être situés hors de Côte d’Ivoire).</li>
+        <li><strong>OpenStreetMap</strong> : images de la carte. Votre appareil les demande à ses serveurs, qui reçoivent son adresse IP, seulement quand vous ouvrez une carte.</li>
+        <li><strong>Google Maps</strong> : uniquement si vous appuyez sur « Itinéraire ». La suite se passe chez Google, selon ses règles.</li>
         <li><strong>Brevo</strong> : envoi de l’email contenant le code de récupération du mot de passe.</li>
         <li><strong>GitHub Pages</strong> : hébergement du site. Comme tout hébergeur, il enregistre l’adresse IP des visiteurs dans ses journaux techniques.</li>
         <li><strong>Google Fonts</strong> et <strong>jsDelivr</strong> : fourniture des polices d’écriture et d’une bibliothèque technique. Ces services reçoivent l’adresse IP de votre appareil au chargement de la page.</li>
@@ -134,6 +136,7 @@
       <!-- Section 5 : sécurité -->
       <h2>5. Sécurité</h2>
       <p>Le site est servi en HTTPS (connexion chiffrée). Des règles de sécurité dans la base de données empêchent chaque utilisateur de lire ou modifier les données des autres, et les pièces d’identité ne sont accessibles qu’aux administrateurs.</p>
+      <p>Une copie de sauvegarde de la base de données et des photos d’annonces (pas des vidéos) peut être faite sur un ordinateur de l’éditeur, pour pouvoir réparer une erreur ou une panne. Chaque copie est effacée au bout de 4 semaines au plus. Elle ne contient ni les pièces d’identité ni les mots de passe.</p>
 
       <!-- Section 6 : droits des personnes et marche à suivre pour la suppression -->
       <h2>6. Vos droits et comment supprimer vos données</h2>

@@ -120,6 +120,14 @@
     x: '<path d="M6 6l12 12M18 6L6 18"/>',
     // flèche vers le bas dans un plateau (télécharger, installer)
     download: '<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19h14"/>',
+    // calendrier (planifier une visite, v8.1)
+    calendar:
+      '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+    // « f » de Facebook (partage, v8.1)
+    facebook:
+      '<path d="M15 3.5h-2.5A3.5 3.5 0 0 0 9 7v3H6.5v3.5H9v7h3.5v-7H15l.5-3.5h-3V7.5a1 1 0 0 1 1-1H15z"/>',
+    // maillons de chaîne (copier le lien, v8.1)
+    link: '<path d="M10 13.5a4 4 0 0 0 5.7.3l3-3a4 4 0 0 0-5.7-5.7l-1.3 1.3"/><path d="M14 10.5a4 4 0 0 0-5.7-.3l-3 3a4 4 0 0 0 5.7 5.7l1.3-1.3"/>',
   };
 
   // Fabrique le code HTML d'une icône. n = nom de l'icône, cls = classe CSS en plus.
@@ -195,6 +203,19 @@
       };
       img.src = url; // lance le téléchargement
     });
+
+  // Petite version d'une photo d'annonce (v8.1) :
+  //   « …/annonces/UID/123-abc.webp » → « …/annonces/UID/123-abc-mini.webp »
+  // Elle est créée en même temps que la photo (storage.js, uploadPhotos) et sert dans les
+  // listes : environ 4 fois plus légère (mesuré), donc pages plus rapides, forfait mobile des visiteurs
+  // et quota gratuit de Supabase préservés. Une photo plus ancienne n'a pas de petite version :
+  // l'image se rabat alors sur la grande (voir « Images de secours », data-full).
+  // Toute autre adresse (image de secours, photo hors de notre stockage) est rendue telle quelle.
+  const miniature = (url) =>
+    /\/storage\/v1\/object\/public\/annonces\/[^?#]+\.(webp|jpg)$/.test(url || "") &&
+    !/-mini\.(webp|jpg)$/.test(url)
+      ? url.replace(/\.(webp|jpg)$/, "-mini.$1")
+      : url;
 
   // Annonce « À la une » en cours ? (v7.2) Date de fin dans le futur ET propriétaire vérifié.
   // v7.3 : la lecture publique (database/13) donne directement le résultat (a_la_une, vrai/faux)
@@ -341,13 +362,25 @@
   /* ───────── 8. Images de secours ─────────
      Une photo d'annonce peut ne pas se charger (supprimée, lien cassé). Les images
      concernées portent data-fallback="assets/img/placeholder.svg".
+     v8.1 : une petite version (miniature) peut manquer, pour une photo envoyée avant la v8.1.
+     L'image porte alors data-full="adresse de la grande photo" : on essaie d'abord la grande,
+     puis l'image de secours.
      Avant, cela se faisait avec onerror="…" écrit DANS le HTML. On l'a déplacé ici pour
      pouvoir interdire tout JavaScript dans le HTML (règle de sécurité CSP des pages). */
   document.addEventListener(
     "error", // événement : un fichier (image…) n'a pas pu être chargé
     (e) => {
       const img = e.target; // l'élément en erreur
-      if (img.tagName !== "IMG" || !img.dataset.fallback) return; // seulement les images prévues
+      if (img.tagName !== "IMG") return; // seulement les images
+      // 1) Petite version absente : on charge la grande photo (une seule fois)
+      const grande = img.dataset.full;
+      if (grande && !img.dataset.fullDone && grande !== img.getAttribute("src")) {
+        img.dataset.fullDone = "1";
+        img.src = grande;
+        return;
+      }
+      // 2) Photo introuvable : image de secours
+      if (!img.dataset.fallback) return; // seulement les images prévues
       if (img.dataset.fallbackDone) return; // déjà remplacée : évite une boucle infinie
       img.dataset.fallbackDone = "1"; // on note le remplacement
       img.src = img.dataset.fallback; // on affiche l'image de secours
@@ -399,6 +432,7 @@
     daysSince, // nombre de jours
     chambresLabel, // « 2 chambres »
     largeurImage, // largeur réelle d'une photo (vitrine)
+    miniature, // petite version d'une photo d'annonce (v8.1)
     estALaUne, // annonce mise en avant en ce moment ?
     ordreVitrine, // « À la une » d'abord
     qs, // raccourci querySelector

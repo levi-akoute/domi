@@ -61,13 +61,13 @@ traitée qui garde encore sa pièce.
    quelqu'un qui passe par l'API peut se créer un mot de passe de 6 caractères.
 5. **Compte admin** : un mot de passe long et unique (12 caractères ou plus), jamais utilisé ailleurs.
 
-## 2 ter. Exécuter le fichier SQL 12 (v7.2, 2 minutes)
+## 2 ter. Exécuter le fichier SQL 12 (v7.2) ✅ fait (vérifié en ligne le 2026-11-21)
 
 `database/12_a_la_une.sql` : Supabase › SQL Editor › New query › coller tout › Run.
 La dernière requête doit afficher 2 lignes (`protect_a_la_une_trigger`, `lock_role_trigger`).
 Sans ce fichier le site marche, mais les boutons « À la une » de l'admin affichent une erreur.
 
-## 2 quater. Exécuter le fichier SQL 13 (v7.3, 2 minutes) ⚠ APRÈS la publication
+## 2 quater. Exécuter le fichier SQL 13 (v7.3) ✅ fait le 2026-11-22 (test du curieux : 16 sur 16)
 
 1. Publier la v7.3 (`/commit`) et attendre que le site en ligne soit à jour (onglet Actions en vert).
 2. Exécuter le fichier 12 s'il ne l'est pas encore (le 13 refuse de s'exécuter sans lui).
@@ -80,6 +80,16 @@ console du navigateur montre une erreur 404 sans gravité sur `annonces_publique
 
 **Voir à tout moment ce qui est installé** : `database/99_verifier_installation.sql` (lecture seule, ne
 modifie rien). Une ligne par fichier : ✅ installé, ❌ manque (avec le détail), ➖ ponctuel.
+
+## 2 quinquies. Exécuter le fichier SQL 14 (v8) ⚠ à faire après la publication
+
+1. Publier la v8 (`/commit`) et attendre que le site en ligne soit à jour (onglet Actions en vert).
+2. `database/14_carte_videos.sql` : Supabase › SQL Editor › New query › coller tout › Run.
+   Le résultat doit afficher **8 lignes ✅**. S'il y a un ❌, montre-le à Claude.
+
+Sans ce fichier, le site marche comme avant : le bloc « Emplacement » et le bloc « Vidéo » du formulaire restent
+cachés. Après ce fichier, plus de lien TikTok ou YouTube : la vidéo est envoyée sur Domi (2 à 3 minutes).
+⚠ Si un jour tu relances le fichier 11 ou le 13, relance ensuite le 14.
 
 ## 3. Supprimer les annonces d'exemple ✅ fait le 2026-11-18 (gardé pour mémoire)
 
@@ -106,9 +116,12 @@ La politique de confidentialité promet une suppression sous 30 jours. Procédur
 1. Vérifie que la demande vient bien du numéro du compte (message WhatsApp depuis ce numéro).
 2. Supabase › Authentication › Users › cherche le compte › **Delete user**. La base supprime en cascade son
    profil, ses annonces, ses avis et ses demandes de vérification ; ses signalements deviennent anonymes.
-3. Supabase › Storage : supprime le dossier portant l'identifiant de l'utilisateur dans `annonces` (ses photos)
-   et dans `verifications` (s'il en reste un).
+3. Supabase › Storage : supprime le dossier portant l'identifiant de l'utilisateur dans `annonces` (ses photos),
+   dans `videos` (ses vidéos) et dans `verifications` (s'il en reste un).
 4. Réponds à la personne que c'est fait.
+
+Rien à faire pour les sauvegardes de ton PC (étape 8) : si tu les lances chaque semaine, aucune copie ne garde le
+compte plus de 4 semaines, donc il disparaît partout dans le délai promis.
 
 ## 6. Déclaration à l'ARTCI (à prévoir)
 
@@ -120,6 +133,17 @@ pas bloquant pour une présentation à des proches, mais ça l'est pour une ouve
 
 Suivre `docs/GUIDE_NOM_DE_DOMAINE.md` (une commande pour changer toutes les adresses du site, puis les réglages DNS,
 GitHub et Supabase).
+
+## 8. Sauvegarder chaque semaine ⚠ IMPORTANT
+
+L'offre gratuite de Supabase ne fait aucune sauvegarde : une annonce effacée par erreur serait perdue pour
+toujours. Mode d'emploi complet : `docs/SAUVEGARDE.md`.
+
+1. **Une seule fois** : dans le fichier `.env` à la racine du workspace, ajoute le numéro et le mot de passe de ton
+   compte admin : `DOMI_ADMIN_TELEPHONE=` et `DOMI_ADMIN_MOT_DE_PASSE=`. Jamais la clé `service_role`.
+2. **Chaque semaine** : `npm run sauvegarder` dans le dossier du projet. Les copies vont dans
+   `Documents\Sauvegardes Domi`, et celles de plus de 3 semaines s'effacent toutes seules.
+3. **De temps en temps** : copie ce dossier sur une clé USB (en cas de vol ou de panne du PC).
 
 ## Ce qui n'est PAS bloquant (à faire plus tard)
 

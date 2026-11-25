@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         // data-* : on range l'identifiant dans le bouton pour savoir sur quelle annonce agir
         return `
         <article class="owner-item">
-          <a class="owner-thumb" href="maison-detail.html?id=${E(a.id)}"><img src="${E(img)}" alt="" loading="lazy" data-fallback="assets/img/placeholder.svg"></a>
+          <a class="owner-thumb" href="maison-detail.html?id=${E(a.id)}"><img src="${E(U.miniature(img))}" data-full="${E(img)}" alt="" loading="lazy" data-fallback="assets/img/placeholder.svg"></a>
           <div class="owner-info">
             <div class="owner-badges">${badgeModeration(a.moderation)} <span class="status-badge static ${dispo ? "available" : "unavailable"}">${E(a.statut)}</span></div>
             <h3><a href="maison-detail.html?id=${E(a.id)}">${E(a.titre)}</a></h3>

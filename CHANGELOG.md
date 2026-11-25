@@ -1,5 +1,71 @@
 # CHANGELOG : Domi, site de location de maisons
 
+## v8.0 « visites, carte et vidéos » (2026-11-24)
+
+### Visites et partage
+- Bouton « Planifier une visite » : jour (les 7 prochains), moment, visite sur place ou en appel vidéo. La demande part
+  sur WhatsApp, déjà écrite, avec le rappel « ne payez rien avant d'avoir visité ». Bouton aussi dans la barre du bas
+  sur téléphone.
+- Partage : WhatsApp, Facebook et « Copier le lien » (remplace l'ancien bouton unique). Visible seulement pour une
+  annonce publiée.
+
+### Photos plus légères dans les listes
+- Chaque photo est envoyée en deux tailles : grande (1 280 px) et miniature (480 px, environ 4 fois plus légère,
+  mesuré). Les listes utilisent la miniature ; une ancienne photo sans miniature retombe sur la grande.
+
+### Carte et itinéraire
+- L'annonceur place une épingle (sa position ou à la main). Les visiteurs voient une zone d'environ 300 m, jamais le
+  point exact (même avec F12). Le point exact est donné au clic sur « Itinéraire », si l'annonceur l'accepte, et ouvre
+  Google Maps. La carte (OpenStreetMap, Leaflet rangé dans le projet) ne se charge qu'au clic.
+- Une épingle déplacée renvoie l'annonce d'un compte non vérifié en validation.
+
+### Vidéos
+- Vidéo de 2 à 3 minutes envoyée sur Domi (plus de lien TikTok, YouTube…). Elle est réduite dans le téléphone
+  (854 px, 0,8 Mbit/s au maximum : 18 Mo au plus pour 3 minutes) avant l'envoi, avec une fenêtre d'avancement et un bouton « Annuler ».
+- Fiche : la vidéo joue dans la page après un appui, rien n'est téléchargé avant. Une photo choisie arrête la vidéo.
+- Suppression : la vidéo et l'annonce disparaissent ensemble.
+
+### Admin
+- Panneau « Espace utilisé » : poids des photos, vidéos et pièces d'identité par rapport à 1 Go gratuit.
+- Lien « Emplacement exact » sur chaque annonce (pour vérifier l'épingle).
+
+### Base de données
+- `database/14_carte_videos.sql` : quota de 400 photos (miniatures), colonnes latitude, longitude et itineraire,
+  `annonces_publiques` renvoie la zone, `itineraire_annonce`, dossier `videos`, `espace_utilise`.
+  ⚠ Après une relance du fichier 11 ou 13, relancer le 14. Testé dans un PostgreSQL local (35 contrôles) : une faille
+  trouvée et corrigée (position à moitié remplie).
+
+### Pages légales
+- Confidentialité et conditions mises à jour (vidéo, épingle, OpenStreetMap, Google Maps).
+
+## v7.4 « sauvegardes » (2026-11-23)
+
+### Pourquoi
+- L'offre gratuite de Supabase ne fait aucune sauvegarde : une annonce effacée par erreur, ou une mauvaise
+  commande SQL, était perdue pour toujours.
+
+### Ajouté
+- `scripts/sauvegarder.mjs` (`npm run sauvegarder`) : copie sur le PC les tables (profils, annonces, avis,
+  signalements, demandes de badge) et les photos des annonces (seulement les nouvelles à chaque fois). Jamais les
+  pièces d'identité. Aucune donnée modifiée.
+- Connexion avec le compte admin (numéro et mot de passe dans `.env`) : mêmes droits que la page admin, jamais la clé
+  `service_role`. Le script ferme sa propre session à la fin.
+- Les sauvegardes de plus de 3 semaines sont effacées à chaque lancement : lancé chaque semaine, le script ne
+  garde aucune copie plus de 4 semaines (promesse « compte supprimé en 30 jours »).
+- Garde-fous : refuse un compte non admin et une copie incomplète, n'envoie le mot de passe qu'au projet Supabase,
+  s'arrête si une clé secrète est écrite dans `js/config.js`, refuse un dossier de sauvegarde situé dans le projet,
+  ne laisse jamais une sauvegarde à moitié faite.
+- `docs/SAUVEGARDE.md` : mode d'emploi.
+- Testé contre une fausse base Supabase locale (53 contrôles), et avec les vraies règles SQL dans un PostgreSQL local :
+  l'admin lit bien toutes les lignes des 5 tables (13 contrôles).
+
+### Modifié
+- `confidentialite.html` (section 5) : mention des copies de sauvegarde, de leur durée et de ce qu'elles ne
+  contiennent pas.
+- `docs/GUIDE_MISE_EN_LIGNE.md` : passer à l'offre payante n'est plus nécessaire au lancement.
+- `docs/AVANT_LANCEMENT.md` : étape 8 (sauvegarde) et rappel dans la suppression d'un compte.
+- `README.md` : commande de sauvegarde, et fichiers SQL `01` à `13` (au lieu de `09`).
+
 ## v7.3 « annonces confidentielles » (2026-11-21)
 
 ### Ce qu'un curieux voit avec F12 (Inspecter)

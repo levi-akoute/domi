@@ -96,10 +96,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       S.adminReports(),
       S.getVerifications(),
       S.adminAvis(),
+      S.espaceUtilise(), // espace des fichiers (null si le fichier 14 n'est pas exécuté)
     ]);
     // Résultat de la requête i (tableau vide si elle a échoué)
     const val = (i) => (res[i].status === "fulfilled" ? res[i].value || [] : []);
     data = { ads: val(0), users: val(1), reps: val(2), ver: val(3), revs: val(4) };
+    data.espace = res[5].status === "fulfilled" ? res[5].value : null;
     // Les avis (index 4) peuvent manquer si 05_avis.sql n'a pas été exécuté : pas une erreur
     const errs = [0, 1, 2, 3]
       .filter((i) => res[i].status === "rejected")
@@ -140,6 +142,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     renderApercu(todo);
+    renderEspace();
     renderAnnonces();
     renderSignalements();
     renderVerifications();
@@ -199,6 +202,38 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
   }
 
+  // Espace utilisé par les fichiers (v8.3). L'offre gratuite de Supabase donne 1 Go au total, photos,
+  // vidéos et pièces d'identité comprises : ce tableau montre le moment où il faudra changer d'offre.
+  const GO = 1073741824; // 1 Go en octets
+  function renderEspace() {
+    const bloc = U.qs("#admin-espace");
+    if (!bloc) return;
+    if (!data.espace) {
+      bloc.innerHTML = '<p class="muted m-0">Visible après l’exécution de database/14.</p>';
+      return;
+    }
+    const noms = {
+      annonces: "Photos des annonces",
+      videos: "Vidéos",
+      verifications: "Pièces d’identité",
+    };
+    const mo = (octets) =>
+      (octets / 1048576).toLocaleString("fr-FR", { maximumFractionDigits: 1 }) + " Mo";
+    const total = data.espace.reduce((n, l) => n + Number(l.octets), 0);
+    const pc = Math.min(100, (total / GO) * 100);
+    // Lignes : dossier, nombre de fichiers, poids (le nom du dossier vient de la base : E() protège)
+    const lignes = data.espace
+      .map(
+        (l) =>
+          `<li><span>${E(noms[l.dossier] || l.dossier)}</span><strong>${mo(Number(l.octets))}</strong><small>${Number(l.fichiers)} fichier(s)</small></li>`
+      )
+      .join("");
+    bloc.innerHTML = `<ul class="espace-liste">${lignes || "<li>Aucun fichier pour le moment.</li>"}</ul>
+      <progress class="espace-barre" max="100" value="${pc.toFixed(1)}"></progress>
+      <p class="m-0"><strong>${mo(total)}</strong> sur 1 Go (${pc.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %)</p>
+      ${pc >= 70 ? `<div class="notice info compact">${I("chart")} L’espace gratuit se remplit. Retirez les annonces inutiles, ou préparez le passage à l’offre payante de Supabase.</div>` : ""}`;
+  }
+
   // Onglet « Annonces »
   function renderAnnonces() {
     const f = U.qs("#ads-filter").value; // filtre d'état choisi
@@ -211,13 +246,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     U.qs("#admin-ads").innerHTML = table(
       ["Annonce", "Annonceur", "Loyer", "État", "À la une", "Actions"],
       list.map((a) => {
+        // Emplacement exact (v8.2) : visible par l'admin seulement, pour vérifier l'épingle.
+        // Number() : les valeurs viennent de la base, on n'insère que des nombres dans le lien.
+        const positionAdmin = (x) =>
+          x.latitude != null && x.longitude != null
+            ? `<a class="text-link" href="https://www.google.com/maps?q=${Number(x.latitude)},${Number(x.longitude)}" target="_blank" rel="noopener">Emplacement exact</a>`
+            : "";
         const img = U.safeUrl(a.image) || "assets/img/placeholder.svg"; // miniature
         const p = a.profiles; // auteur de l'annonce
         const owner = p
           ? `${E(p.prenom)} ${E(p.nom)}${p.verifie ? ` <span class="verified-inline">${I("shield")}</span>` : ""}`
           : "–";
         return `<tr>
-          ${td("Annonce", `<div class="cell-media"><img src="${E(img)}" alt="" loading="lazy" data-fallback="assets/img/placeholder.svg"><div><strong>${E(a.titre)}</strong><small>${E(a.commune)}${a.quartier ? " · " + E(a.quartier) : ""} · ${date(a.created_at)}</small></div></div>`)}
+          ${td("Annonce", `<div class="cell-media"><img src="${E(U.miniature(img))}" data-full="${E(img)}" alt="" loading="lazy" data-fallback="assets/img/placeholder.svg"><div><strong>${E(a.titre)}</strong><small>${E(a.commune)}${a.quartier ? " · " + E(a.quartier) : ""} · ${date(a.created_at)}</small>${positionAdmin(a)}</div></div>`)}
           ${td("Annonceur", `${owner}<small>${E(p?.telephone || a.telephone || "")}</small>`)}
           ${td("Loyer", U.money(a.loyer))}
           ${td("État", st(MOD, a.moderation))}

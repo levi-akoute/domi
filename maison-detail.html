@@ -16,7 +16,7 @@
          v7.1 (audit 2026-11-18) : seuls le fichier exact de la librairie Supabase et NOTRE projet Supabase
          sont autorisés (avant : tout jsDelivr et tous les projets Supabase du monde). ⚠ Si le projet
          Supabase change, remplacer « mplbhzqmffaywlhbxleb » dans cette ligne, sur chaque page. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://mplbhzqmffaywlhbxleb.supabase.co; connect-src 'self' https://mplbhzqmffaywlhbxleb.supabase.co; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://mplbhzqmffaywlhbxleb.supabase.co https://tile.openstreetmap.org; connect-src 'self' https://mplbhzqmffaywlhbxleb.supabase.co; media-src 'self' https://mplbhzqmffaywlhbxleb.supabase.co; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" />
     <!-- SÉCURITÉ : quand un visiteur quitte Domi par un lien, le site visité ne voit que
          « domi » et pas l'adresse complète de la page (qui peut contenir un identifiant) -->
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -95,6 +95,8 @@
     <script src="js/storage.js"></script>
     <!-- 5. Comptes : connexion, inscription, utilisateur courant -->
     <script src="js/auth.js"></script>
+    <!-- Carte OpenStreetMap (v8.2) : chargée seulement si on l'ouvre -->
+    <script src="js/carte.js"></script>
     <!-- Script propre à cette page -->
     <script src="js/detail.js"></script>
   </body>

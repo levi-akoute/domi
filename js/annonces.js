@@ -34,11 +34,12 @@
       Number(a.nb_avis) > 0
         ? `<span class="rt">${I("star")} ${String(Number(a.note_moyenne)).replace(".", ",")} <small>(${Number(a.nb_avis)})</small></span>`
         : "";
-    // data-fallback : si la photo ne charge pas, utils.js la remplace par l'image de secours
+    // Petite version de la photo (v8.1). data-full : la grande, si la petite manque ;
+    // data-fallback : l'image de secours, si la photo ne charge pas du tout (utils.js)
     return `
       <article class="listing-card">
         <a class="listing-image" href="${href}">
-          <img src="${E(img)}" alt="${E(a.titre)}" loading="lazy" data-fallback="${FALLBACK}">
+          <img src="${E(U.miniature(img))}" data-full="${E(img)}" alt="${E(a.titre)}" loading="lazy" data-fallback="${FALLBACK}">
           <span class="status-badge ${dispo ? "available" : "unavailable"}">${E(a.statut || "")}</span>
           ${a.video ? `<span class="video-badge">${I("play")} Vidéo</span>` : ""}
           ${une(a) ? `<span class="une-badge">${I("star")} À la une</span>` : ""}

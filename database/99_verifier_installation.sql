@@ -66,7 +66,25 @@ elements(fichier, quoi, present) as (values
   ('13_annonces_confidentielles', 'règle listing_read (propriétaire et admin seulement)',
      exists (select 1 from regles where nom = 'listing_read' and condition not like '%approuvee%')),
   ('13_annonces_confidentielles', 'règle reviews_read (auteur et admin seulement)',
-     exists (select 1 from regles where nom = 'reviews_read' and condition not like '%approuve%'))
+     exists (select 1 from regles where nom = 'reviews_read' and condition not like '%approuve%')),
+
+  -- 14 (v8) : miniatures, carte, vidéos. Si un fichier 11 ou 13 a été relancé APRÈS le 14, ces lignes
+  -- passent à ❌ : relancez alors database/14.
+  ('14_carte_videos', 'quota de 400 photos par compte',
+     exists (select 1 from pg_policy where polname = 'annonces_insert_own' and pg_get_expr(polwithcheck, polrelid) like '%400%')),
+  ('14_carte_videos', 'colonnes listings.latitude, longitude, itineraire',
+     (select count(*) = 3 from colonnes where nom in ('listings.latitude', 'listings.longitude', 'listings.itineraire'))),
+  ('14_carte_videos', 'fonction annonces_publiques avec la zone (zone_lat)',
+     exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+              where n.nspname = 'public' and p.proname = 'annonces_publiques' and pg_get_function_result(p.oid) like '%zone_lat%')),
+  ('14_carte_videos', 'fonction itineraire_annonce', exists (select 1 from fonctions where nom = 'itineraire_annonce')),
+  ('14_carte_videos', 'protection de l''épingle (protect_listing)',
+     exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+              where n.nspname = 'public' and p.proname = 'protect_listing' and p.prosrc like '%new.latitude%')),
+  ('14_carte_videos', 'dossier des vidéos', exists (select 1 from storage.buckets where id = 'videos')),
+  ('14_carte_videos', 'vidéos de Domi seulement (listings_video_hosts)',
+     exists (select 1 from pg_constraint where conname = 'listings_video_hosts' and pg_get_constraintdef(oid) like '%video_domi_ok%')),
+  ('14_carte_videos', 'fonction espace_utilise', exists (select 1 from fonctions where nom = 'espace_utilise'))
 )
 
 -- Une ligne par fichier : ✅ si tout est présent, sinon ❌ et la liste de ce qui manque

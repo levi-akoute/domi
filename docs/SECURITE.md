@@ -75,6 +75,9 @@ choisissent les colonnes ; la table complète n'est lisible que par son proprié
 | Spam de demandes de vérification | Une seule demande en attente par compte | `09` |
 | Textes géants, faux formats | Tailles maximales et formats vérifiés | `09` |
 | Appeler une fonction interne | Droit d'exécution retiré | `09` |
+| Retrouver l'adresse exacte d'un logement vide (F12, aspiration de la carte) | Les visiteurs reçoivent une zone arrondie d'environ 330 m ; point exact annonce par annonce, au clic, si l'annonceur l'accepte | `14` |
+| Lien de vidéo vers un faux site de paiement | Plus aucun lien externe : la vidéo doit être dans le dossier Domi de l'annonceur | `14` |
+| Remplir le stockage gratuit avec des vidéos | 40 Mo par vidéo, 12 vidéos et 240 Mo par compte ; l'admin voit l'espace utilisé | `14` |
 
 ### Mot de passe oublié (Edge Function)
 
